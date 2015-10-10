@@ -1,0 +1,7 @@
+#!/bin/sh -ex
+
+# configure proftpd
+
+# Disable memcache module: wheezy issue until patch???
+# Use dedicated ftp appliance if memcache useful/required.
+sed -i "s/LoadModule mod_tls_memcache.c/# LoadModule mod_tls_memcache.c/g" /etc/proftpd/modules.conf

@@ -1,0 +1,34 @@
+#!/bin/bash -e
+# Create initial base site stack.
+
+. /etc/default/inithooks
+
+# Requires vars added to INITHOOKS_CONF by formavid.py.
+if [ -e $INITHOOKS_CONF ] && . $INITHOOKS_CONF; then
+
+    # Delete vars from INITHOOKS_CONF.
+    sed -i '/DRUPAL_PASS=/d' $INITHOOKS_CONF
+    sed -i '/MYSQL_PASS=/d' $INITHOOKS_CONF
+    sed -i '/SITE_EMAIL=/d' $INITHOOKS_CONF
+    sed -i '/SITE_HOSTNAME=/d' $INITHOOKS_CONF
+    sed -i '/SITE_BASENAME=/d' $INITHOOKS_CONF
+    sed -i '/SITE_TLD=/d' $INITHOOKS_CONF
+
+    # Configure base site.
+    $INITHOOKS_PATH/bin/formavidbasesite.py --apass="$DRUPAL_PASS" --email="$SITE_EMAIL" --hostname="$SITE_HOSTNAME" --sitename="$SITE_BASENAME"
+
+    # Create initial drupal stack.
+    /usr/local/formavid/bin/create-drupal-stack.py --dbpass="$MYSQL_PASS" --pass="$DRUPAL_PASS" --sitename="$SITE_BASENAME" --tld="$SITE_TLD"
+
+    # Prefix initial stack with aaa- so it gets hit first and differentiates it from other user created stacks.
+    rm -f /etc/apache2/sites-enabled/$SITE_HOSTNAME.conf
+    mv -f /etc/apache2/sites-available/$SITE_HOSTNAME.conf /etc/apache2/sites-available/aaa-$SITE_HOSTNAME.conf
+    cp -sf /etc/apache2/sites-available/aaa-$SITE_HOSTNAME.conf /etc/apache2/sites-enabled/.
+
+    # Reboot to apply.
+    chmod +x $INITHOOKS_PATH/firstboot.d/99reboot
+
+    # Disable replay.
+    chmod -x $INITHOOKS_PATH/firstboot.d/97formavid-base-site
+
+fi

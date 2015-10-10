@@ -1,0 +1,48 @@
+#include <turnkey/base>
+#include <turnkey/lamp>
+
+/* Apache */
+apache2-utils
+
+/* Drupal */
+php5-gd
+php-pear            /* used for drush */
+php5-curl           /* dependency of drupal module simpletest */
+php-getid3       /* dependency of drupal module getid3 */
+libssh2-php      /* support inline updates */
+
+/* Simple Invoices */
+php5-xsl
+
+/* Compass */
+build-essential
+ruby2.1
+ruby2.1-dev
+rubygems
+
+/* Roundup */
+libapache2-mod-python
+python-mysqldb
+python-tz           /* Full timezone support */
+roundup
+
+/* Solr */
+openjdk-7-jdk
+openjdk-7-jre
+
+/* FTP */
+proftpd-basic
+webmin-proftpd
+
+/* Dovecot */
+libsasl2-modules
+sasl2-bin
+dovecot-imapd
+webmin-dovecot
+
+/* Fail2ban */
+fail2ban
+webmin-fail2ban
+
+/* Webmin update */
+apt-show-versions

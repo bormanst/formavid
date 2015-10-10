@@ -1,0 +1,10 @@
+#!/bin/sh -ex
+
+# configure postfix
+
+# Use Maildir format.
+/etc/init.d/postfix start
+postconf -e "home_mailbox = Maildir/"
+postfix reload
+/etc/init.d/postfix stop
+

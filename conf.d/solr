@@ -1,0 +1,100 @@
+#!/bin/sh -ex
+
+# Modify to location of compressed tgz
+SRC=/usr/local/src
+SOLR_HOME=/var/lib/solr
+SOLR_ETC=/usr/local/solr/server/etc
+SOLR_LOG=/var/log/solr
+SOLR_OVERRIDES=$SOLR_HOME/solr.in.sh
+INSTALL_SCRIPT="install_solr_service.sh"
+
+# Solr archive
+TGZ=$(find $SRC -name "solr-*.tgz" | head -1)
+
+# Extract INSTALL_SCRIPT file inside parent/bin
+# strip-components 2: removes parent/bin file structure
+# no-anchored: searches recursively.
+tar -zxf $TGZ --strip-components 2 --no-anchored -C $SRC/ $INSTALL_SCRIPT
+
+# make INSTALL_SCRIPT executable.
+chmod +x $SRC/${INSTALL_SCRIPT}
+
+# First arg must be compressed tgz
+# i:install location (war,jars,etc.)
+# d:data location(configs,indices,etc.)
+# p:port number
+# s:service name to run solr as
+# u:user name for solr
+$SRC/${INSTALL_SCRIPT} $TGZ -i /usr/local -d $SOLR_HOME -p 8983 -s solr -u solr
+
+# Service autostarts after install.
+service solr stop
+
+# Change log location.
+mkdir $SOLR_LOG
+chown solr:solr $SOLR_LOG
+sed -i "s/solr.log=\${solr.solr.home}\/..\/logs/solr.log=\/var\/log\/solr/g" $SOLR_HOME/log4j.properties
+
+# Solr overides.
+sed -i "s/SOLR_LOGS_DIR=\/var\/lib\/solr\/logs/SOLR_LOGS_DIR=\/var\/log\/solr/g" $SOLR_OVERRIDES
+
+# Solr protection.
+FILE=$SOLR_ETC/jetty.xml
+sed -i '/<\/Configure>/d' $FILE
+cat >>$FILE<<EOF
+    <!-- ======= Solr password protection ===== -->
+    <Call name="addBean">
+      <Arg>
+        <New class="org.eclipse.jetty.security.HashLoginService">
+          <Set name="name">Solr</Set>
+          <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>
+          <Set name="refreshInterval">0</Set>
+        </New>
+      </Arg>
+    </Call>
+
+</Configure>
+EOF
+
+FILE=$SOLR_ETC/jetty-https-ssl.xml
+sed -i '/<\/Configure>/d' $FILE
+cat >>$FILE<<EOF
+    <!-- ======= Solr password protection ===== -->
+    <Call name="addBean">
+      <Arg>
+        <New class="org.eclipse.jetty.security.HashLoginService">
+          <Set name="name">Solr</Set>
+          <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>
+          <Set name="refreshInterval">0</Set>
+        </New>
+      </Arg>
+    </Call>
+
+</Configure>
+EOF
+
+FILE=$SOLR_ETC/webdefault.xml
+sed -i '/<\/web-app>/d' $FILE
+cat >>$FILE<<EOF
+  <!-- ======= Solr password protection ===== -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Solr</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>search-role</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Solr</realm-name>
+  </login-config>
+
+</web-app>
+EOF
+
+# Clean up
+rm -rf $SRC/*solr*
+

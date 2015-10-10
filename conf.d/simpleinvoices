@@ -1,0 +1,86 @@
+#!/bin/sh -ex
+
+DB_NAME=simpleinvoices
+DB_USER=simpleinvoices
+DB_PASS=$(mcookie)
+
+ADMIN_PASS=turnkey
+ADMIN_MAIL=admin@example.com
+
+SRC=/usr/local/src
+WEBROOT=/var/www/simpleinvoices
+
+# unpack and set permissions
+unzip -q $SRC/simpleinvoices.*.zip -d $(dirname $WEBROOT)
+rm $SRC/simpleinvoices.*.zip
+chown -R root:root $WEBROOT
+chown -R www-data:www-data $WEBROOT/tmp
+chown www-data:www-data $WEBROOT/config/config.ini
+
+# tweak php.ini
+# PHPINI=/etc/php5/apache2/php.ini
+# sed -i "s|^memory_limit.*|memory_limit = 64M|" $PHPINI
+
+# tweak configuration
+CONF=$WEBROOT/config/config.ini
+sed -i "0,/params.username/s/params.username.*/params.username = $DB_USER/" $CONF
+sed -i "0,/params.password/s/params.password.*/params.password = $DB_PASS/" $CONF
+sed -i "0,/params.dbname/s/params.dbname.*/params.dbname = $DB_NAME/" $CONF
+
+sed -i "s|^encryption.default.key.*|encryption.default.key = $(mcookie)|" $CONF
+sed -i "s|^nonce.key.*|nonce.key = $(mcookie)|" $CONF
+
+sed -i "s|Europe/London|UTC|" $CONF
+
+# configure apache
+# a2enmod authn_dbm
+# a2enmod rewrite
+
+# configure apache
+rm /etc/apache2/sites-enabled/adminer.conf
+ln -s /etc/apache2/sites-available/simpleinvoices.conf /etc/apache2/sites-enabled/simpleinvoices.conf
+
+# start services
+/etc/init.d/mysql start
+/etc/init.d/apache2 start
+
+# setup the database
+MYSQL_BATCH="mysql --user=root --password=$MYSQL_PASS --batch"
+MYSQL_ADMIN="mysqladmin --user=root --password=$MYSQL_PASS"
+
+$MYSQL_ADMIN create $DB_NAME
+$MYSQL_BATCH --execute "grant all privileges on $DB_NAME.* to $DB_USER@localhost identified by '$DB_PASS'; flush privileges;"
+
+# curl based install
+URL="http://127.0.0.1/index.php?module=install"
+CURL="curl -c /tmp/cookie -b /tmp/cookie"
+
+$CURL "${URL}&view=structure"
+$CURL "${URL}&view=essential"
+
+rm -f /tmp/cookie
+
+# enable authentication and set default creds
+CONF=$WEBROOT/config/config.ini
+sed -i "s|^authentication.enabled.*|authentication.enabled = true|" $CONF
+
+MD5_PASS=$(echo -n $ADMIN_PASS | md5sum | cut -d " " -f 1)
+$MYSQL_BATCH --database=$DB_NAME --execute "UPDATE si_user SET email='$ADMIN_MAIL', password='$MD5_PASS' WHERE id=1;" 
+
+# secure sensitive files
+chmod 640 $WEBROOT/config/config.ini
+
+# stop services
+/etc/init.d/mysql stop
+/etc/init.d/apache2 stop
+
+# reconfigure apache
+# a2dissite simpleinvoices
+# a2ensite default
+ln -s /etc/apache2/sites-available/adminer.conf /etc/apache2/sites-enabled/adminer.conf
+
+# remove moot file
+rm /etc/apache2/sites-enabled/simpleinvoices.conf
+rm /etc/apache2/sites-available/simpleinvoices.conf
+
+

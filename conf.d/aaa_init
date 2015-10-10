@@ -1,0 +1,27 @@
+#!/bin/sh -ex
+
+# configure apache
+/etc/init.d/apache2 stop
+a2enmod authn_dbm
+a2enmod rewrite
+
+# Remove default index.html.
+rm -f /var/www/index.html
+
+# Remove default html.
+rm -rf /var/www/html
+rm /etc/apache2/sites-enabled/000-default.conf
+rm /etc/apache2/sites-available/000-default.conf
+
+# increase php cli memory limit (for drush)
+sed -i "s|^memory_limit.*|memory_limit = 64M|" /etc/php5/cli/php.ini
+
+# root pass moved to base site script
+rm -f /usr/lib/inithooks/firstboot.d/30rootpass
+
+# MySQL pass moved to base site script
+rm -f /usr/lib/inithooks/firstboot.d/35mysqlpass
+
+# finish compass install
+gem install compass
+
