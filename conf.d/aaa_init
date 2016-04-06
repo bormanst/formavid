@@ -13,8 +13,9 @@ rm -rf /var/www/html
 rm /etc/apache2/sites-enabled/000-default.conf
 rm /etc/apache2/sites-available/000-default.conf
 
-# increase php cli memory limit (for drush)
-sed -i "s|^memory_limit.*|memory_limit = 64M|" /etc/php5/cli/php.ini
+# increase php cli & apache memory limits (cli for drush)
+sed -i "s|^memory_limit.*|memory_limit = 76M|" /etc/php5/cli/php.ini
+sed -i "s|^memory_limit.*|memory_limit = 64M|" /etc/php5/apache2/php.ini
 
 # root pass moved to base site script
 rm -f /usr/lib/inithooks/firstboot.d/30rootpass
@@ -24,4 +25,3 @@ rm -f /usr/lib/inithooks/firstboot.d/35mysqlpass
 
 # finish compass install
 gem install compass
-

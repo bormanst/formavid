@@ -4,29 +4,22 @@ NAME=roundup
 ADMIN_PASS=turnkey
 DB_PASS=$(mcookie)
 
+# Formavid: setup tracker in /var/www/support
 SRC=/usr/local/src
 RT_NAME=support
 RT_TRACKER=/var/www/$RT_NAME
 RT_TEMPLATE=classic
 RT_BACKEND=mysql
 
-# create directories
+# Formavid: create/copy local docs
 mkdir -p /var/www/$RT_NAME/docs
-
-# copy local docs
 cp -r /usr/share/doc/roundup/* /var/www/$RT_NAME/docs
 
+# Formavid: do not create convenience symlinks
 # convenience symlinks
 # ln -s $RT_TRACKER /var/www/$RT_NAME/webroot
 # ln -s /etc/roundup /var/www/$RT_NAME/config
 # ln -s /usr/share/doc/roundup /var/www/$RT_NAME/docs
-
-# fix doc links issue.
-# ln -s /usr/share/doc/roundup/original_overview.html /usr/share/doc/roundup/html/original_overview.html
-# ln -s /usr/share/doc/roundup/spec.html /usr/share/doc/roundup/html/spec.html
-# ln -s /usr/share/doc/roundup/acknowledgements.txt /usr/share/doc/roundup/html/acknowledgements.txt
-# sed -i 's|<a href="|<a href="html/|g' /usr/share/doc/roundup/index.html
-# sed -i 's|html/html|html|g' /usr/share/doc/roundup/index.html
 
 # innodb workaround (Incorrect information in file: './roundup/schema.frm'")
 /etc/init.d/mysql start
@@ -65,8 +58,14 @@ for file in *.help*.html _generic.calendar.html; do
     sed -i "s|</head>|<style type='text/css'> #turnkey-credit { display: none; }</style>\n  </head>|" $RT_TRACKER/html/$file
 done
 
+# Formavid: apache conf files created in base site script
 # apache configuration
 # ln -s /etc/roundup/apache.conf /etc/apache2/sites-available/roundup
+# a2dissite 000-default
+# a2ensite roundup
+
+# Formavid: moved to aaa_init
+# rm -rf /var/www/html
 
 # we don't need roundup-server (using apache)
 update-rc.d -f roundup remove
@@ -77,4 +76,3 @@ rm -rf /var/www/trackers
 
 # stop mysql server
 /etc/init.d/mysql stop
-

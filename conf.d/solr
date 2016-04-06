@@ -5,7 +5,7 @@ SRC=/usr/local/src
 SOLR_HOME=/var/lib/solr
 SOLR_ETC=/usr/local/solr/server/etc
 SOLR_LOG=/var/log/solr
-SOLR_OVERRIDES=$SOLR_HOME/solr.in.sh
+SOLR_OVERRIDES=/etc/default/solr.in.sh
 INSTALL_SCRIPT="install_solr_service.sh"
 
 # Solr archive
@@ -97,4 +97,3 @@ EOF
 
 # Clean up
 rm -rf $SRC/*solr*
-

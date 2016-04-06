@@ -1,15 +1,23 @@
 #include <turnkey/base>
 #include <turnkey/lamp>
 
-/* Apache */
+/* LAMP */
 apache2-utils
+libapache2-mod-python    # Apache 2 module that embeds Python within the server
+python-mysqldb           # A Python interface to MySQL
+libapache2-mod-perl2     # Integration of perl with the Apache2 web server
+libdbd-mysql-perl        # A Perl5 database interface to the MySQL database
+php5-xdebug
+php-pear
 
 /* Drupal */
 php5-gd
-php-pear            /* used for drush */
 php5-curl           /* dependency of drupal module simpletest */
 php-getid3       /* dependency of drupal module getid3 */
 libssh2-php      /* support inline updates */
+php5-readline
+libjs-jquery-colorbox 	/* dependency of drupal module Colorbox */
+php5-gmp		/* optimizes performance of OpenID Math library */
 
 /* Simple Invoices */
 php5-xsl
@@ -21,8 +29,6 @@ ruby2.1-dev
 rubygems
 
 /* Roundup */
-libapache2-mod-python
-python-mysqldb
 python-tz           /* Full timezone support */
 roundup
 

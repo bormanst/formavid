@@ -89,7 +89,7 @@
     <li><a href="http://dev.mysql.com/doc/refman/5.5/en/" title="MySQL Documentation">MySQL Documentation</a></li>
     <li><a href="http://www.adminer.org/" title="Adminer Home">Adminer Home</a></li>
     <li><a href="http://www.adminer.org/en/plugins/" title="Adminer News">Adminer Plugins</a></li>
-    <li><a href="http://sourceforge.net/p/adminer/news/feed" title="Adminer News">Adminer Latest News</a></li>
+    <li><a href="http://sourceforge.net/p/adminer/news" title="Adminer News">Adminer Latest News</a></li>
     <li><a href="http://sourceforge.net/p/adminer/discussion/" title="Adminer Forums">Adminer Forums</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
@@ -161,9 +161,9 @@
   <div><h3><a href="http://lucene.apache.org/solr/" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3><br></div>
   <ul>
     <li><a href="/solr.php" title="Apache Solr Local Info">Apache Solr Local Info</a></li>
-    <li><a href="http://lucene.apache.org/solr/5_3_1/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
+    <li><a href="http://lucene.apache.org/solr/5_5_0/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
     <li><a href="http://lucene.apache.org/solr/quickstart.html" title="Apache Solr Quick Start">Apache Solr Quick Start</a></li>
-    <li><a href="http://lucene.apache.org/core/5_3_1/index.html" title="Apache Solr Core">Apache Solr Core</a></li>
+    <li><a href="http://lucene.apache.org/core/5_5_0/index.html" title="Apache Solr Core">Apache Solr Core</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
     <li><a href="http://www.apache.org/foundation/contributing.html" title="Apache Solr Donate">Apache Solr <b><i>Donate</i></b></a></li>
   </ul>

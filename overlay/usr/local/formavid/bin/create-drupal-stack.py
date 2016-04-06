@@ -275,11 +275,11 @@ def main():
 
         # Update solr urls.
         # No search for aggregator.
-        system("drush -r /var/www/drupal7 --uri=http://%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s-article" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s-blog" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s-book" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s-forum" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s-poll" % (hostname,password,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.article" % (hostname,password,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://blog.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.blog" % (hostname,password,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://book.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.book" % (hostname,password,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://forum.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.forum" % (hostname,password,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://poll.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.poll" % (hostname,password,sitename))
 
         # Drupal - set solr as default search.
         system("drush -r /var/www/drupal7 --uri=http://%s vset --yes search_default_module 'apachesolr_search'" % (hostname))

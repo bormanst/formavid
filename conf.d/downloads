@@ -7,14 +7,23 @@ dl() {
 
 SRC=/usr/local/src
 
-# Simple invoices
-VERSION="2011.1"
-URL="http://simpleinvoices.googlecode.com/files/simpleinvoices.${VERSION}.zip"
-dl $URL $SRC
-
 # Solr
-VERSION="5.3.1"
+VERSION="5.5.0"
 URL="http://mirrors.advancedhosters.com/apache/lucene/solr/${VERSION}/solr-${VERSION}.tgz"
 dl $URL $SRC
 
+unset PROXY
 
+# Simple invoices
+[ "$FAB_HTTP_PROXY" ] &&  http_proxy="$FAB_HTTP_PROXY"
+
+REPO_URL=git://github.com/simpleinvoices/simpleinvoices.git
+BRANCH="master"
+WEBROOT=/var/www/simpleinvoices
+
+# tested working at commit 96079e3526 - Mar 27 2015
+# https://github.com/simpleinvoices/simpleinvoices/commit/96079e35269b4e513b3f8bac29ea9a2843f10236
+
+git clone --recursive --depth 1 -b $BRANCH $REPO_URL $WEBROOT
+
+unset http_proxy
