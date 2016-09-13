@@ -34,7 +34,6 @@ roundup
 
 /* Solr */
 openjdk-7-jdk
-openjdk-7-jre
 
 /* FTP */
 proftpd-basic
