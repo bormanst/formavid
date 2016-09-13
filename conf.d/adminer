@@ -1,4 +1,4 @@
 #!/bin/sh -ex
-
+# Single cert.
 # Change cert to snakeoil cert.
 # sed -i "s|SSLCertificateFile /etc/ssl/certs/cert.pem|SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem\nSSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key|" /etc/adminer/apache.conf
