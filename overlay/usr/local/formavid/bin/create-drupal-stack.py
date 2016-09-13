@@ -231,7 +231,7 @@ def main():
         system("echo ''")
 
         # Drupal - create site theme from zen sub-theme.
-        system("drush -r /var/www/drupal7 --uri=http://%s zen \"%s\" --without-rtl" % (hostname,sitename))
+        system("drush -r /var/www/drupal7 --uri=http://%s zen \"%s\"" % (hostname,sitename))
 
         # Drupal - set site theme cssadmin access.
         system("chown -R cssadmin:cssadmin /var/www/drupal7/sites/all/themes/%s" % (sitename))

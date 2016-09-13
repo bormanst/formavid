@@ -59,9 +59,6 @@ chown www-data:www-data $SETTINGS
 #    --account-pass=$ADMIN_PASS \
 #    --site-name="TurnKey Drupal7" --db-su=root --db-su-pw=$MYSQL_PASS --db-url=mysql://$DB_USER:$DB_PASS@localhost/$DB_NAME
 
-chown root:www-data $SETTINGS
-chmod 640 $SETTINGS
-chown -R www-data:www-data $WEBROOT/sites/default/files
 
 # Formavid: modified default modules.
 # download, install and enable modules
