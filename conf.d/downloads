@@ -8,8 +8,8 @@ dl() {
 SRC=/usr/local/src
 
 # Solr
-VERSION="5.5.0"
-URL="http://mirrors.advancedhosters.com/apache/lucene/solr/${VERSION}/solr-${VERSION}.tgz"
+VERSION="5.5.3"
+URL="http://archive.apache.org/dist/lucene/solr/${VERSION}/solr-${VERSION}.tgz"
 dl $URL $SRC
 
 unset PROXY

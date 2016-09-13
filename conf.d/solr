@@ -33,30 +33,13 @@ service solr stop
 # Change log location.
 mkdir $SOLR_LOG
 chown solr:solr $SOLR_LOG
-sed -i "s/solr.log=\${solr.solr.home}\/..\/logs/solr.log=\/var\/log\/solr/g" $SOLR_HOME/log4j.properties
+sed -i "s/solr.log=logs/solr.log=\/var\/log\/solr/g" $SOLR_HOME/log4j.properties
 
 # Solr overides.
 sed -i "s/SOLR_LOGS_DIR=\/var\/lib\/solr\/logs/SOLR_LOGS_DIR=\/var\/log\/solr/g" $SOLR_OVERRIDES
 
 # Solr protection.
 FILE=$SOLR_ETC/jetty.xml
-sed -i '/<\/Configure>/d' $FILE
-cat >>$FILE<<EOF
-    <!-- ======= Solr password protection ===== -->
-    <Call name="addBean">
-      <Arg>
-        <New class="org.eclipse.jetty.security.HashLoginService">
-          <Set name="name">Solr</Set>
-          <Set name="config"><SystemProperty name="jetty.home" default="."/>/etc/realm.properties</Set>
-          <Set name="refreshInterval">0</Set>
-        </New>
-      </Arg>
-    </Call>
-
-</Configure>
-EOF
-
-FILE=$SOLR_ETC/jetty-https-ssl.xml
 sed -i '/<\/Configure>/d' $FILE
 cat >>$FILE<<EOF
     <!-- ======= Solr password protection ===== -->
