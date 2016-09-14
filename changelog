@@ -1,5 +1,17 @@
 turnkey-formavid-14.1 (1) turnkey; urgency=low
 
+  * Solr version updated to 5.5.3
+
+  * Drupal and drush build commands updated to resolve build errors.
+
+  * Appliance specific CSS conflicts in SimpleInvoices resolved.
+
+  * Commented out overlooked test single certificate code.
+
+ -- Sean Borman <bormanst@gmail.com>  Wed, 14 Sep 2016 15:08:37 -0500
+
+turnkey-formavid-14.1 (1) turnkey; urgency=low
+
   * Solr version updated to 5.5.0.
 
   * Drupal, Roundup, SimpleInvoices conf.d script files updated to their 
