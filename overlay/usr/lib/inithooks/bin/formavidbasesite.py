@@ -115,6 +115,8 @@ def main():
     system("sed -i '/<title/d' /var/www/simpleinvoices/templates/default/header.tpl")
     system("sed -i '/favicon.ico/d' /var/www/simpleinvoices/templates/default/header.tpl")
     system("sed -i '/<head/r /usr/local/src/styles.txt' /var/www/simpleinvoices/templates/default/header.tpl")
+    system("sed -i 's/<style>/<!-- <style>/' /var/www/simpleinvoices/templates/default/header.tpl")
+    system("sed -i 's/<\/style>/<\/style> -->/' /var/www/simpleinvoices/templates/default/header.tpl")
     system("sed -i '/<head/r /usr/local/src/title.txt' /var/www/simpleinvoices/templates/default/header.tpl")
     system("sed -i '/<body/r /usr/local/src/header.txt' /var/www/simpleinvoices/templates/default/header.tpl")
     system("sed -i 's/sedtoolname/Billing/g' /var/www/simpleinvoices/templates/default/header.tpl")
