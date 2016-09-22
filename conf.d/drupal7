@@ -132,11 +132,25 @@ drush dl --default-major=7 \
 drush cc all
 
 # Formavid: apachesolr module.
-# Solr - update apachesolr 4.x files to work with 5.x.
+# Solr - update apachesolr 4.x files to work with 5.5.x.
 CONF_SOLR=$WEBROOT/sites/all/modules/apachesolr/solr-conf/solr-4.x
 sed -i "s/solr.FloatField/solr.TrieFloatField/g" $CONF_SOLR/schema.xml
 sed -i "s/solr.DateField/solr.TrieDateField/g" $CONF_SOLR/schema.xml
-sed -i "/solr.admin.AdminHandlers/d" $CONF_SOLR/solrconfig.xml
+sed -i "/solr.admin.AdminHandlers/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/solr.admin.AdminHandlers/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/contrib}\/extraction\/lib/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/contrib}\/extraction\/lib/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/contrib}\/clustering\/lib/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/contrib}\/clustering\/lib/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/<mergeFactor>/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/<mergeFactor>/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/<maxMergeDocs>/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/<maxMergeDocs>/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/<mergePolicy /s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/<mergePolicy /s/$/ -->/" $CONF_SOLR/solrconfig.xml
+sed -i "/<unlockOnStartup>/s/^/<\!-- Commented out for Solr 5.5.3 /" $CONF_SOLR/solrconfig.xml
+sed -i "/<unlockOnStartup>/s/$/ -->/" $CONF_SOLR/solrconfig.xml
+
 
 # configure D7 3rd party libraries path
 LIBRARIES_PATH=$WEBROOT/sites/all/libraries
