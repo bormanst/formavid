@@ -1,9 +1,0 @@
-#!/bin/sh -ex
-# Single cert.
-# Change to snakeoil cert.
-# sed -i "/keyfile=/d" /etc/webmin/miniserv.conf
-# cat >> /etc/webmin/miniserv.conf << EOF
-# keyfile=/etc/ssl/private/ssl-cert-snakeoil.key
-# certfile=/etc/ssl/certs/ssl-cert-snakeoil.pem
-# EOF
-
