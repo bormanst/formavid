@@ -97,7 +97,7 @@
     <li><b>System admin:</b> admin</li>
     <li><b>CSS admin:</b> cssadmin</li>
     <li><b>CSS themes:</b> /var/www/drupal7/sites/all/themes</li>
-    <li>Site stacks created using <a href="/drupal.php" title="instructions and script">instructions and script<a>.</li>
+    <li>Site stacks created using <a href="/drupal.php" title="instructions and script">instructions and script</a>.</li>
     <li>Permanent apache url redirects used to isolate sub sites.</li>
     <li><b>Apache configuration:</b> /etc/apache2/sites-available/HOSTNAME.conf</li>
     <li><b>Stack components:</b>
