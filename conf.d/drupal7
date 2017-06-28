@@ -1,9 +1,5 @@
 #!/bin/sh -ex
 
-# remove php5-xcache (#untracked-bug)
-apt-get purge php5-xcache -y
-rm -f /etc/php5/cli/conf.d/20-xcache.ini
-
 DB_NAME=drupal7
 DB_USER=drupal7
 DB_PASS=$(mcookie)
@@ -36,25 +32,25 @@ cat > /etc/drush/drushrc.php << EOF
 \$options['r'] = '$WEBROOT';
 EOF
 
-# download latest drupal7 and install into existing overlay directory
+# download latest drupal7 and install
 drush dl drupal-7 --destination=$(dirname $WEBROOT)
-# Formavid: overlay creates dir so need to cp/rm instead of mv.
-# mv $(dirname $WEBROOT)/drupal-7* $WEBROOT
-cp -r $(dirname $WEBROOT)/drupal-7*/* $WEBROOT
-rm -rf $(dirname $WEBROOT)/drupal-7*
+mv $(dirname $WEBROOT)/drupal-7* $WEBROOT
 
 SETTINGS=$WEBROOT/sites/default/settings.php
 cp $WEBROOT/sites/default/default.settings.php $SETTINGS
-chown www-data:www-data $SETTINGS
-
-/etc/init.d/mysql start
-
 # Formavid: sites created with custom site stack script.
-# drush site-install standard -y \
-#    --account-name=$ADMIN_NAME \
-#    --account-pass=$ADMIN_PASS \
-#    --site-name="TurnKey Drupal7" --db-su=root --db-su-pw=$MYSQL_PASS --db-url=mysql://$DB_USER:$DB_PASS@localhost/$DB_NAME
+# chown www-data:www-data $SETTINGS
 
+# /etc/init.d/mysql start
+
+# drush site-install standard -y \
+#     --account-name=$ADMIN_NAME \
+#     --account-pass=$ADMIN_PASS \
+#     --site-name="TurnKey Drupal7" --db-su=root --db-su-pw=$MYSQL_PASS --db-url=mysql://$DB_USER:$DB_PASS@localhost/$DB_NAME
+
+# chown root:www-data $SETTINGS
+# chmod 640 $SETTINGS
+# chown -R www-data:www-data $WEBROOT/sites/default/files
 
 # Formavid: modified default modules.
 # download, install and enable modules
@@ -147,7 +143,6 @@ sed -i "/<mergePolicy /s/$/ -->/" $CONF_SOLR/solrconfig.xml
 sed -i "/<unlockOnStartup>/s/^/<\!-- Commented out for Solr 5.5.4 /" $CONF_SOLR/solrconfig.xml
 sed -i "/<unlockOnStartup>/s/$/ -->/" $CONF_SOLR/solrconfig.xml
 
-
 # configure D7 3rd party libraries path
 LIBRARIES_PATH=$WEBROOT/sites/all/libraries
 mkdir -p $LIBRARIES_PATH
@@ -160,7 +155,6 @@ ln -s /usr/share/php-getid3 $LIBRARIES_PATH/getid3/getid3
 # link jquery-colorbox for colorbox module
 ln -s /usr/share/javascript/jquery-colorbox/ $LIBRARIES_PATH/colorbox
 
-# configure D7 ckeditor
 tar -zxf $SRC/ckeditor_*.tar.gz -C $LIBRARIES_PATH
 rm -f $SRC/ckeditor_*.tar.gz
 
@@ -186,10 +180,10 @@ cat >>$WEBROOT/sites/default/settings.php<< EOF
 \$conf['cron_safe_threshold'] = 0;
 EOF
 
-# Formavid: make copy for site stack template
+# Formavid: make copy for site stack template.
 cp $WEBROOT/sites/default/settings.php $WEBROOT/sites/default/stack.settings.php
 
-# Formavid: need to loop through all sites in drupal stack
+# Formavid: need to loop through all sites in drupal stack.
 CRON_DRUPAL=/etc/cron.hourly/drupal7
 cat >$CRON_DRUPAL<<EOF
 #!/bin/bash -e
@@ -197,6 +191,7 @@ cat >$CRON_DRUPAL<<EOF
 # Alternatively Drupal's poor mans cron: sites/default/settings.php
 [ -x /usr/local/bin/drush ] || exit 0
 # su www-data -c "/usr/local/bin/drush --quiet cron"
+# su www-data -s /bin/bash -c "/usr/local/bin/drush --quiet cron"
 # Drupal sites will, by custom scripted design, have a "." in their directory name.
 sites=()
 while read -r -d ''; do
@@ -205,12 +200,12 @@ done < <(cd $WEBROOT/sites/; find *.* -maxdepth 0 -type d -print0)
 # Run cron on the sites.
 len=\${#sites[*]}
 for((i=0; i<\$len; i++)); do
-    su www-data -c "/usr/bin/drush -r $WEBROOT --uri=http://\${sites[\${i}]} --quiet cron"
+    su www-data -s /bin/bash -c "/usr/bin/drush -r $WEBROOT --uri=http://\${sites[\${i}]} --quiet cron"
 done
 EOF
 chmod +x $CRON_DRUPAL
 
-# Formavid: skip welcome page creation
+# Formavid: skip welcome page creation.
 # create welcome page
 # MYSQL_BATCH="mysql --user=root --password=$MYSQL_PASS --batch"
 
@@ -229,14 +224,15 @@ chmod +x $CRON_DRUPAL
 # disable footer
 # $MYSQL_BATCH --database=$DB_NAME --execute "UPDATE block SET region = '-1' WHERE delta = 'powered-by';"
 
-/etc/init.d/mysql stop
+# Formavid: sites created with custom site stack script.
+# /etc/init.d/mysql stop
 
-# Formavid: apache conf files created in site stack script
+# Formavid: apache conf files created in site stack script.
 # configure apache
 # a2dissite 000-default
 # a2ensite drupal7
 
-# Formavid: moved to aaa_init
+# Formavid: moved to aaa_init.
 # a2enmod rewrite
 
 # unset proxy settings
