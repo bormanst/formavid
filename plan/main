@@ -21,6 +21,8 @@ php5-gmp		/* optimizes performance of OpenID Math library */
 
 /* Simple Invoices */
 php5-xsl
+php5-cli
+unzip
 
 /* Compass */
 build-essential
