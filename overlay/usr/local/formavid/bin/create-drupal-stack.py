@@ -1,12 +1,10 @@
 #!/usr/bin/python
 """Create drupal stack
-
 Option:
     --dbpass=     unless provided, will ask interactively
     --sitename=   unless provided, will ask interactively
     --tld=        unless provided, will ask interactively
     --pass=       unless provided, will ask interactively
-
 """
 
 import sys
@@ -83,38 +81,20 @@ def main():
         # Sites - ensure clean start.
         system("rm -rf %s/sites-staging" % templates)
 
-        # Solr - no search for aggregator.
+        # Sites - set types.
+        siteTypes = ['article','aggregator','blog','book','forum','poll']
 
         # Solr - set core properties.
-        sitetype = "article"
-        system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-        system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-
-        sitetype = "blog"
-        system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-        system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-
-        sitetype = "book"
-        system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-        system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-
-        sitetype = "forum"
-        system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-        system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-
-        sitetype = "poll"
-        system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-        system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-        system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
+        system("echo ''")
+        system("echo 'Creating and configuring solr search cores.'")
+        system("echo ''")
+        for sitetype in siteTypes:
+            # Solr - no search for aggregator.
+            if sitetype != 'aggregator':
+                system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
+                system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
+                system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
+                system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
 
         # Solr - load cores.
         solrdata = "/var/lib/solr/data"
@@ -122,25 +102,26 @@ def main():
 
         # Solr - copy drupal solr conf.
         apachesolr = "/var/www/drupal7/sites/all/modules/apachesolr/solr-conf/solr-4.x"
-        system("cp -r %s %s/%s/article/conf" % (apachesolr,solrdata,sitename))
-        system("cp -r %s %s/%s/blog/conf" % (apachesolr,solrdata,sitename))
-        system("cp -r %s %s/%s/book/conf" % (apachesolr,solrdata,sitename))
-        system("cp -r %s %s/%s/forum/conf" % (apachesolr,solrdata,sitename))
-        system("cp -r %s %s/%s/poll/conf" % (apachesolr,solrdata,sitename))
+        for sitetype in siteTypes:
+            # Solr - no search for aggregator.
+            if sitetype != 'aggregator':
+                system("cp -r %s %s/%s/%s/conf" % (apachesolr,solrdata,sitename,sitetype))
 
         # Solr - ensure owner.
         system("chown -R solr:solr %s/%s" % (solrdata,sitename))
 
         # Solr - enable changes.
         system("service solr restart")
+        system("echo ''")
+        system("echo 'Solr search cores have been created.'")
+        system("echo ''")
 
-        # Hosts - add to hosts as needed.
-        system("sed -i '/127.0.1.1/s/$/ %s/' /etc/hosts" % hostname)
-        system("sed -i '/127.0.1.1/s/$/ aggregator.%s/' /etc/hosts" % hostname)
-        system("sed -i '/127.0.1.1/s/$/ blog.%s/' /etc/hosts" % hostname)
-        system("sed -i '/127.0.1.1/s/$/ book.%s/' /etc/hosts" % hostname)
-        system("sed -i '/127.0.1.1/s/$/ forum.%s/' /etc/hosts" % hostname)
-        system("sed -i '/127.0.1.1/s/$/ poll.%s/' /etc/hosts" % hostname)
+        # Hosts - update.
+        for sitetype in siteTypes:
+            sitetypemod = ''
+            if sitetype != 'article':
+                sitetypemod = sitetype + '.'
+            system("sed -i '/127.0.1.1/s/$/ %s%s/' /etc/hosts" % (sitetypemod,hostname))
 
         # Sites - prepare templates.
         system("cp -rf %s/sites-template %s/sites-staging" % (templates,templates))
@@ -150,7 +131,7 @@ def main():
 
         # Apache - add sites available.
         system("cp -f %s/sites-staging/sitehostname.conf /etc/apache2/sites-available/%s.conf" % (templates,hostname))
- 
+
         # Apache - enable added sites.
         system("cp -sf /etc/apache2/sites-available/%s.conf /etc/apache2/sites-enabled/." % hostname)
 
@@ -160,59 +141,40 @@ def main():
         system("echo ''")
 
         # Create drupal sites.
-        system("echo 'Creating site: %s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_article --site-name=\"%s\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/%s/settings.php" % (hostname,hostname))
-
-        system("echo 'Creating site: aggregator.%s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_aggregator --site-name=\"%s Aggregator\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=aggregator.%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/aggregator.%s/settings.php" % (hostname,hostname))
-
-        system("echo 'Creating site: blog.%s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_blog --site-name=\"%s Blogs\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=blog.%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/blog.%s/settings.php" % (hostname,hostname))
-
-        system("echo 'Creating site: book.%s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_book --site-name=\"%s Manuals\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=book.%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/book.%s/settings.php" % (hostname,hostname))
-
-        system("echo 'Creating site: forum.%s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_forum --site-name=\"%s Forums\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=forum.%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/forum.%s/settings.php" % (hostname,hostname))
-
-        system("echo 'Creating site: poll.%s'" % hostname)
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
-        system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_poll --site-name=\"%s Polls\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=poll.%s" % (password,dbpass,password,sitename,sitebasename,hostname,hostname,hostname))
-        system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/poll.%s/settings.php" % (hostname,hostname))
-
-        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
+        for sitetype in siteTypes:
+            sitetypemod = ''
+            sitetypetitle = ''
+            if sitetype != 'article':
+                sitetypemod = sitetype + '.'
+                sitetypetitle = ' ' + sitetype.title() + 's'
+            # Create site type.
+            system("echo 'Creating site: %s%s'" % (sitetypemod,hostname))
+            system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
+            system("chown www-data:www-data /var/www/drupal7/sites/default/settings.php")
+            system("drush -q -r /var/www/drupal7 site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_%s --site-name=\"%s%s\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=%s%s" % (password,dbpass,password,sitename,sitetype,sitebasename,sitetypetitle,hostname,hostname,sitetypemod,hostname))
+            system("sed -i \"s/# \\$cookie_domain = '.example.com'\;/\\$cookie_domain = '.%s'\;/g\" /var/www/drupal7/sites/%s/settings.php" % (hostname,hostname))
+            # Sites - update permissions.
+            system("chown root:www-data /var/www/drupal7/sites/%s%s/settings.php" % (sitetypemod,hostname))
+            system("chmod 640 /var/www/drupal7/sites/%s%s/settings.php" % (sitetypemod,hostname))
+            system("chown -R www-data:www-data /var/www/drupal7/sites/%s%s/files" % (sitetypemod,hostname))
+            system("chmod 777 /var/www/drupal7/sites/%s%s/files" % (sitetypemod,hostname))
 
         # Sites - clean up.
+        system("cp -f /var/www/drupal7/sites/default/stack.settings.php /var/www/drupal7/sites/default/settings.php")
+        system("chown root:www-data /var/www/drupal7/sites/default/settings.php")
+        system("chmod 640 /var/www/drupal7/sites/default/settings.php")
         system("rm -rf %s/sites-staging" % templates)
 
         # Get db cursor.
         cur = con.cursor()
 
-        # Sites - add admin user for drush.
-        cur.execute("GRANT ALL PRIVILEGES ON %s_aggregator.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-        cur.execute("GRANT ALL PRIVILEGES ON %s_article.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-        cur.execute("GRANT ALL PRIVILEGES ON %s_blog.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-        cur.execute("GRANT ALL PRIVILEGES ON %s_book.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-        cur.execute("GRANT ALL PRIVILEGES ON %s_forum.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-        cur.execute("GRANT ALL PRIVILEGES ON %s_poll.* TO drupal7@localhost WITH GRANT OPTION;" % sitename)
-
-        # Sites - set file permissions.
-        system("chmod 777 /var/www/drupal7/sites/%s/files" % hostname)
-        system("chmod 777 /var/www/drupal7/sites/aggregator.%s/files" % hostname)
-        system("chmod 777 /var/www/drupal7/sites/blog.%s/files" % hostname)
-        system("chmod 777 /var/www/drupal7/sites/book.%s/files" % hostname)
-        system("chmod 777 /var/www/drupal7/sites/forum.%s/files" % hostname)
-        system("chmod 777 /var/www/drupal7/sites/poll.%s/files" % hostname)
+        # Sites - set additional database properties.
+        for sitetype in siteTypes:
+            # Allow perms for drush.
+            cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal7@localhost WITH GRANT OPTION;" % (sitename,sitetype))
+            # Update admin email attributes.
+            cur.execute('UPDATE %s_%s.users SET mail=\"admin@%s\" WHERE name=\"admin\";' % (sitename,sitetype,hostname))
+            cur.execute('UPDATE %s_%s.users SET init=\"admin@%s\" WHERE name=\"admin\";' % (sitename,sitetype,hostname))
 
         # Finish initial stack setup.
         system("echo ''")
@@ -220,9 +182,18 @@ def main():
         system("echo ''")
 
         # Restart services.
+        system("echo ''")
+        system("echo 'Restarting apache2 to activate %s site stack.'" % hostname)
+        system("echo ''")
         system("service apache2 restart")
+        system("echo ''")
+        system("echo 'Site stack for %s is now available to configure.'" % hostname)
+        system("echo ''")
 
         # Clear drupal caches.
+        system("echo ''")
+        system("echo 'Clear drupal caches.'")
+        system("echo ''")
         system("drush -r /var/www/drupal7 cc all")
 
         # Start configuring stack.
@@ -237,95 +208,38 @@ def main():
         system("chown -R cssadmin:cssadmin /var/www/drupal7/sites/all/themes/%s" % (sitename))
         system("chmod -R 775 /var/www/drupal7/sites/all/themes/%s" % (sitename))
 
-        # Drupal - enable site theme.
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-enable --yes '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s pm-enable --yes '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable --yes '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable --yes '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable --yes '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable --yes '%s'" % (hostname,sitename))
-
-        # Drupal - set default theme.
-        system("drush -r /var/www/drupal7 --uri=http://%s vset --yes theme_default '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s vset --yes theme_default '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s vset --yes theme_default '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s vset --yes theme_default '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s vset --yes theme_default '%s'" % (hostname,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s vset --yes theme_default '%s'" % (hostname,sitename))
-
-        # Enable solr modules.
-        # No search for aggregator.
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-enable apachesolr --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable apachesolr --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable apachesolr --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable apachesolr --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable apachesolr --yes" % (hostname))
-
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-enable apachesolr_access --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable apachesolr_access --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable apachesolr_access --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable apachesolr_access --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable apachesolr_access --yes" % (hostname))
-
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-enable apachesolr_search --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable apachesolr_search --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable apachesolr_search --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable apachesolr_search --yes" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable apachesolr_search --yes" % (hostname))
-
-        # Update solr urls.
-        # No search for aggregator.
-        system("drush -r /var/www/drupal7 --uri=http://%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.article" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.blog" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.book" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.forum" % (hostname,password,sitename))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.poll" % (hostname,password,sitename))
-
-        # Drupal - set solr as default search.
-        system("drush -r /var/www/drupal7 --uri=http://%s vset --yes search_default_module 'apachesolr_search'" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s vset --yes search_default_module 'apachesolr_search'" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s vset --yes search_default_module 'apachesolr_search'" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s vset --yes search_default_module 'apachesolr_search'" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s vset --yes search_default_module 'apachesolr_search'" % (hostname))
-
-        # Enable site specific.
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s pm-enable --yes aggregator" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable --yes blog" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable --yes book" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable --yes forum" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable --yes poll" % (hostname))
-
-        # Enable contact form.
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-enable --yes contact" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s pm-enable --yes contact" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-enable --yes contact" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-enable --yes contact" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-enable --yes contact" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-enable --yes contact" % (hostname))
-
-        # Disable overlay.
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-disable --yes overlay" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s pm-disable --yes overlay" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-disable --yes overlay" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-disable --yes overlay" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-disable --yes overlay" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-disable --yes overlay" % (hostname))
-
-        # Disable dashboard.
-        system("drush -r /var/www/drupal7 --uri=http://%s pm-disable --yes dashboard" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://aggregator.%s pm-disable --yes dashboard" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://blog.%s pm-disable --yes dashboard" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://book.%s pm-disable --yes dashboard" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://forum.%s pm-disable --yes dashboard" % (hostname))
-        system("drush -r /var/www/drupal7 --uri=http://poll.%s pm-disable --yes dashboard" % (hostname))
-
-        # Sites - disable footer block.
-        system("mysql -u root --password=%s -e \"UPDATE %s_article.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
-        system("mysql -u root --password=%s -e \"UPDATE %s_aggregator.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
-        system("mysql -u root --password=%s -e \"UPDATE %s_blog.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
-        system("mysql -u root --password=%s -e \"UPDATE %s_book.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
-        system("mysql -u root --password=%s -e \"UPDATE %s_forum.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
-        system("mysql -u root --password=%s -e \"UPDATE %s_poll.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitename))
+        # Drupal - enable/disable properties.
+        for sitetype in siteTypes:
+            sitetypemod = ''
+            if sitetype != 'article':
+                sitetypemod = sitetype + '.'
+            # Start configuring sites.
+            system("echo ''")
+            system("echo ''")
+            system("echo 'Enabling and disabling Drupal properties for %s%s ...'" % (sitetypemod,hostname))
+            system("echo ''")
+            # Enable site theme.
+            system("drush -r /var/www/drupal7 --uri=http://%s%s pm-enable --yes '%s'" % (sitetypemod,hostname,sitename))
+            # Set default theme.
+            system("drush -r /var/www/drupal7 --uri=http://%s%s vset --yes theme_default '%s'" % (sitetypemod,hostname,sitename))
+            # Enable solr modules. No search for aggregator.
+            if sitetype != 'aggregator':
+                system("drush -r /var/www/drupal7 --uri=http://%s%s pm-enable apachesolr --yes" % (sitetypemod,hostname))
+                system("drush -r /var/www/drupal7 --uri=http://%s%s pm-enable apachesolr_access --yes" % (sitetypemod,hostname))
+                system("drush -r /var/www/drupal7 --uri=http://%s%s pm-enable apachesolr_search --yes" % (sitetypemod,hostname))
+                system("drush -r /var/www/drupal7 --uri=http://%s%s solr-set-env-url http://drupal7:%s@localhost:8983/solr/%s.%s" % (sitetypemod,hostname,password,sitename,sitetype))
+                system("drush -r /var/www/drupal7 --uri=http://%s%s vset --yes search_default_module 'apachesolr_search'" % (sitetypemod,hostname))
+            # Enable site specific.
+            if sitetype != 'article':
+                system("drush -r /var/www/drupal7 --uri=http://%s.%s pm-enable --yes %s" % (sitetype,hostname,sitetype))
+            # Enable contact form.
+            system("drush -r /var/www/drupal7 --uri=http://%s%s pm-enable --yes contact" % (sitetypemod,hostname))
+            # Disable overlay.
+            system("drush -r /var/www/drupal7 --uri=http://%s%s pm-disable --yes overlay" % (sitetypemod,hostname))
+            # Disable dashboard.
+            system("drush -r /var/www/drupal7 --uri=http://%s%s pm-disable --yes dashboard" % (sitetypemod,hostname))
+            # Disable footer block.
+            system("mysql -u root --password=%s -e \"UPDATE %s_%s.block SET status=0 WHERE module='system' AND delta='powered-by' AND theme='%s'\"" % (dbpass,sitename,sitetype,sitename))
 
         # Symlink logo to admin page.
         system("chmod -R 644 /var/www/drupal7/sites/all/themes/%s/logo.png" % (sitename))
@@ -334,22 +248,37 @@ def main():
 
         # Finished configuring stack.
         system("echo ''")
+        system("echo ''")
         system("echo 'Site stack for %s has been configured.'" % hostname)
         system("echo ''")
-        system("echo 'All of the sites should be available immediately.'")
-        system("echo 'Please verify the stack by visiting the status report for each site.'")
-        system("echo ''")
-
-        # Clear drupal caches.
-        system("drush -r /var/www/drupal7 cc all")
 
         # Postfix virtual addresses.
+        system("echo ''")
+        system("echo 'Adding %s email addresses to postfix.'" % hostname)
+        system("echo ''")
         system("echo 'webmaster@%s admin' >> /etc/postfix/virtual" % hostname)
         system("echo 'admin@%s admin' >> /etc/postfix/virtual" % hostname)
         system("echo 'support@%s admin' >> /etc/postfix/virtual" % hostname)
         system("service postfix start")
         system("postmap /etc/postfix/virtual")
         system("service postfix stop")
+        system("echo ''")
+        system("echo 'Postfix has been updated.'")
+        system("echo ''")
+
+        # Clear drupal caches.
+        system("echo ''")
+        system("echo 'Clear drupal caches.'")
+        system("echo ''")
+        system("drush -r /var/www/drupal7 cc all")
+        system("echo ''")
+
+        # Completed.
+        system("echo ''")
+        system("echo 'All of the sites should be available immediately.'")
+        system("echo 'Please verify the stack by visiting the status report for each site.'")
+        system("echo ''")
+        system("echo ''")
 
     except mdb.Error, e:
   
