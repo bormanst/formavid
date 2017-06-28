@@ -8,7 +8,7 @@ dl() {
 SRC=/usr/local/src
 
 # Solr
-VERSION="5.5.3"
+VERSION="5.5.4"
 URL="http://archive.apache.org/dist/lucene/solr/${VERSION}/solr-${VERSION}.tgz"
 dl $URL $SRC
 
