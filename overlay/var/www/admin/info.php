@@ -14,7 +14,7 @@
 <h1 align="center">Info</h1>
 <div align="center" style="font-size:20px">(Please donate to the projects listed below as they are a vital part of our community.)</div>
 <div>  
-  <div><h3><a href="http://formavid.org" title="FormaVid"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>FormaVid Small Business Appliance</a></h3><br></div>
+  <div><h3><a href="http://formavid.org" title="FormaVid"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>FormaVid Small Business Appliance</a></h3></div>
   <ul>
     <li><a href="/local.php" title="Local Appliance Info">Local Appliance Info</a></li>
     <li><a href="/user.php" title="User Access Info">User Access Info</a></li>
@@ -29,17 +29,20 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.turnkeylinux.org/" title="Turnkey Linux"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/turnkey.png"/><br><br>Turnkey Linux</a></h3><br></div>
+  <div><h3><a href="https://www.turnkeylinux.org/" title="Turnkey Linux"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/turnkey.png"/><br><br>Turnkey Linux</a></h3></div>
   <ul>
     <li><a href="https://hub.turnkeylinux.org/" title="Turnkey Linux Hub">Turnkey Linux Hub</a</li>
-    <li><a href="http://www.turnkeylinux.org/docs/tklbam" title="TKLBAM (TurnKey Linux Backup and Migration)">TKLBAM (TurnKey Linux Backup and Migration)</a></li>
-    <li><a href="http://www.turnkeylinux.org/docs/automatic-security-updates" title="Turnkey Linux Security Updates">Turnkey Linux Security Updates</a></li>
+    <li><a href="https://www.turnkeylinux.org/docs/tklbam" title="TKLBAM (TurnKey Linux Backup and Migration)">TKLBAM (TurnKey Linux Backup and Migration)</a></li>
+    <li><a href="https://www.turnkeylinux.org/docs/automatic-security-updates" title="Turnkey Linux Security Updates">Turnkey Linux Security Updates</a></li>
+    <li><a href="https://www.turnkeylinux.org/docs/confconsole" title="Confconsole - TurnKey Linux Configuration Console">Confconsole - TurnKey Linux Configuration Console</a></li>
+    <li><a href="https://www.turnkeylinux.org/docs/confconsole/letsencrypt" title="Confconsole - Let's Encrypt: Free SSL/TLS certs">Confconsole - Let's Encrypt: Free SSL/TLS certs</a></li>
+    <li><a href="https://www.turnkeylinux.org/docs/confconsole/mail_relay" title="Confconsole - Mail relay">Confconsole - Mail relay</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
-    <li><a href="http://www.turnkeylinux.org/help/donate" title="Turnkey Linux Donate">Turnkey Linux <b><i>Donate</i></b></a></li>
+    <li><a href="https://www.turnkeylinux.org/help/donate" title="Turnkey Linux Donate">Turnkey Linux <b><i>Donate</i></b></a></li>
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://httpd.apache.org/" title="Apache"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache</a></h3><br></div>
+  <div><h3><a href="http://httpd.apache.org/" title="Apache"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache</a></h3></div>
   <ul>
     <li><a href="/apache.php" title="Apache Local Info">Apache Local Info</a></li>
     <li><a href="http://httpd.apache.org/docs/2.4/" title="Apache Docs">Apache Docs</a></li>
@@ -47,7 +50,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://compass-style.org/" title="Compass"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/compass.png"/><br><br>Compass</a></h3><br></div>
+  <div><h3><a href="http://compass-style.org/" title="Compass"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/compass.png"/><br><br>Compass</a></h3></div>
   <ul>
     <li><a href="http://compass-style.org/reference/compass/" title="Compass Reference">Compass Reference</a></li>
     <li><a href="http://compass-style.org/reference/compass/css3/" title="Compass CSS3">Compass CSS3</a></li>
@@ -55,14 +58,14 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.dovecot.org/" title="Dovecot"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/dovecot.png"/><br><br>Dovecot</a></h3><br></div>
+  <div><h3><a href="http://www.dovecot.org/" title="Dovecot"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/dovecot.png"/><br><br>Dovecot</a></h3></div>
   <ul>
     <li><a href="http://wiki2.dovecot.org/" title="Dovecot Documentation">Dovecot Documentation</a></li>
     <li><a href="http://wiki2.dovecot.org/WhyDoesItNotWork" title="Dovecot Problems">Dovecot Problems</a></li>
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://drupal.org/" title="Drupal"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal</a></h3><br></div>
+  <div><h3><a href="http://drupal.org/" title="Drupal"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal</a></h3></div>
   <ul>
     <li><a href="/drupal.php" title="Drupal Local Info">Drupal Local Info</a></li>
     <li><a href="http://drupal.org/documentation" title="Drupal Documentation">Drupal Documentation</a></li>
@@ -73,7 +76,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.fail2ban.org/wiki/index.php/Main_Page" title="Fail2ban"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/fail2ban.png"/><br><br>Fail2ban</a></h3><br></div>
+  <div><h3><a href="http://www.fail2ban.org/wiki/index.php/Main_Page" title="Fail2ban"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/fail2ban.png"/><br><br>Fail2ban</a></h3></div>
   <ul>
     <li><a href="http://www.fail2ban.org/wiki/index.php/README" title="Fail2ban README">Fail2ban README</a></li>
     <li><a href="http://www.fail2ban.org/wiki/index.php/MANUAL_0_8" title="Fail2ban Documentation">Fail2ban Documentation</a></li>
@@ -84,7 +87,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.mysql.com/" title="MySQL"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>MySQL</a></h3><br></div>
+  <div><h3><a href="http://www.mysql.com/" title="MySQL"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>MySQL</a></h3></div>
   <ul>
     <li><a href="http://dev.mysql.com/doc/refman/5.5/en/" title="MySQL Documentation">MySQL Documentation</a></li>
     <li><a href="http://www.adminer.org/" title="Adminer Home">Adminer Home</a></li>
@@ -95,7 +98,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://php.net/" title="PHP"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/php.png"/><br><br>PHP</a></h3><br></div>
+  <div><h3><a href="http://php.net/" title="PHP"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/php.png"/><br><br>PHP</a></h3></div>
   <ul>
     <li><a href="/phpinfo.php" title="PHP Local Info">PHP Local Info</a></li>
     <li><a href="http://php.net/manual/en/" title="PHP Manual">PHP Manual</a></li>
@@ -104,7 +107,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.postfix.org/" title="Postfix"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/postfix.png"/><br><br>Postfix</a></h3><br></div>
+  <div><h3><a href="http://www.postfix.org/" title="Postfix"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/postfix.png"/><br><br>Postfix</a></h3></div>
   <ul>
     <li><a href="http://www.postfix.org/documentation.html" title="Postfix Documentation">Postfix Documentation</a></li>
     <li><a href="http://www.postfix.org/docs.html" title="Postfix Howtos and FAQs">Postfix Howtos and FAQs</a></li>
@@ -112,7 +115,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.proftpd.org/" title="ProFTPD"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</a></h3><br></div>
+  <div><h3><a href="http://www.proftpd.org/" title="ProFTPD"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</a></h3></div>
   <ul>
     <li><a href="http://www.proftpd.org/docs/directives/configuration_full.html" title="ProFTPD Configuration Directive List">ProFTPD Configuration Directive List</a></li>
     <li><a href="http://www.proftpd.org/docs/faq/linked/faq.html" title="FAQs">ProFTPD FAQs</a></li>
@@ -122,7 +125,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://roundup.sourceforge.net/" title="Roundup"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</a></h3><br></div>
+  <div><h3><a href="http://roundup.sourceforge.net/" title="Roundup"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</a></h3></div>
   <ul>
     <li><a href="http://roundup.sourceforge.net/docs.html" title="Roundup Docs">Roundup Docs</a></li>
     <li><a href="http://roundup.sourceforge.net/docs/FAQ.html" title="Roundup FAQs">Roundup FAQs</a></li>
@@ -133,7 +136,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://sass-lang.com/" title="Sass"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/sass.png"/><br><br>Sass</a></h3><br></div>
+  <div><h3><a href="http://sass-lang.com/" title="Sass"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/sass.png"/><br><br>Sass</a></h3></div>
   <ul>
     <li><a href="http://sass-lang.com/documentation/file.SASS_REFERENCE.html" title="Sass Reference">Sass Reference</a></li>
     <li><a href="http://sass-lang.com/tutorial.html" title="Sass Tutorial">Sass Tutorial</a></li>
@@ -141,13 +144,13 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://code.google.com/p/shellinabox/" title="Shell In A Box"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell In A Box</a></h3><br></div>
+  <div><h3><a href="http://code.google.com/p/shellinabox/" title="Shell In A Box"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell In A Box</a></h3></div>
   <ul>
     <li><a href="http://code.google.com/p/shellinabox/wiki/shellinaboxd_man" title="Shell In A Box">Shell In A Box Documentation</a></li>
   </ul>
 </div>
 <div>
-  <div><h3><a href="https://simpleinvoices.org/" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3><br></div>
+  <div><h3><a href="https://simpleinvoices.org/" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3></div>
   <ul>
     <li><a href="/simpleinvoices.php" title="Simple Invoices Local Info">Simple Invoices Local Info</a></li>
     <li><a href="https://simpleinvoices.org/wiki" title="Simple Invoices Wiki">Simple Invoices Wiki</a></li>
@@ -158,7 +161,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://lucene.apache.org/solr/" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3><br></div>
+  <div><h3><a href="http://lucene.apache.org/solr/" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div>
   <ul>
     <li><a href="/solr.php" title="Apache Solr Local Info">Apache Solr Local Info</a></li>
     <li><a href="http://lucene.apache.org/solr/5_5_4/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
@@ -169,7 +172,7 @@
   </ul>
 </div>
 <div>
-  <div><h3><a href="http://www.webmin.com/" title="Webmin"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</a></h3><br></div>
+  <div><h3><a href="http://www.webmin.com/" title="Webmin"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</a></h3></div>
   <ul>
     <li><a href="http://doxfer.webmin.com/Webmin" title="Webmin Documentation">Webmin Documentation</a></li>
     <li><a href="http://doxfer.webmin.com/Webmin/Webmin_Configuration" title="Webmin Configuration">Webmin Configuration</a></li>
