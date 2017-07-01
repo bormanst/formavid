@@ -146,7 +146,15 @@ def main():
     system("rm /usr/local/src/title.txt")
 
     # TKLBAM create initial custom backup profile.
+    system("echo ''")
+    system("echo ''")
+    system("echo 'Create initial TKLBAM backup profile...'")
+    system("echo ''")
     system("tklbam-internal create-profile /usr/local/formavid/tklbam/formavid.conf/ /usr/local/formavid/tklbam/profile.conf")
+    system("echo ''")
+    system("echo 'TKLBAM backup profile located in /usr/local/formavid/tklbam'")
+    system("echo ''")
+    system("echo ''")
 
 if __name__ == "__main__":
     main()
