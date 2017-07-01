@@ -251,6 +251,10 @@ def main():
         system("echo ''")
         system("echo 'Site stack for %s has been configured.'" % hostname)
         system("echo ''")
+        system("echo 'All of the sites should be available immediately.'")
+        system("echo 'Please verify the stack by visiting the drupal status report for each site.'")
+        system("echo ''")
+        system("echo ''")
 
         # Postfix virtual addresses.
         system("echo ''")
@@ -271,13 +275,6 @@ def main():
         system("echo 'Clear drupal caches.'")
         system("echo ''")
         system("drush -r /var/www/drupal7 cc all")
-        system("echo ''")
-
-        # Completed.
-        system("echo ''")
-        system("echo 'All of the sites should be available immediately.'")
-        system("echo 'Please verify the stack by visiting the status report for each site.'")
-        system("echo ''")
         system("echo ''")
 
     except mdb.Error, e:
