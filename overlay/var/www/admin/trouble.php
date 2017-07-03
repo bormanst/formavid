@@ -13,7 +13,7 @@
 <body>
 <h1 align="center">Trouble Info</h1>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Can no longer do a task.</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Can no longer do a task.</h3></div>
   <ul>
     <li>Confirm that the exact task acutually worked at some point.</li>
     <li>Address any application/log error messages starting with the ones they both have in common before the rest.</li>
@@ -21,7 +21,7 @@
     <li>Confirm user:group on affected files and chown as required/allowed.</li>
     <li>Confirm permissions on affected files and chmod as required/allowed.</li>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Adding a new task does not work.</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Adding a new task does not work.</h3></div>
   <ul>
     <li>If it is similar to some_similar_task, then see if some_similar_task is working.</li>
     <li>Address any application/log error messages starting with the ones they both have in common before the rest.</li>
@@ -30,7 +30,7 @@
     <li>Confirm communication and configuration of network[/apache]/application layers.</li>
     <li>Refer to application documentation.</li>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Passwords</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Passwords</h3></div>
   <ul>
     <li>Passwords are handled by the application, by apache, or sometimes both.</li>
     <li>Refer to the application documentation regarding application password assistance.</li>
@@ -42,7 +42,7 @@
       <li>Refer to online info for a desired method or <a href="http://www.debuntu.org/how-to-recover-root-password-under-linux-with-single-user-mode/" title="How-To: Recover root password under linux with single user mode">how to recover root password</a>.</li>
     </ul>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Accidentally disabled/deleted all/part of a drupal stack.</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Accidentally disabled/deleted all/part of a drupal stack.</h3></div>
   <ul>
     <li>/etc/apache2/sites-available/<b>SITEHOSTNAME.conf does exist:</b></li>
     <ul>

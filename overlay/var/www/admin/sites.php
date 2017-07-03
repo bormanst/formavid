@@ -20,7 +20,7 @@ $arrFiles = scandir('/var/www/drupal7/sites');
 foreach ($arrFiles as $file) if ($file != '.' && $file !='..' && is_dir('/var/www/drupal7/sites/' . $file) && count(preg_split($pattern, $file)) == 2) array_push($arrBaseSites, $file);
 foreach ($arrBaseSites as $site) {
   $imageName = preg_split($pattern, $site)[0];
-  echo "<div><h3><a href='http://",$site,"/user' title='$site'><img style='float: left; margin: 0px 15px 0px 0px;' src='images/$imageName.png'/><br>",$site,"</a></h3><br><br>";
+  echo "<div><h3><a href='http://",$site,"/user' title='$site'><img style='float: left; margin: 0px 15px 0px 0px;' src='images/$imageName.png'/><br>",$site,"</a></h3>";
   echo "<ul>";
   foreach ($arrFiles as $file) if (strpos($file, $site) !== false && $file != '.' && $file !='..' && is_dir('/var/www/drupal7/sites/' . $file) && count(preg_split($pattern, $file)) > 1 && $file != $site) echo "<li><a href='http://",$file,"/user' title='$file'>",$file,"</a></li><br>";
   echo "</ul></div>";

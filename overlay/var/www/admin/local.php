@@ -12,7 +12,7 @@
 </head>
 <body>
 <h1 align="center">Local Appliance Info</h1>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Add local documentation.</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Add local documentation.</h3></div>
   <ul>
     <li>Modify /var/www/admin/local.php to update this page.</li>
     <li>Add any information pertinent to this specific appliance such as maintenance notes, network changes, mail changes, additional applications, etc.</li>

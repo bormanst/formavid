@@ -13,7 +13,7 @@
 <body>
 <h1 align="center">Apache Info</h1>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache Server Status Password</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache Server Status Password</h3></div>
   <ul>
     <li>The Apache server satus page is protected by the same password as the tools 'admin'.</li>
     <li><b>Follow tools password instructions here:</b> <a href="/tools.php" title="Tools Info">Tools Info</a>.</li>

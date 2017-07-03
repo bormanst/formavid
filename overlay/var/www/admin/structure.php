@@ -13,7 +13,7 @@
 <body>
 <h1 align="center">Appliance Structure Info</h1>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Dependency Stack</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Dependency Stack</h3></div>
   <ul>
     <div>
       <div style="float: left; width: 3%">&nbsp;</div>
@@ -44,7 +44,7 @@
   </ul>
 </div>
 <div>	
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</h3></div>
   <ul>
     <li><b>Host name:</b> /etc/hostname</li>
     <li><b>Hosts:</b> /etc/hosts</li>
@@ -61,7 +61,7 @@
   </ul>
 </div>
 <div>	
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools</h3></div>
   <ul>
     <li><b>Address:</b> https://admin.sedhostname</li>
     <li><b>Location:</b> /var/www/admin</li>
@@ -74,7 +74,7 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/apache.png"/><br><br>Apache</h3></div>
   <ul>
     <li><b>Location:</b> /etc/apache2</li>
     <li><b>Logs:</b> /var/log/apache2</li>
@@ -83,7 +83,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/dovecot.png"/><br><br>Dovecot</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/dovecot.png"/><br><br>Dovecot</h3></div>
   <ul>
     <li><b>Location:</b> /etc/dovecot</li>
     <li><b>Data:</b> /var/lib/dovecot</li>
@@ -91,7 +91,7 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal7</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal7</h3></div>
   <ul>
     <li><b>Location:</b> /var/www/drupal7</li>
     <li><b>System admin:</b> admin</li>
@@ -113,7 +113,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/fail2ban.png"/><br><br>Fail2ban</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/fail2ban.png"/><br><br>Fail2ban</h3></div>
   <ul>
     <li><b>Location:</b> /etc/fail2ban</li>
     <li><b>Jails:</b> /etc/fail2ban</li>
@@ -122,7 +122,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/postfix.png"/><br><br>Postfix</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/postfix.png"/><br><br>Postfix</h3></div>
   <ul>
     <li><b>Location:</b> /etc/postfix</li>
     <li><b>Mail (Maildir format):</b> /home/{username}/Maildir</li>
@@ -132,7 +132,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</h3></div>
   <ul>
     <li><b>Location:</b> /etc/proftpd</li>
     <li><b>Server:</b> /srv/ftp</li>
@@ -142,7 +142,7 @@
   </ul>
 </div>
 <div>  
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3></div>
   <ul>
     <li><b>Address:</b> https://support.sedhostname/support/</li>
     <li><b>Location:</b> /etc/roundup</li>
@@ -153,7 +153,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</h3></div>
   <ul>
     <li><b>Address:</b> https://billing.sedhostname</li>
     <li><b>Location:</b> /var/www/simpleinvoices</li>
@@ -165,7 +165,7 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</h3></div>
   <ul>
     <li><b>Admin Address:</b> http://sedhostname:8983/solr/#/</li>
     <li><b>Location:</b> /usr/local/solr</li>
@@ -180,7 +180,7 @@
   </ul>
 </div>
 <div>     
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</h3></div>
   <ul>
     <li><b>Address:</b> https://admin.sedhostname:12321</li>
      <li><b>Location:</b> /etc/webmin</li>

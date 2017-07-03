@@ -13,7 +13,7 @@
 <body>
 <h1 align="center">User Access Info</h1>
 <div>
-  <div><h3><a href="/structure.php" title="Appliance"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</a></h3><br></div>
+  <div><h3><a href="/structure.php" title="Appliance"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</a></h3></div>
   <ul>
     <li><b>admin:</b></li>
     <ul>
@@ -40,7 +40,7 @@
        <li>Drush commands.</li>
     </ul>
   </ul>
-  <div><h3><a href="/drupal.php" title="Drupal"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal</a></h3><br></div>
+  <div><h3><a href="/drupal.php" title="Drupal"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal</a></h3></div>
   <ul>
     <li><b>admin:</b></li>
     <ul>
@@ -69,7 +69,7 @@
       <li>ssh.</li>
     </ul>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>MySQL</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>MySQL</h3></div>
   <ul>
     <li><b>root:</b></li>
     <ul>
@@ -88,7 +88,7 @@
       <li>Drush.</li>
     </ul>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/proftpd.png"/><br><br>ProFTPD</h3></div>
   <ul>
     <li><b>cssadmin:</b></li>
     <ul>
@@ -99,7 +99,7 @@
       <li>ProFTPD account mapped to /var/www/drupal7/sites/all/themes directory.</li>
     </ul>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3></div>
   <ul>
     <li><b>admin:</b></li>
     <ul>
@@ -108,13 +108,13 @@
       <li>User maintenance.</li>
     </ul>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell-In-A-Box</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell-In-A-Box</h3></div>
   <ul>
     <li>admin access.</li>
     <li>cssadmin access.</li>
     <li>root access (when enabled by admin).</li>
   </ul>
-  <div><h3><a href="/simpleinvoices.php" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3><br></div>
+  <div><h3><a href="/simpleinvoices.php" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3></div>
   <ul>
     <li>Initial site and application password entered for Simple Invoices admin during appliance install.</li>
     <li>Special note: application requires <b>admin@BASESITENAME.TLD:password</b> for access (email address not just user name.)</li>
@@ -123,7 +123,7 @@
     <li>Initial application access is "admin@BASESITENAME.TLD:password".</li>
     <li>Two layer security: need to first access apache site with "admin:sharedpassword" and then the application with "email:userpassword".</li>
   </ul>
-  <div><h3><a href="/solr.php" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3><br></div>
+  <div><h3><a href="/solr.php" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div>
   <ul>
     <li><b>admin:</b></li>
     <ul>
@@ -134,12 +134,12 @@
       <li>Verify drupal dependencies before changes.</li>
     </ul>
   </ul>
-  <div><h3><a href="/tools.php" title="Tools"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools</a></h3><br></div>
+  <div><h3><a href="/tools.php" title="Tools"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools</a></h3></div>
   <ul>
     <li>Initial password entered for Tools admin during appliance install.</li>
     <li>Initial apache site access is "admin:password".</li>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</h3></div>
   <ul>
     <li><b>admin:</b></li>
     <ul>

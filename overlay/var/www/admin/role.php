@@ -12,7 +12,7 @@
 </head>
 <body>
 <h1 align="center">User Role Info</h1>
-<div><h3><a href="/structure.php" title="Appliance"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</a></h3><br></div>
+<div><h3><a href="/structure.php" title="Appliance"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Appliance</a></h3></div>
 <div>
 <ul>
   <br>

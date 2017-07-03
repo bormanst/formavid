@@ -13,7 +13,7 @@
 <body>
 <h1 align="center">Solr Info</h1>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr Password</h3><br></div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr Password</h3></div>
   <ul>
     <li><b>Update /usr/local/solr/server/etc/realm.properties:</b> admin: NEWPASSWORD and drupal7: NEWPASSWORD</li>
     <li><b>Update Drupal Solr entries using a shell command as root (substitute appropriate SITENAME/TLD):</b></li>
