@@ -1,0 +1,70 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=postfix
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check dir
+# Note: support alias added below so using as a trigger
+if [ $(grep -c '^support:' /etc/aliases) -gt 0 ];  then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# Use Maildir format.
+postconf -e "home_mailbox = Maildir/"
+postfix reload
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# create virtual map
+touch /etc/postfix/virtual
+
+# add aliases
+echo "support: admin" >> /etc/aliases
+echo "webmaster@localhost admin" >> /etc/postfix/virtual
+echo "root@${APP_HOSTNAME} admin" >> /etc/postfix/virtual
+newaliases
+
+# post virtual map
+postmap /etc/postfix/virtual
+postconf -e 'virtual_alias_maps = hash:/etc/postfix/virtual'
+postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.org.pem'
+postfix reload
+
+# harden postfix banner
+postconf -e inet_interfaces=localhost
+postconf -e myhostname=${APP_HOSTNAME}
+postconf -e smtpd_banner='$myhostname ESMTP'
+
+# start service
+systemctl restart ${PACKAGE}
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

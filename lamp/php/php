@@ -1,0 +1,95 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=php
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check exists
+# Note: xdebug.max_nesting_level set below so using as a trigger
+if [[ $(php -r "echo ini_get('memory_limit');") == "256M" ]] \
+    && [[ $(php -r "echo ini_get('xdebug.max_nesting_level');") == "256" ]]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+setini() {
+
+    file=$1
+    var=$2
+    val=$3
+
+    count=$(grep -c $var $file) || true
+    if [ "$count" -eq 0 ]; then
+        echo "[WARNING] no match for $var in $file"
+    elif [ "$count" -gt 1 ]; then
+        echo "[FATAL] more than one match for $var in $file"
+        exit 1
+    else
+        echo "  - $var=$val"
+        sed -i "/^;* *$var *=/ s|^;* *$var|$var|g" $file
+        sed -i "/^$var *=/ s|= *[^ ]\+|=$val|g" $file
+    fi
+}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# use these defaults
+set ${PHP_MEMORY_LIMIT:=256M}           # php.ini default: 128MB
+set ${PHP_POST_MAX_SIZE:=16M}           # php.ini default: 8MB
+set ${PHP_UPLOAD_MAX_FILESIZE:=8M}      # php.ini default: 2MB
+
+# should be ok defaults
+set ${OPCACHE_INTERNAL_STR_BUFF:=8}     # php.ini default: 4(MB)
+set ${OPCACHE_FAST_SHUTDOWN:=1}         # php.ini default: 0 (disabled)
+set ${OPCACHE_REVALIDATE_FREQ:=30}      # php.ini default: 2 (seconds)
+
+# update defaults
+cli_ini=cli/php.ini
+for f in /etc/php/?.?/*/php.ini; do
+    [ -f $f ] || continue
+    echo "updating $f"
+    setini $f memory_limit $PHP_MEMORY_LIMIT
+    setini $f post_max_size $PHP_POST_MAX_SIZE
+    setini $f upload_max_filesize $PHP_UPLOAD_MAX_FILESIZE
+
+    # adjust opcache settings for Apache only (not cli)
+    if [ "${f%%$cli_ini}" = "$f" ]; then
+        setini $f opcache.interned_strings_buffer $OPCACHE_INTERNAL_STR_BUFF
+        setini $f opcache.fast_shutdown $OPCACHE_FAST_SHUTDOWN
+        setini $f opcache.revalidate_freq $OPCACHE_REVALIDATE_FREQ
+    fi
+done
+
+for f in /etc/php/?.?/cli/conf.d/20-xdebug.ini; do
+    [ -f $f ] || continue
+    echo "updating $f"
+    echo "xdebug.max_nesting_level=256" >> $f
+done
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

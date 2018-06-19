@@ -1,0 +1,49 @@
+#!/bin/bash
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=default_envars
+
+# order important: required password list
+export PASS_REQ_LIST="APP_PASS BORGBACKUP_PASS DB_PASS ROUNDUP_PASS SIMPLEINVOICES_PASS TOOLS_PASS"
+
+# order important: required envars
+export ENVAR_REQ_LIST="DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCS_BUCKET_REGION GCS_BUCKET_TYPE GCS_BUCKET SOLR_INSTALL DEFAULT_PASS"
+
+# DOMAIN goes first
+export DOMAIN="www.examplesitename.com" # will map to examplesitename.com
+export APP_HOSTNAME=`echo ${DOMAIN,,} | sed 's/www.//'`
+export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
+export SITETITLE="Example Site Name" # will map to Example Site Name for drupal and base admin site
+export APP_EMAIL="admin@${APP_HOSTNAME}"
+export SOLR_INSTALL="False" # default: False
+export DEFAULT_PASS=""
+
+# gcloud envars
+GCS_PROJECT_ID="None"
+GCS_BUCKET_REGION="None"
+GCS_BUCKET_TYPE="None"
+GCS_BUCKET="None"
+if [ "${GCS_PROJECT_ID}" == "None" ] && ( gcloud config list --format="text(core.project)" > /dev/null 2>&1 ); then
+    GCS_PROJECT_ID=`gcloud config list --format="text(core.project)" | sed "s/core.project: //"`
+    if ( gcloud compute project-info describe --project ${GCS_PROJECT_ID} > /dev/null 2>&1 ); then
+        GCS_BUCKET_REGION=`gcloud compute project-info describe --project ${GCS_PROJECT_ID} --format="value(commonInstanceMetadata.google-compute-default-region)"`
+        GCS_BUCKET_TYPE="nearline"
+        GCS_BUCKET="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"
+    else
+        GCS_PROJECT_ID="None"
+    fi
+fi
+export GCS_PROJECT_ID=${GCS_PROJECT_ID}
+export GCS_BUCKET_REGION=${GCS_BUCKET_REGION}
+export GCS_BUCKET_TYPE=${GCS_BUCKET_TYPE}
+export GCS_BUCKET=${GCS_BUCKET}
+
+# export ETCKEEPER_COMMIT="SKIP"
+# export REBOOT="SKIP"
+export CERTBOT_INSTALL="False" # default: False
+export SECURE_CIPHER_LIST="ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256"
+
+echo "$( date ) Exported default envars." >> ${LOG}

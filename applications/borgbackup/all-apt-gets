@@ -1,0 +1,39 @@
+#!/bin/bash
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=borgbackup
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+# check dir
+APP_DIR=/var/www/admin
+if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    MESSSAGE="Skipping package install for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+else
+    # add base packages
+    # using gcsfuse to directly temp mount storage buckets instead of rclone, etc.
+    export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+    echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+    export APTGETS="${PACKAGE} ${PACKAGE}-doc gcsfuse"
+    export "${PACKAGE^^}"="True"
+    # log export
+    MESSSAGE="export ${PACKAGE^^}=True"
+    echo ${MESSSAGE} | tee -a ${LOG} ${FORMAVID}/bin/deploy/shell/default_envars
+fi

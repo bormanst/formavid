@@ -1,0 +1,35 @@
+#!/bin/bash
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+DEFAULT_ENVARS=${FORMAVID}/bin/deploy/shell/default_envars
+
+# export user input
+export_user_input () {
+    # prompt for input with default
+    read -p "Please enter ${1} or press enter to select the default of [${2}]:" ${1}
+    # export based on intput
+    if [[ -z "${!1// }" ]]; then export ${1}=${2}; else export ${1}=${!1}; fi
+}
+
+# get envars
+ARG=1
+for ENVAR in ${ENVAR_REQ_LIST}; do
+    # skip passwords
+    if [[ "${ENVAR}" != *"PASS"* ]]; then
+        # get inputs
+        export_user_input "${ENVAR}" "${!ENVAR}"
+        # update default
+        sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=${!ENVAR}/" ${DEFAULT_ENVARS}
+    fi
+    # args++
+    let ARG=ARG+1
+done
+
+# set remaining envars
+export APP_HOSTNAME=`echo "${DOMAIN,,}" | sed 's/www.//'`
+export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
+
+echo "$( date ) Exported user selected envars." >> ${LOG}

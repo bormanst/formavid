@@ -1,0 +1,212 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=simpleinvoices
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+APP_DIR=/var/www/${PACKAGE}
+# check dir
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: mysql
+DEPENDS=mysql
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: apache2
+DEPENDS=apache2
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: php
+DEPENDS=php
+if ! (hash php); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: git
+DEPENDS=git
+if ! hash ${DEPENDS} 2>/dev/null; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+DB_NAME=${PACKAGE}
+DB_USER=${PACKAGE}
+
+CONF=${APP_DIR}/config/config.php
+AVAILABLE=/etc/apache2/sites-available
+ENABLED=/etc/apache2/sites-enabled
+
+# install latest
+URL="git://github.com/${PACKAGE}/${PACKAGE}.git"
+BRANCH="master"
+git clone --recursive --depth 1 -b ${BRANCH} ${URL} ${APP_DIR}
+
+# set permissions
+chown -R root:root ${APP_DIR}
+chown -R www-data:www-data ${APP_DIR}/tmp
+chown www-data:www-data ${CONF}
+
+# tweak configuration
+sed -i "0,/params.username/s/params.username.*/params.username = ${DB_USER}/" ${CONF}
+sed -i "0,/params.password/s/params.password.*/params.password = ${DB_PASS}/" ${CONF}
+sed -i "0,/params.dbname/s/params.dbname.*/params.dbname = ${DB_NAME}/" ${CONF}
+sed -i "s|Europe/London|UTC|" ${CONF}
+
+# set database access
+MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
+MYSQL_ADMIN="mysqladmin --user=root --password=${DB_PASS}"
+${MYSQL_ADMIN} create ${DB_NAME}
+${MYSQL_BATCH} --execute "grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${DB_PASS}'; flush privileges;"
+
+# curl based install
+URL="http://127.0.0.1/index.php?module=install"
+CURL="curl -c /tmp/cookie -b /tmp/cookie"
+${CURL} "${URL}&view=structure"
+${CURL} "${URL}&view=essential"
+rm -f /tmp/cookie
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# enable authentication and set default creds
+sed -i "s|^authentication.enabled.*|authentication.enabled = true|" ${CONF}
+
+#we don`t need mysql 1071 error
+sed -i "s|\`email\` varchar(255) DEFAULT NULL,|\`email\` varchar(40) DEFAULT NULL,|" ${APP_DIR}/databases/mysql/Full_Simple_Invoices.sql
+sed -i "s|\`name\` varchar(255) NOT NULL,|\`name\` varchar(50) NOT NULL,|" ${APP_DIR}/databases/mysql/Full_Simple_Invoices.sql
+
+# create database
+mysql --user=root --password=${DB_PASS} ${DB_NAME} < ${APP_DIR}/databases/mysql/Full_Simple_Invoices.sql
+
+# set admin password
+${FORMAVID}/bin/initialize/python/simpleinvoices.py
+
+# set nonce key: should be random and secret
+RANDOM_1=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''`
+RANDOM_2=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''`
+RANDOM_3=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''`
+sed -i "s|^nonce.key.*|nonce.key = ${RANDOM_1}${RANDOM_2}${RANDOM_3}|" ${CONF}
+
+# secure sensitive files
+chmod 0640 ${CONF}
+
+# create etc dir
+ETC=/etc/${PACKAGE}
+mkdir -p ${ETC}
+
+# apache2: create conf
+APACHE_CONF=${ETC}/apache.conf
+cat > ${APACHE_CONF} <<EOF
+<VirtualHost *:443>
+    ServerName billing.${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    SSLEngine on
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    Alias /theme /var/www/drupal8/themes/${SITENAME}
+    DocumentRoot ${APP_DIR}
+    <Directory ${APP_DIR}>
+        AllowOverride All
+        Options +FollowSymLinks
+        AuthName "password protected area"
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName billing.${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    RedirectPermanent / "https://billing.${APP_HOSTNAME}/"
+</VirtualHost>
+EOF
+
+#  apache2: set conf perms
+chmod 0644 ${APACHE_CONF}
+
+# apache2: link conf file
+ln -s ${APACHE_CONF} ${AVAILABLE}/${PACKAGE}.conf
+
+# apache2: enable conf
+a2enmod rewrite
+a2ensite ${PACKAGE}
+
+# add hosts entry
+sed -i "/127.0.1.1/s/$/ billing.${APP_HOSTNAME}/" /etc/hosts
+
+# apply theme.
+sed -i "/<title/d" ${APP_DIR}/templates/default/header.tpl
+sed -i "/favicon.ico/d" ${APP_DIR}/templates/default/header.tpl
+sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/templates/default/header.tpl
+sed -i "s/<style>/<!-- <style>/" ${APP_DIR}/templates/default/header.tpl
+sed -i "s/<\/style>/<\/style> -->/" ${APP_DIR}/templates/default/header.tpl
+sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${APP_DIR}/templates/default/header.tpl
+sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/templates/default/header.tpl
+sed -i "s/sedtoolname/Billing/g" ${APP_DIR}/templates/default/header.tpl
+
+# clean up
+touch ${APP_DIR}/tmp/cache/
+rm -rf ${APP_DIR}/tmp/cache/*
+
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

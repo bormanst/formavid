@@ -1,0 +1,92 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=mysql
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check exists
+# Note: force_utf8mb4.cnf is applied by overlay below
+#       so using as a trigger
+MYSQL_CONF=/etc/mysql/conf.d/force_utf8mb4.cnf
+if [ -f "${MYSQL_CONF}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+BATCH_EX="--batch --execute"
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+
+# set root password
+mysqladmin -u root password ${DB_PASS}
+
+# set required global vars
+QUERY="SET GLOBAL innodb_file_format=Barracuda; SET GLOBAL innodb_file_per_table=ON; SET GLOBAL innodb_large_prefix=1;"
+mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+
+# enable db socket access
+CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
+sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
+
+# TODO: secure installation
+
+# use mysql db
+# MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
+# QUERY="USE mysql;"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# remove anonymous users
+# QUERY="DELETE FROM user WHERE User='';"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# remove remote root
+# QUERY="DELETE FROM user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# remove test database
+# QUERY="DROP DATABASE IF EXISTS test;"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# QUERY="DELETE FROM db WHERE Db='test' OR Db='test\\_%';"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# rename root to adminer
+# QUERY="RENAME USER 'root'@'localhost' TO 'adminer'@'localhost';"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# reload privilege
+# QUERY="FLUSH PRIVILEGES;"
+# ${MYSQL_BATCH} --execute ${QUERY}
+
+# restart service
+systemctl restart ${PACKAGE}
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

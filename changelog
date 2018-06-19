@@ -1,21 +1,100 @@
-turnkey-formavid-14.2 (1) turnkey; urgency=low
+formavid (15.0.0) stable; urgency=low
+
+  * Refactored to be a collection of install and configuration scripts.
+
+  * Simple script layout allows for the additon or removal of components.
+
+  * Scripts are well documented for easy modification or customization.
+
+  * No longer dependent on a proprietary distro.
+
+  * Targets Debian 9 Stretch as the preferred base distro.
+
+  * Designed to work on a minimal Google Compute Engine f1-micro instance.
+
+  * Drupal upgraded to 8.5.4 and installed using Composer.
+
+  * MySQL has been replaced with the new Debian default MariaDB 10.1.26.
+
+  * Roundup upgraded to 1.5.1.
+
+  * Solr upgraded to 7.3.1 and is now an optional install.
+
+  * BorgBackup added as the preferred deduplicating backup utilty.
+
+  * Drupal 8 configurations:
+
+   - Installed from upstream source code to /var/www/drupal8.
+   - Includes drush for command line administration and configuration.
+   - Includes composer for base component and module administration.
+   - Configured to use Gulp/Sass for improved design efficiency.
+   - Default theme based upon Zen Grids for mobile first design.
+   - Site stacks are created in /var/www/drupal8/sites.
+   - Each site stack has its own corresponding apache.conf stack file.
+
+  * Includes many useful/popular Drupal 8 modules:
+
+    drupal/advagg
+    drupal/advanced_help
+    drupal/background_image
+    drupal/backup_migrate
+    drupal/captcha
+    drupal/components
+    drupal/ctools
+    drupal/devel
+    drupal/features
+    drupal/field_group
+    drupal/fivestar
+    drupal/honeypot
+    drupal/image_style_quality
+    drupal/imageapi_optimize
+    drupal/imagemagick
+    drupal/imce
+    drupal/inline_entity_form
+    drupal/module_filter
+    drupal/panels
+    drupal/pathauto
+    drupal/recaptcha
+    drupal/rules
+    drupal/search_api_solr
+    drupal/search_api_solr_defaults
+    drupal/tagadelic
+    drupal/views_bulk_operations
+    drupal/zen
+
+  * Major component versions:
+
+    adminer         4.2.5
+    apache2         2.4.25
+    borgbackup      1.0.9
+    dovecot         2.2.27
+    drupal          8.5.4 (upstream archive)
+    fail2ban        0.9.6
+    mariadb         10.1.26
+    php             7.0.27
+    proftpd         1.35
+    postfix         3.1.8
+    roundup         1.5.1 (upstream archive)
+    simpleinvoices  2011.1 (upstream archive)
+    solr (optional) 7.3.1 (upstream archive)
+
+ -- Sean Borman <bormanst@gmail.com>  Sun, 17 Jun 2018 23:11:03 -0500
+
+formavid (14.2.0) stable; urgency=low
 
   * Updated Adminer to 4.2.5
 
   * Updated Drupal7 to latest stable upstream (via drush).
 
   * Updated Drush to latest stable relevant version.
-  
+
   * Updated Solr to 5.5.4
 
   * Installed security updates.
 
-  * Note: Please refer to turnkey-core's changelog for changes common to all
-    appliances. Here we only describe changes specific to this appliance.
-
  -- Sean Borman <bormanst@gmail.com>  Fri, 30 Jun 2017 17:11:31 -0500
 
-turnkey-formavid-14.1 (2) turnkey; urgency=low
+formavid (14.1.1) stable; urgency=low
 
   * Solr version updated to 5.5.3
 
@@ -27,21 +106,18 @@ turnkey-formavid-14.1 (2) turnkey; urgency=low
 
  -- Sean Borman <bormanst@gmail.com>  Wed, 14 Sep 2016 15:08:37 -0500
 
-turnkey-formavid-14.1 (1) turnkey; urgency=low
+formavid (14.1.0) stable; urgency=low
 
   * Solr version updated to 5.5.0.
 
-  * Drupal, Roundup, SimpleInvoices conf.d script files updated to their 
+  * Drupal, Roundup, SimpleInvoices conf.d script files updated to their
     recent respective appliance versions and customization comments added.
-
-  * Note: Please refer to turnkey-core's changelog for changes common to all
-    appliances. Here we only describe changes specific to this appliance.
 
  -- Sean Borman <bormanst@gmail.com>  Wed, 06 Apr 2016 14:58:37 -0500
 
-turnkey-formavid-14.0 (1) turnkey; urgency=low
+formavid (14.0.0) stable; urgency=low
 
-  * Initial public release of TurnKey FormaVid.
+  * Initial public release of FormaVid.
 
   * Set root password on firstboot (convenience, security).
 
@@ -77,7 +153,7 @@ turnkey-formavid-14.0 (1) turnkey; urgency=low
     Also includes webmin dovecot module for convenience.
 
   * Drupal 7 configurations:
-   
+
    - Installed from upstream source code to /var/www/drupal7.
    - Includes drush for command line administration and configuration.
    - Configured to use Compass/Sass for improved design efficiency.
@@ -121,7 +197,7 @@ turnkey-formavid-14.0 (1) turnkey; urgency=low
   * Roundup configurations:
 
     - Uses webserver to serve roundup (instead of roundup-server).
-    - Installed from package management to /var/www/support instead 
+    - Installed from package management to /var/www/support instead
       of default /var/lib/roundup.
     - Disabled registration confirmation via email (requires mail server).
     - Includes Xapian full text indexer (recommended for large issue DB).
@@ -130,7 +206,7 @@ turnkey-formavid-14.0 (1) turnkey; urgency=low
     - Pinned Roundup and related to update directly from Debian (security).
 
   * SimpleInvoices configurations:
-   
+
    - Installed from upstream source code to /var/www/simpleinvoices.
    - Apache protected site using 'admin':simpleinvoices_password .
    - Initial user login 'admin@hostname':simpleinvoices_password.
@@ -142,19 +218,16 @@ turnkey-formavid-14.0 (1) turnkey; urgency=low
 
   * Major component versions
 
-    adminer		3.3.3-1
-    apache2		2.4.10-10+deb8u3
-    dovecot		2.2.13-12~deb8u1
-    drupal		7.39 (upstream archive)
-    drush		7.x-6.2.0 (upstream archive)
-    mysql-server	5.5.44-0+deb8u1
-    proftpd		1.3.5-1.1+deb8u1
-    postfix		2.11.3-1
-    roundup		1.4.20-1.1
-    simpleinvoices	2011.1 (upstream archive)
-    solr		5.3.1 (upstream archive)
-
-  * Note: Please refer to turnkey-core's changelog for changes common to all
-    appliances. Here we only describe changes specific to this appliance.
+    adminer     3.3.3-1
+    apache2     2.4.10-10+deb8u3
+    dovecot     2.2.13-12~deb8u1
+    drupal      7.39 (upstream archive)
+    drush       7.x-6.2.0 (upstream archive)
+    mysql-server    5.5.44-0+deb8u1
+    proftpd     1.3.5-1.1+deb8u1
+    postfix     2.11.3-1
+    roundup     1.4.20-1.1
+    simpleinvoices  2011.1 (upstream archive)
+    solr        5.3.1 (upstream archive)
 
  -- Sean Borman <bormanst@gmail.com>  Sat, 10 Oct 2015 00:49:23 +0000

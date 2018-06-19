@@ -1,0 +1,17 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# will be skipped if REBOOT set to SKIP
+
+reboot() {
+    shutdown -r now
+}
+
+if [ "$REBOOT" == "SKIP" ] || [ -z "${PASSWORDS_ONLY}" ]; then
+    /usr/local/formavid-gce/bin/initialize/python/reboot-ask.py && reboot
+fi
+
+exit 0

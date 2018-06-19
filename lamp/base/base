@@ -1,0 +1,179 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=base
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check dir
+APP_DIR=/var/www/admin
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# create admin
+if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ];  then
+    useradd -g adm -m -s /bin/bash admin
+    echo admin:${APP_PASS} | chpasswd
+fi
+
+# create cssadmin user
+if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ];  then
+    useradd -U -m -s /bin/bash cssadmin
+    echo cssadmin:${APP_PASS} | chpasswd
+    echo "cd /var/www/drupal8/themes" >> /home/cssadmin/.bashrc
+fi
+
+# tools: add hosts entry
+sed -i "/127.0.0.1/s/$/ admin.${APP_HOSTNAME}/" /etc/hosts
+
+# tools: update admin pages
+sed -i "s/sedlowername/${SITENAME}/g" ${APP_DIR}/*.php
+sed -i "s/sedsitename/${SITETITLE}/g" ${APP_DIR}/*.php
+sed -i "s/sedhostname/${APP_HOSTNAME}/g" ${APP_DIR}/*.php
+
+# tools: update header
+sed -i "s/sedsitename/${SITETITLE}/g" ${FORMAVID}/sites-template/header.txt
+
+# tools: theme
+sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/*.php
+sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/*.php
+sed -i "s/sedtoolname/Admin/g" ${APP_DIR}/*.php
+
+# stunnel conf
+CONF=/etc/stunnel/stunnel.conf
+cat > ${CONF} <<EOF
+; **************************************************************************
+; * Global options                                                         *
+; **************************************************************************
+
+; A copy of some devices and system files is needed within the chroot jail
+; Chroot conflicts with configuration file reload and many other features
+; Remember also to update the logrotate configuration.
+chroot = /var/lib/stunnel4/
+; Chroot jail can be escaped if setuid option is not used
+setuid = stunnel4
+setgid = stunnel4
+
+; PID is created inside the chroot jail
+pid = /stunnel4.pid
+
+; Debugging stuff (may useful for troubleshooting)
+;debug = 7
+;output = /var/log/stunnel4/stunnel.log
+
+; **************************************************************************
+; * Service defaults may also be specified in individual service sections  *
+; **************************************************************************
+
+; Certificate/key is needed in server mode and optional in client mode
+cert = /etc/ssl/private/cert.pem
+
+; Authentication stuff needs to be configured to prevent MITM attacks
+; It is not enabled by default!
+; verify = 2
+; Don't forget to c_rehash CApath
+; CApath is located inside chroot jail
+;CApath = /certs
+; It's often easier to use CAfile
+;CAfile = /etc/stunnel/certs.pem
+; CAfile = etc/ssl/certs/ca-certificates.crt
+; Don't forget to c_rehash CRLpath
+; CRLpath is located inside chroot jail
+;CRLpath = /crls
+; Alternatively CRLfile can be used
+;CRLfile = /etc/stunnel/crls.pem
+
+; Disable support for insecure SSLv2 protocol
+options = NO_SSLv3
+
+; Workaround for Eudora bug
+;options = DONT_INSERT_EMPTY_FRAGMENTS
+
+; These options provide additional security at some performance degradation
+;options = SINGLE_ECDH_USE
+;options = SINGLE_DH_USE
+
+options = CIPHER_SERVER_PREFERENCE
+renegotiation = no
+
+ciphers=${SECURE_CIPHER_LIST}
+EOF
+
+# enable stunnel to automatically start services
+sed -i "s|ENABLED=0|ENABLED=1|" /etc/default/stunnel4
+
+# shellinabox: create default configuration
+set ${SHELLINABOX_PORT:=12319}
+CONF=/etc/default/shellinabox
+cat > ${CONF} <<EOF
+SHELLINABOX_DAEMON_START=1
+SHELLINABOX_PORT=${SHELLINABOX_PORT}
+SHELLINABOX_ARGS="--no-beep --disable-ssl --localhost-only"
+EOF
+
+# shellinabox: add stunnel entry
+set ${ACCEPT_PORT:=12320}
+set ${BIND_ADDR:=127.0.0.1}
+CONF=/etc/stunnel/stunnel.conf
+cat >> ${CONF} <<EOF
+
+[shellinabox]
+accept = ${ACCEPT_PORT}
+connect = ${BIND_ADDR}:${SHELLINABOX_PORT}
+TIMEOUTclose = 0
+EOF
+
+# set default theme as white on black
+ENABLED=/etc/shellinabox/options-enabled
+AVAILABLE=/etc/shellinabox/options-available
+rm ${ENABLED}/00*
+ln -s ${AVAILABLE}/00_White\ On\ Black.css ${ENABLED}/00+White\ On\ Black.css
+ln -s ${AVAILABLE}/00+Black\ on\ White.css ${ENABLED}/00_Black\ on\ White.css
+
+# shellinabox: update securetty (for root login)
+echo >> /etc/securetty
+echo "# shellinabox" >> /etc/securetty
+declare -i COUNT=0
+while [ $COUNT -le 40 ]; do
+    echo "pts/$COUNT" >> /etc/securetty
+    ((COUNT=$COUNT+1))
+done
+
+# update unattended-upgrades
+sed -i 's|//Unattended-Upgrade::Mail "root";|Unattended-Upgrade::Mail "root";|' /etc/apt/apt.conf.d/50unattended-upgrades
+
+# enable unattended-upgrades
+sed -i 's|//Unattended-Upgrade::Mail "root";|Unattended-Upgrade::Mail "root";|' /etc/apt/apt.conf.d/50unattended-upgrades
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0
+

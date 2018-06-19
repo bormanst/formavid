@@ -1,0 +1,371 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=deploy_appliance
+
+echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
+echo "This program is free software: you can redistribute it and/or modify"
+echo "it under the terms of the GNU General Public License as published by"
+echo "the Free Software Foundation, either version 3 of the License, or"
+echo "(at your option) any later version."
+echo ""
+echo "This program is distributed in the hope that it will be useful,"
+echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
+echo "GNU General Public License for more details."
+echo ""
+echo "You should have received a copy of the GNU General Public License"
+echo "along with this program. If not, see <https://www.gnu.org/licenses/>."
+
+# set default FORMAVID
+export FORMAVID=/usr/local/formavid
+
+# check FORMAVID
+if [ ! -d "${FORMAVID}" ]; then
+    # dir should exist: this script is supposed to be located in formavid/bin
+    export FORMAVID=$(find /usr/local -name "formavid")
+    if [ -z "${FORMAVID}" ]; then
+        echo ""
+        echo ""
+        echo "WARNING! ${PACKAGE} depends on formavid's location being in /usr/local."
+        echo "WARNING! Please ensure that formavid is located in /usr/local."
+        echo "WARNING! OR"
+        echo "WARNING! Modify formavid's default location formavid/bin/${PACKAGE}."
+        echo ""
+        echo ""
+        exit 0
+    fi
+fi
+
+# create log files
+FORMAVID_LOGS=/var/log/formavid
+mkdir -p ${FORMAVID_LOGS}
+
+# export log
+export LOG=${FORMAVID_LOGS}/deploy_appliance.log
+
+# begin deployment
+TIME_START=$( date +%s )
+echo "$( date ) Deployment started." >> ${LOG}
+
+# configure apt for queued access
+CONF=/etc/apt/apt.conf
+if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
+
+# load default envars
+. ${FORMAVID}/bin/deploy/shell/default_envars
+
+# get envars
+let ENVAR_REQ_LIST_SIZE=`echo "${ENVAR_REQ_LIST}" | awk -F" " '{print NF-1}'`+1
+if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; then
+    DEFAULT_ENVARS=${FORMAVID}/bin/deploy/shell/default_envars
+    # set envars by args
+    echo "$( date ) Using passed in envars." >> ${LOG}
+    ARG=1
+    for ENVAR in ${ENVAR_REQ_LIST}; do
+        # export envar
+        export ${ENVAR}="${!ARG}"
+        # update default envars
+        if [[ "${ENVAR}" != *"PASS"* ]]; then
+            sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=${!ARG}/" ${DEFAULT_ENVARS}
+        fi
+        # args++
+        let ARG=ARG+1
+    done
+else
+    # set envars by input
+    . ${FORMAVID}/bin/deploy/shell/get_envars
+fi
+
+# set passwords by input
+. ${FORMAVID}/bin/deploy/shell/get_passwords ${DEFAULT_PASS}
+
+# dependencies check
+${FORMAVID}/bin/deploy/shell/dependencies
+
+# check envars
+if [ -n "${APP_EMAIL}" ] || [ -n "${PASSWORDS_ONLY}" ]; then
+    # Note: apt-get locks so cannot run parallel jobs
+    # Note: apt cron daemon is just a serializer so no better
+    # install all packages prior to configuration scripts
+    PKGS=all-apt-gets
+
+    # set parent
+    PARENT_DIR=${FORMAVID}/lamp
+    # check script dir
+    if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
+    MESSSAGE="$( date ) Building list of apt packages..."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # initialize ALLAPTGETS
+    ALLAPTGETS=""
+    # get application dirs
+    for CHILD_DIR in $(find ${PARENT_DIR} -maxdepth 1 -mindepth 1 -type d | sort); do
+        # run only all-apt-gets
+        SCRIPT=$(find ${CHILD_DIR} -name "${PKGS}")
+        if [ -f "${SCRIPT}" ] && [ -x "${SCRIPT}" ]; then
+            MESSSAGE="$( date ) Adding packages from: ${SCRIPT}"
+            echo ""
+            echo "# ${MESSSAGE}"
+            echo ${MESSSAGE} >> ${LOG}
+            . ${SCRIPT}
+            # build package list
+            ALLAPTGETS="${ALLAPTGETS} ${APTGETS}"
+        fi
+    done
+    # set parent
+    PARENT_DIR=${FORMAVID}/applications
+    # check script dir
+    if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
+    # get application dirs
+    for CHILD_DIR in $(find ${PARENT_DIR} -maxdepth 1 -mindepth 1 -type d | sort); do
+        # run only all-apt-gets
+        SCRIPT=$(find ${CHILD_DIR} -name "${PKGS}")
+        if [ -f "${SCRIPT}" ] && [ -x "${SCRIPT}" ]; then
+            MESSSAGE="$( date ) Adding packages from: ${SCRIPT}"
+            echo ""
+            echo "# ${MESSSAGE}"
+            echo ${MESSSAGE} >> ${LOG}
+            . ${SCRIPT}
+            # build package list
+            ALLAPTGETS="${ALLAPTGETS} ${APTGETS}"
+        fi
+    done
+    # if ALLAPTGETS then install
+    if [[ ! -z "${ALLAPTGETS// }" ]]; then
+        echo ""
+        MESSSAGE="$( date ) Installing apt packages..."
+        echo "#############################################"
+        echo "#"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+        # update to enable all added sources
+        apt-get update
+        # disable interactive apt installs
+        export DEBIAN_FRONTEND=noninteractive
+        # batch install packages
+        apt-get install -y -qq ${ALLAPTGETS}
+    fi
+    echo ""
+    MESSSAGE="$( date ) Required apt packages are installed."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+
+    echo ""
+    MESSSAGE="$( date ) Installing base lamp applications..."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # set parent
+    PARENT_DIR=${FORMAVID}/lamp
+    # check script dir
+    if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
+    # get application dirs
+    for CHILD_DIR in $(find ${PARENT_DIR} -maxdepth 1 -mindepth 1 -type d | sort); do
+        # loop through scripts
+        for SCRIPT in $(find ${CHILD_DIR} -maxdepth 1 -type f | sort); do
+            # skip package and non-executables
+            if [ "${SCRIPT}" == "${CHILD_DIR}/${PKGS}" ] || [ ! -x "${SCRIPT}" ]; then continue; fi
+            # execute script
+            MESSSAGE="$( date ) Running script: ${SCRIPT}"
+            echo ""
+            echo "# ${MESSSAGE}"
+            echo ${MESSSAGE} >> ${LOG}
+            ${SCRIPT} ${CHILD_DIR} &
+        done
+    done
+    echo ""
+    MESSSAGE="$( date ) Waiting for background processes..."
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # wait for processes completed
+    wait
+    # bug - other systemd services gerk after enabling solr
+    if [ "${SOLR_INSTALL}" == "True" ]; then
+        systemctl restart mysql
+        systemctl restart apache2
+        systemctl restart postfix
+    fi
+    echo ""
+    MESSSAGE="$( date ) Base lamp setup completed."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+
+    # run app scripts
+    echo ""
+    MESSSAGE="$( date ) Installing dependent applications..."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # set parent
+    PARENT_DIR=${FORMAVID}/applications
+    # check script dir
+    if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
+    # get application dirs
+    for CHILD_DIR in $(find ${PARENT_DIR} -maxdepth 1 -mindepth 1 -type d | sort); do
+        # loop through scripts
+        for SCRIPT in $(find ${CHILD_DIR} -maxdepth 1 -type f | sort); do
+            # skip package and non-executables
+            if [ "${SCRIPT}" == "${CHILD_DIR}/${PKGS}" ] || [ ! -x "${SCRIPT}" ]; then continue; fi
+            # execute script
+            MESSSAGE="$( date ) Running script: ${SCRIPT}"
+            echo ""
+            echo "# ${MESSSAGE}"
+            echo ${MESSSAGE} >> ${LOG}
+            ${SCRIPT} ${CHILD_DIR} &
+        done
+    done
+    echo ""
+    MESSSAGE="$( date ) Waiting for background processes..."
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # wait for processes completed
+    wait
+
+    # restart stunnel4
+    if (systemctl -q is-active stunnel4); then systemctl restart stunnel4; fi
+
+    # restart shellinabox - depends on stunnel4
+    if (systemctl -q is-active shellinabox); then systemctl restart shellinabox; fi
+
+    # restart webmin - depends on stunnel4
+    if (systemctl -q is-active webmin); then systemctl restart webmin; fi
+
+    # restart apache2
+    if (systemctl -q is-active apache2); then systemctl restart apache2; fi
+
+    echo ""
+    MESSSAGE="$( date ) Install and configuration completed."
+    echo "#############################################"
+    echo "#"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+
+    # initialize appliance
+    # ${FORMAVID}/bin/initialize_appliance
+
+    # initial hourly borgbackup
+    # SCRIPT=/etc/cron.hourly/borgbackup
+    SCRIPT=DONTBACKUP
+    if [ -f "${SCRIPT}" ]; then
+        echo ""
+        MESSSAGE="$( date ) Performing initial hourly borgbackup..."
+        echo "#############################################"
+        echo "#"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+        # initial hourly borgbackup
+        ${SCRIPT}
+        echo ""
+        MESSSAGE="$( date ) Initial hourly borgbackup completed."
+        echo "#############################################"
+        echo "#"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+    fi
+
+    # initial daily borgbackup
+    # SCRIPT=/etc/cron.daily/borgbackup
+    SCRIPT=DONTBACKUP
+    if [ -f "${SCRIPT}" ]; then
+        echo ""
+        MESSSAGE="$( date ) Performing initial daily borgbackup..."
+        echo "#############################################"
+        echo "#"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+        # initial daily borgbackup
+        ${SCRIPT}
+        echo ""
+        MESSSAGE="$( date ) Initial daily borgbackup completed."
+        echo "#############################################"
+        echo "#"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+    fi
+fi
+
+# end deployment
+TIME_END=$( date +%s )
+TIME_TOTAL=$(( ${TIME_END}-${TIME_START} ))
+SECONDS=$(( ${TIME_TOTAL}%60 ))
+MINUTES=$(( (${TIME_TOTAL}-${SECONDS})%3600 ))
+HOURS=$(( ((${TIME_TOTAL}-${MINUTES}-${SECONDS})%216000)/3600 ))
+MINUTES=$(( ${MINUTES}/60 ))
+echo ""
+MESSSAGE="$( date ) Appliance deployment completed in ${HOURS}-hr:${MINUTES}-min:${SECONDS}-sec."
+echo "#############################################"
+echo "#"
+echo "#"
+echo "# ${MESSSAGE}"
+echo "#"
+echo "#"
+echo "#############################################"
+echo ${MESSSAGE} >> ${LOG}
+
+echo ""
+
+exit 0

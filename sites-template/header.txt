@@ -1,0 +1,8 @@
+<header class="header" id="header" role="banner">
+<div class="header__name-and-slogan" id="name-and-slogan">
+  <h1 class="header__site-name" id="site-name">
+    <a href="/" title="Home" rel="home" class="header__logo" id="logo"><img src="/images/logo.svg" alt="Home" class="header__logo-image" /></a>
+    <a href="/" title="Home" class="header__site-link" rel="home" style="text-decoration:none"><span>sedsitename sedtoolname</span></a>
+  </h1>
+</div>
+</header>

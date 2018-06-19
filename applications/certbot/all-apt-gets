@@ -1,0 +1,37 @@
+#!/bin/bash
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=certbot
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+# check install and dir
+APP_DIR=/usr/lib/python3/dist-packages/${PACKAGE}
+if [ "${CERTBOT_INSTALL}" != "True" ]; then
+    MESSSAGE="default_envars:CERTBOT_INSTALL not set to 'True'. Skipping package install for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+elif [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    MESSSAGE="Skipping package install for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+else
+    # install latest
+    export APTGETS="python-certbot-apache python-certbot-apache-doc"
+    export "${PACKAGE^^}"="True"
+    # log export
+    MESSSAGE="export ${PACKAGE^^}=True"
+    echo ${MESSSAGE} | tee -a ${LOG} ${FORMAVID}/bin/deploy/shell/default_envars
+fi

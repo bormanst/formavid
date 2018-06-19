@@ -1,8 +1,20 @@
-This appliance has all the standard features in `TurnKey Core`_, plus:
-----------------------------------------------------------------------
+The FormaVid Small Business Appliance has been completely refactored:
+------------------------------------------------------------------------
+
+- Refactored to be a collection of install and configuration scripts.
+- No longer incorporates base operating system allowing for user choice.
+- Specifically designed to run on Google Compute Engine's Debian-9 image
+  but will run on compatible distros with minor modifications.
+- All dependencies on other vendor distros have been removed.
+- Deployable on local hardware, VMs, or to the cloud.
+- Select any compatible base distro and let the scripts do the work.
 
 
-Drupal 7 - Content Management Framework
+The FormaVid Small Business Appliance integrates the following features:
+------------------------------------------------------------------------
+
+
+Drupal 8 - Content Management Framework
 =======================================
 
 `Drupal`_ is an open source content management platform licensed under
@@ -10,54 +22,59 @@ the GPL. Equipped with a powerful blend of features, Drupal can support
 a variety of websites ranging from personal blogs, corporate brochures
 and large community-driven websites.
 
-- Drupal 7 configurations:
-   
-   - Installed from upstream source code to /var/www/drupal7
+- Drupal 8 configurations:
+
+   - Installed from upstream source code to /var/www/drupal8.
    - Includes drush for command line administration and configuration.
-   - Configured to use Compass/Sass for improved design efficiency.
+   - Includes composer for base component and module administration.
+   - Configured to use Gulp/Sass for improved design efficiency.
    - Default theme based upon Zen Grids for mobile first design.
-   - Site stacks are created in /var/www/drupal7/sites.
+   - Site stacks are created in /var/www/drupal8/sites.
    - Each site stack has its own corresponding apache.conf stack file.
 
-- Bundled popular Drupal 7 modules and dependencies (installed to
-  /var/www/drupal7/sites/all/modules):
-   
-   - `Panels`_: Drag and drop customized layouts for pages, nodes and
-     blocks.
+- Additional Drupal 8 modules and dependencies:
+
+   - `Advagg`_: Advanced CSS/JS Aggregation.
+   - `Advanced help`_: Allows developers to store help outside the system.
+   - `Background Image`_: Allows utilizing background images.
    - `Backup and migrate`_: Backup and restore your Drupal site
      on-demand or on a schedule.
+   - `CAPTCHA`_: A challenge-response test for forms.
+   - `Component Libraries`_: Registers “component libraries” defined by
+     your theme or module as Twig namespaces.
+   - `Chaos tool suite`_: Set of APIs and tools for developers.
    - `Devel`_: A suite of helper modules for Drupal module and theme
      developers.
    - `Drush`_: a command line shell and Unix scripting interface for
      Drupal.
-   - `Ckeditor`_: Enables CKeditor (a WYSIWYG editor) instead of plain
-     text fields.
+   - `Features`_: Enables the capture and management of features.
+   - `Field Group`_: Enables grouping fields together.
+   - `FiveStar`_: Simple five-star voting widget for nodes.
+   - `Honeypot`_: Methods for deterring spam bots.
+   - `Image Style Quality`_: Allows you to specify a custom quality on
+     individual image styles.
+   - `ImageAPI Optimize`_: allows you to use your preferred toolkit and
+     optimize (losslessly) the image when it is saved.
+   - `ImageMagick`_: Allows to use ImageMagick or GraphicsMagick as image
+     toolkit for Image API.
    - `Imce`_: Powerful image file uploader and browser, with support for
      on the fly resizing.
+   - `Inline Entity Form`_: Provides a widget for inline management
+     (creation, modification, removal) of referenced entities.
+   - `Module Filter`_: The ability to quickly find  modules.
+   - `Panels`_: Drag and drop customized layouts for pages, nodes and
+     blocks.
+   - `PathAuto`_: Auto-generate search engine friendly URLs (SEO).
    - `Recaptcha`_: Thwart spammers by adding image or text based
      CAPTCHAs to your site.
-   - `PathAuto`_: Auto-generate search engine friendly URLs (SEO).
-   - `GlobalRedirect`_: Alias 301 redirects, prevents duplicate content.
-     (SEO)
-   - `FiveStar`_: Simple five-star voting widget for nodes.
-   - `Webform`_: Create forms and questionnaires.
-   - `Logintoboggan`_: Improves Drupal's login system.
-   - `Admin menu`_: Adds dropdown administration menu to the top of the
-     screen.
+   - `Rules`_: Allows site administrators to define conditionally
+     executed actions based on occurring events.
+   - `Search API Solr Search`_: Optional customizable search support.
    - `Tagadelic`_: Makes weighted tag clouds from your taxonomy terms.
-   - `Lightbox2`_: Places images above your current page, not within.
-   - `Google analytics`_: Adds Google Analytics js tracking code to all
-     your site's pages.
-   - `Advanced\_help`_: Improves the Drupal help system.
-   - `Rules`_: Lets you define conditionally executed actions based on
-     occurring events.
-   - `Jquery\_ui`_: provides jQuery UI plugin to other Drupal modules.
-   - `Token`_: Provides a shared API for replacement of textual
-     placeholders with actual data.
-   - `Email`_: Support email field in custom content types.
-   - `Link`_: Support URL link field in custom content types.
-   - `Date`_: Support Date field in custom content types.
-   - `Apache Solr`_: Customizable search support.
+   - `Views Bulk Operations`_: augments Views by allowing bulk operations
+     to be executed on the displayed rows.
+   - `Zen`_: a modern, powerful, HTML5 starting theme with component-based
+     CSS and a responsive, mobile-first grid design.
 
 
 Roundup - Issue Tracking System
@@ -69,8 +86,8 @@ bug tracking and TODO list management, issue management, customer help
 desk support, and sales lead tracking.
 
 - Roundup configurations:
-   
-   - Installed from package management to /var/www/support instead 
+
+   - Installed from package management to /var/www/support instead
      of default /var/lib/roundup.
    - Uses Apache2 to serve roundup (instead of roundup-server).
    - Disabled registration confirmation via email (requires mail
@@ -107,9 +124,9 @@ looking invoices without having to set up to much. Install the software,
 enter a biller, a customer and go nuts creating invoices!
 
 - SimpleInvoices configurations:
-   
+
    - Installed from upstream source code to /var/www/simpleinvoices.
-   - Apache protected site using 'admin':simpleinvoices_password .
+   - Apache protected site using 'admin':simpleinvoices_password.
    - Initial user login 'admin@hostname':simpleinvoices_password.
 
 
@@ -117,57 +134,40 @@ Additional Features
 -------------------
 
 - SSL support out of the box.
-- `Adminer`_ administration frontend for MySQL (listening on port
+- `Adminer`_ administration frontend for MariaDB (listening on port
   12322 - uses SSL).
-- `Apache Solr`_ search server (listening on port 8983).
+- `Apache Solr`_ optional search server (listening on port 8983).
+- `BorgBackup`_ deduplicating archiver with compression and encryption.
 - `Dovecot`_ IMAP/POP3 server (listening on ports 993/143).
 - `Postfix`_ MTA (bound to localhost) to allow sending of email (e.g.,
   password recovery).
 - `ProFTPD`_ ftp server (listening on port 21).
 - SSH server (listening on port 22).
 - `Webmin`_ (listening on port 12321) with modules for configuring
-  Apache2, Dovecot, Fail2ban, PHP, ProFTPD, MySQL and Postfix.
+  Apache2, Dovecot, Fail2ban, PHP, ProFTPD, MariaDB and Postfix.
 - `Webshell`_ (listening on port 12320).
+- `Fail2ban`_ bans IPs that show malicious signs.
 
 
 Credentials *(passwords set at first boot)*
 -------------------------------------------
 
--  Webmin, Webshell, SSH, MySQL, Adminer: username **root**
--  Drupal 7, Roundup, SimpleInvoices: username **admin**
+-  Webmin, Webshell, SSH, MariaDB, Adminer: username **root**
+-  Drupal 8, Roundup, SimpleInvoices: username **admin**
 -  ProFTPD: username **cssadmin**
+-  BorgBackup: repository passphrase
 
-.. _Drupal: http://drupal.org
-.. _TurnKey Core: https://www.turnkeylinux.org/core
-.. _Panels: http://drupal.org/project/panels
-.. _Backup and migrate: http://drupal.org/project/backup_migrate
-.. _Devel: http://drupal.org/project/devel
-.. _Drush: http://drupal.org/project/drush
-.. _Ckeditor: http://drupal.org/project/ckeditor
-.. _Imce: http://drupal.org/project/imce
-.. _Recaptcha: http://drupal.org/project/recaptcha
-.. _PathAuto: http://drupal.org/project/pathauto
-.. _GlobalRedirect: http://drupal.org/project/globalredirect
-.. _FiveStar: http://drupal.org/project/fivestar
-.. _Webform: http://drupal.org/project/webform
-.. _Logintoboggan: http://drupal.org/project/logintoboggan
-.. _Admin menu: http://drupal.org/project/admin_menu
-.. _Tagadelic: http://drupal.org/project/tagadelic
-.. _Lightbox2: http://drupal.org/project/lightbox2
-.. _Google analytics: http://drupal.org/project/google_analytics
-.. _Advanced\_help: http://drupal.org/project/advanced_help
-.. _Rules: http://drupal.org/project/rules
-.. _Jquery\_ui: http://drupal.org/project/jquery_ui
-.. _Token: http://drupal.org/project/token
-.. _Email: http://drupal.org/project/email
-.. _Link: http://drupal.org/project/link
-.. _Date: http://drupal.org/project/date
-.. _Adminer: http://www.adminer.org
-.. _Roundup: http://roundup.sourceforge.net
-.. _SimpleInvoices: http://www.simpleinvoices.org/
-.. _Apache Solr: http://lucene.apache.org/solr/
-.. _Dovecot: http://www.dovecot.org/
-.. _Postfix: http://www.postfix.org/
-.. _ProFTPD: http://www.proftpd.org/
-.. _Webmin: http://www.webmin.com/
+.. _Adminer: https://www.adminer.org/
+.. _Apache: https://httpd.apache.org/
+.. _Apache Solr: https://lucene.apache.org/solr/
+.. _BorgBackup: https://www.borgbackup.org/
+.. _Dovecot: https://www.dovecot.org/
+.. _Drupal: https://www.drupal.org/
+.. _Fail2ban: https://www.fail2ban.org/
+.. _MariaDB: https://mariadb.org/
+.. _Postfix: https://www.postfix.org/
+.. _ProFTPD: https://www.proftpd.org/
+.. _Roundup: https://roundup.sourceforge.net/
+.. _SimpleInvoices: https://www.simpleinvoices.org/
+.. _Webmin: https://www.webmin.com/
 .. _Webshell: https://code.google.com/p/shellinabox/

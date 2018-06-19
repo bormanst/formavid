@@ -1,0 +1,39 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=initialize_appliance
+
+# check FORMAVID
+if [ -z "${FORMAVID}" ]; then
+    FORMAVID=/usr/local/formavid
+fi
+
+# set bin dir
+BIN_DIR=${FORMAVID}/bin
+
+# check envars
+if [ -z "${APP_EMAIL}" ]; then
+    # set passwords only
+    export PASSWORDS_ONLY="True";
+    ${BIN_DIR}/deploy/python/get-envars.py;
+fi
+
+# run sub-scripts
+SCRIPT_DIR=${BIN_DIR}/initialize/shell
+
+# check script dir
+if [ ! -d "${SCRIPT_DIR}" ]; then exit 0; fi
+
+# loop through scripts
+for SCRIPT in $(find ${SCRIPT_DIR} -type f -or -type l | sort); do
+    # check executable
+    [ -x "${SCRIPT}" ] || continue
+    # execute script
+    echo "# ${SCRIPT}"
+    ${SCRIPT}
+done
+
+exit 0

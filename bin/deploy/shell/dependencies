@@ -1,0 +1,42 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=dependencies
+
+# check dir
+APP_DIR=/var/www/admin
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: composer requires lotsa mem or just a swap
+SWAPFILE=/swapfile
+if [ $(swapon -s | grep -ci "${SWAPFILE}") -eq 0 ];  then
+    # add permanent swap:
+    echo "$( date ) Adding permanent swap." >> ${LOG}
+    fallocate -l 1G ${SWAPFILE}
+    chmod 600 ${SWAPFILE}
+    mkswap ${SWAPFILE}
+    swapon ${SWAPFILE}
+    swapon -s
+    echo "${SWAPFILE} none swap sw 0 0" >> /etc/fstab
+fi
+
+echo ""
+echo ""
+echo "Package ${PACKAGE} install has completed."
+echo ""
+echo ""
+
+exit 0

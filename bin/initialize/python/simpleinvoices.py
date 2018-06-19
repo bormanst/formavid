@@ -1,0 +1,85 @@
+#!/usr/bin/python
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+"""
+
+Set SimpleInvoices admin password and email
+
+"""
+
+import hashlib
+import os
+import MySQLdb as mdb
+
+from dialog_wrapper import Dialog
+from local_methods import *
+
+DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
+DEFAULT_HOSTNAME = "examplesitename.com"
+
+def main():
+    username = "admin"
+
+    dbpass = os.environ.get("DB_PASS")
+    email = os.environ.get("APP_EMAIL")
+    hostname = os.environ.get("APP_HOSTNAME")
+    password = os.environ.get("SIMPLEINVOICES_PASS")
+
+    d = Dialog(DEFAULT_DIALOG_HEADER)
+
+    if not hostname: hostname = DEFAULT_HOSTNAME
+
+    if not password:
+        password = d.get_password(
+            "Simple Invoices admin Password",
+            "Enter password for the Simple Invoices apache site access and admin account.")
+
+    if not email:
+        email = d.get_email(
+            "Simple Invoices admin Email",
+            "Enter email address for the Simple Invoices admin account.",
+            "admin@%s" % hostname)
+
+    if not dbpass:
+        dbpass = d.get_input(
+            "MySQL 'root' Password",
+            "Please enter new password for the MySQL 'root' account.")
+
+    hashpass = hashlib.md5(password).hexdigest()
+
+    con = ""
+    try:
+        # Get db conection.
+        con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
+        # Get db cursor.
+        cur = con.cursor()
+        # Update simpleinvoices password.
+        cur.execute('UPDATE simpleinvoices.si_user SET password=\"%s\" WHERE id=1;' % hashpass)
+        cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
+
+    except mdb.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+        sys.exit(1)
+
+    finally:
+        if con:
+            con.close()
+
+    # Set apache2 htdbm password.
+    directory = "/usr/local/apache2/passwd/simpleinvoices"
+    if not os.path.isdir(directory): system("mkdir -p %s" % directory)
+    directory = "".join([directory, '/passwords.dbm'])
+    command = " ".join(['htdbm -bc', directory, username, password])
+    system(command)
+
+    # Set encryption key passphrase.
+    system("sed -i 's|^encryption.default.key.*|encryption.default.key = %s|' /var/www/simpleinvoices/config/config.php" % password)
+
+    # restart apache2
+    system('systemctl restart apache2')
+
+if __name__ == "__main__":
+    main()

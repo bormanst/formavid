@@ -1,0 +1,39 @@
+#!/bin/bash
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=drupal8
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# set dirs
+DRUPAL_DIR=${PACKAGE}
+WWW_DIR=/var/www
+APP_DIR=${WWW_DIR}/${DRUPAL_DIR}
+# check dir
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    MESSSAGE="Skipping package install for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+else
+    # add node.js source
+    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    # install dependencies
+    export APTGETS="checkinstall composer libjs-jquery-colorbox libssl-dev nodejs php-curl php-gd php-getid3 php-gmp php-readline php-ssh2 php-twig php-xml python-yaml"
+    export "${PACKAGE^^}"="True"
+    # log export
+    MESSSAGE="export ${PACKAGE^^}=True"
+    echo ${MESSSAGE} | tee -a ${LOG} ${FORMAVID}/bin/deploy/shell/default_envars
+fi

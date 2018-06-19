@@ -1,0 +1,555 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# limit resource impact
+ionice -c2 -n7 -p$$
+
+PACKAGE=borgbackup
+
+# check install
+if [ "${GCS_BUCKET}" == "None" ] && [ "${GCS_PROJECT_ID}" == "None" ]; then
+    MESSSAGE="default_envars:GCS_BUCKET and GCS_PROJECT_ID are both set to 'None'. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "${PACKAGE^} will need to be manually configured."
+    echo "The script was specifically designed for gcloud deployment."
+    echo "Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check cron job
+SCRIPT=/etc/cron.hourly/${PACKAGE}
+if [ -f "${SCRIPT}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# set BACKUP_DIR on GCS_BUCKET
+BACKUP_DIR=${PACKAGE}
+if ( gsutil -q stat gs://${GCS_BUCKET}/${BACKUP_DIR}/ ); then
+    echo ""
+    echo ""
+    echo "WARNING! Command gsutil -q stat ${GCS_BUCKET}/${BACKUP_DIR} already exists."
+    echo "WARNING! Check console to ensure the directory ${BACKUP_DIR} is empty/removed."
+    echo "WARNING! The bucket ${GCS_BUCKET} returns a positive result - no need to modify."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# check create bucket based on project id
+# note: billing must be enabled to create bucket
+if [ "${GCS_PROJECT_ID}" != "None" ]; then
+    # set bucket type
+    BUCKET_TYPE="nearline"
+    if [ "${GCS_BUCKET_TYPE}" != "None" ]; then BUCKET_TYPE="${GCS_BUCKET_TYPE}"; fi
+    # create bucket dependent on location
+    GCS_BUCKET="${GCS_PROJECT_ID}-backup-${BUCKET_TYPE}"
+    if ( ! gsutil -q ls -b gs://${GCS_BUCKET} ); then
+        MESSSAGE="Creating borgbackup GCS bucket for ${GCS_PROJECT_ID}..."
+        echo ${MESSSAGE} | tee -a ${LOG}
+        if [ "${GCS_BUCKET_REGION}" != "None" ]; then
+            gsutil mb -p ${GCS_PROJECT_ID} -c ${BUCKET_TYPE} -l ${GCS_BUCKET_REGION} gs://${GCS_BUCKET}
+        else
+            gsutil mb -p ${GCS_PROJECT_ID} -c ${BUCKET_TYPE} gs://${GCS_BUCKET}
+        fi
+        MESSSAGE="Created GCS bucket ${GCS_BUCKET} for borgbackup."
+        echo ${MESSSAGE} | tee -a ${LOG}
+    fi
+fi
+
+# check bucket exists
+if ( ! gsutil -q ls -b gs://${GCS_BUCKET} ); then
+    echo ""
+    echo ""
+    echo "WARNING! Command gsutil -q ls -b ${GCS_BUCKET} fails."
+    echo "WARNING! Check console to ensure the bucket ${GCS_BUCKET} exists."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# create log files
+PACKAGE_LOG_DIR=/var/log/${PACKAGE}
+mkdir -p ${PACKAGE_LOG_DIR}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# set fuse mount point
+MOUNT=/mnt/${PACKAGE}
+
+# create fuse backup point
+DIR=${MOUNT}
+if [ ! -d "${DIR}" ]; then
+    mkdir ${DIR}
+fi
+
+# mount fuse to GCS_BUCKET
+gcsfuse ${GCS_BUCKET} ${MOUNT}
+
+# set BACKUP_DIR on GCS_BUCKET
+BACKUP_DIR=${PACKAGE}
+mkdir ${MOUNT}/${BACKUP_DIR}
+
+# unmount fuse
+fusermount -u -z ${MOUNT}
+
+# mount fuse to BACKUP_DIR
+gcsfuse --only-dir ${BACKUP_DIR}/ ${GCS_BUCKET} ${MOUNT}
+
+# initialize repository
+BORG_PASSPHRASE="${BORGBACKUP_PASS}" borg init --info --encryption=repokey ${MOUNT} 2>> ${PACKAGE_LOG_DIR}/$( date +%Y%m%d ).log
+
+# unmount fuse
+fusermount -u -z ${MOUNT}
+
+# create cron hourly main job
+FILE=/etc/cron.hourly/${PACKAGE}
+cat > ${FILE} <<EOF
+#!/bin/sh
+# limit resource impact
+renice 10 \$\$
+ionice -c2 -n7 -p\$\$
+
+# set log dir
+BORG_LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
+
+# set GCS_BUCKET
+GCS_BUCKET=${GCS_BUCKET}
+
+# set GCS_BUCKET backup directory
+BACKUP_DIR=${BACKUP_DIR}
+
+# Setting this, so the repo does not need to be given on the commandline:
+export BORG_REPO=${MOUNT}
+
+# Setting this, so you won't be asked for your repository passphrase:
+export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
+# or this to ask an external program to supply the passphrase:
+# export BORG_PASSCOMMAND='pass show backup'
+
+# some helpers and error handling:
+info() { printf "\n%s %s\n\n" "\$( date )" "\$*" >> \${BORG_LOG}; }
+trap 'echo \$( date ) Backup interrupted >> \${BORG_LOG}; exit 2' INT TERM
+
+# Backup the most important directories into an archive named after
+# the machine this script is currently running on:
+
+# dump databases
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+MYSQL=/usr/bin/mysql
+MYSQL_DUMP=/usr/bin/mysqldump
+
+DUMP_DIR=~/mysqldump
+if [ ! -d "\${DUMP_DIR}" ]; then
+    mkdir -p \${DUMP_DIR}
+fi
+
+info "Using mysqldump to create temp database backups in \${DUMP_DIR}..."
+
+DATABASES=\`\${MYSQL} \${ROOT_CREDS} -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema)"\`
+
+for DATABASE in \${DATABASES}; do
+  \${MYSQL_DUMP} --force --opt \${ROOT_CREDS} --single-transaction --databases \${DATABASE} > \${DUMP_DIR}/\${DATABASE}.sql
+done
+
+info "Temp database backups created in \${DUMP_DIR} but will be deleted."
+
+if mount | grep \${BORG_REPO} > /dev/null; then
+    info "Mount for \${BORG_REPO} is active."
+else
+    info "Mounting \${GCS_BUCKET}/\${BACKUP_DIR} to \${BORG_REPO} using gcsfuse..."
+    gcsfuse --only-dir \${BACKUP_DIR}/ \${GCS_BUCKET} \${BORG_REPO}
+fi
+
+info "Starting main backup..."
+
+borg create \\
+    --checkpoint-interval 30 \\
+    --compression lz4 \\
+    --exclude '/etc/apt/*' \\
+    --exclude '/etc/debian_version' \\
+    --exclude '/etc/fstab' \\
+    --exclude '/etc/group*' \\
+    --exclude '/etc/mtab' \\
+    --exclude '/etc/ld.so.cache' \\
+    --exclude '/etc/mysql/debian.cnf' \\
+    --exclude '/etc/mysql/mariadb.cnf' \\
+    --exclude '/etc/network/interfaces/*' \\
+    --exclude '/etc/passwd*' \\
+    --exclude '/etc/resolv.conf' \\
+    --exclude '/etc/ssh/ssh_host_*/*' \\
+    --exclude '/etc/udev/rules.d/*' \\
+    --exclude '/etc/webmin/system-status/history*/*' \\
+    --exclude '/home/*/.cache/*' \\
+    --exclude '/root/.cache/*' \\
+    --exclude '/root/.drush/cache/*' \\
+    --exclude '/root/.npm/_cacache/*' \\
+    --exclude '/var/cache/*' \\
+    --exclude '/var/lib/google/google_users' \\
+    --exclude '/var/lib/monit/state' \\
+    --exclude '/var/lib/ntp/ntp.drift' \\
+    --exclude '/var/lib/systemd/*' \\
+    --exclude '/var/log/*' \\
+    --exclude '/var/run/*.pid' \\
+    --exclude '/var/run/*/*.pid' \\
+    --exclude '/var/spool/postfix/lib/*' \\
+    --exclude '/var/spool/postfix/private/*' \\
+    --exclude '/var/spool/postfix/public/*' \\
+    --exclude '/var/spool/postfix/pid/*' \\
+    --exclude '/var/spool/postfix/dev/*' \\
+    --exclude '/var/tmp/*' \\
+    --exclude '/var/webmin/miniserv.lastcrons' \\
+    --exclude '/var/webmin/modules/system-status/*' \\
+    --exclude '/var/webmin/modules/package-updates/*' \\
+    --exclude '/var/www/.drush/cache/*' \\
+    --exclude '/var/www/drupal8/sites/*/files/config_*' \\
+    --exclude '/var/www/drupal8/sites/*/files/css/*' \\
+    --exclude '/var/www/drupal8/sites/*/files/js/*' \\
+    --exclude '/var/www/drupal8/sites/*/files/php/*' \\
+    --exclude '/var/www/drupal8/sites/*/files/styles/*' \\
+    --exclude-caches \\
+    --filter AME \\
+    --info \\
+    --list \\
+    --show-rc \\
+    --stats \\
+    ::'{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\
+    /etc \\
+    /home \\
+    /opt \\
+    /root \\
+    /srv \\
+    /usr/local \\
+    /var \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Main backup finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Main backup finished with an error."
+else
+    info "Main backup finished with no exceptions."
+fi
+
+# rm all database dumps
+rm -rf \${DUMP_DIR}/*
+info "Temp database backups dir \${DUMP_DIR} has been cleaned."
+
+info "Pruning repository..."
+
+# Use the prune subcommand to maintain 7 daily, 4 weekly and 6 monthly
+# archives of THIS machine. The '{hostname}-' prefix is very important to
+# limit prune's operation to this machine's archives and not apply to
+# other machines' archives also:
+
+borg prune \\
+    --info \\
+    --list \\
+    --prefix '{hostname}-' \\
+    --show-rc \\
+    --keep-hourly 24 \\
+    --keep-daily 7 \\
+    --keep-weekly 4 \\
+    --keep-monthly 12 \\
+    --keep-yearly 5 \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Pruning repository finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Pruning repository finished with an error."
+else
+    info "Pruning repository finished with no exceptions."
+fi
+
+# unmount google fuse
+info "Unmounting gcsfuse mount..."
+fusermount -u -z ${MOUNT}
+info "Unmounted gcsfuse mount."
+
+exit \${global_exit}
+EOF
+
+# make executable root only
+chmod 0700 ${FILE}
+
+# create cron daily log job
+FILE=/etc/cron.daily/${PACKAGE}
+cat > ${FILE} <<EOF
+#!/bin/sh
+# limit resource impact
+renice 10 \$\$
+ionice -c2 -n7 -p\$\$
+
+# set log dir
+BORG_LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
+
+# set GCS_BUCKET
+GCS_BUCKET=${GCS_BUCKET}
+
+# set GCS_BUCKET backup directory
+BACKUP_DIR=${BACKUP_DIR}
+
+# Setting this, so the repo does not need to be given on the commandline:
+export BORG_REPO=${MOUNT}
+
+# Setting this, so you won't be asked for your repository passphrase:
+export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
+# or this to ask an external program to supply the passphrase:
+# export BORG_PASSCOMMAND='pass show backup'
+
+# some helpers and error handling:
+info() { printf "\n%s %s\n\n" "\$( date )" "\$*" >> \${BORG_LOG}; }
+trap 'echo \$( date ) Backup interrupted >> \${BORG_LOG}; exit 2' INT TERM
+
+# Backup the most important directories into an archive named after
+# the machine this script is currently running on:
+
+# use google fuse mount
+if mount | grep \${BORG_REPO} > /dev/null; then
+    info "Mount for \${BORG_REPO} is active."
+else
+    info "Mounting \${GCS_BUCKET}/\${BACKUP_DIR} to \${BORG_REPO} using gcsfuse..."
+    gcsfuse --only-dir \${BACKUP_DIR}/ \${GCS_BUCKET} \${BORG_REPO}
+fi
+
+info "Starting logs backup..."
+
+# Backup the logs differently
+
+borg create \\
+    --checkpoint-interval 30 \\
+    --compression lz4 \\
+    --exclude-caches \\
+    --exclude '/var/log/borgbackup/*' \\
+    --filter AME \\
+    --info \\
+    --list \\
+    --show-rc \\
+    --stats \\
+    ::'log-{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\
+    /var/log \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Logs backup finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Logs backup finished with an error."
+else
+    info "Logs backup finished with no exceptions."
+fi
+
+# only need 7 days of logs
+info "Pruning logs..."
+
+borg prune \\
+    --info \\
+    --list \\
+    --prefix 'log-{hostname}-' \\
+    --show-rc \\
+    --keep-daily 7 \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Pruning logs finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Pruning logs finished with an error."
+else
+    info "Pruning logs finished with no exceptions."
+fi
+
+# verify the repository
+info "Verifying repository..."
+
+borg check \\
+    --info \\
+    --repository-only \\
+    --save-space \\
+    --show-rc \\
+    \${BORG_REPO} \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Verifying repository finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Verifying repository finished with an error."
+else
+    info "Verifying repository finished with no exceptions."
+fi
+
+# verify main archives
+info "Verifying main archives..."
+
+borg check \\
+    --archives-only \\
+    --info \\
+    --prefix '{hostname}-' \\
+    --save-space \\
+    --show-rc \\
+    \${BORG_REPO} \\
+    2>> \${BORG_LOG}
+
+exit_code=\$?
+
+if [ \${exit_code} -eq 1 ]; then
+    info "Verifying main archives finished with a warning."
+elif [ \${exit_code} -gt 1 ]; then
+    info "Verifying main archives finished with an error."
+else
+    info "Verifying main archives finished with no exceptions."
+fi
+
+# unmount google fuse
+info "Unmounting gcsfuse mount..."
+fusermount -u -z ${MOUNT}
+info "Unmounted gcsfuse mount."
+
+exit \${global_exit}
+EOF
+
+# make executable root only
+chmod 0700 ${FILE}
+
+# create borg gcs mount script
+FILE=/usr/bin/borg-mount-gcs-archive
+cat > ${FILE} <<EOF
+#!/bin/bash -e
+# limit resource impact
+renice 10 \$\$
+ionice -c2 -n7 -p\$\$
+
+PACKAGE=borgmount
+
+# set GCS_BUCKET
+GCS_BUCKET=${GCS_BUCKET}
+
+# set GCS_BUCKET backup directory
+BACKUP_DIR=${BACKUP_DIR}
+
+# check bucket exists
+if ( ! gsutil -q stat gs://\${GCS_BUCKET}/\${BACKUP_DIR}/ ); then
+    echo ""
+    echo ""
+    echo "WARNING! Command gsutil -q stat for \${GCS_BUCKET}/\${GCS_BUCKET_DIR} fails."
+    echo "WARNING! Check console to ensure the bucket \${GCS_BUCKET}/\${GCS_BUCKET_DIR} exists/initialized."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# set gcsfuse mount point
+BORG_REPO=/mnt/\${BACKUP_DIR}
+
+# gcsfuse BORG_REPO to BACKUP_DIR
+echo ""
+if mount | grep \${BORG_REPO} > /dev/null; then
+    echo "Mount for \${BORG_REPO} is active."
+else
+    echo "Mounting \${GCS_BUCKET}/\${BACKUP_DIR} to \${BORG_REPO} using gcsfuse..."
+    gcsfuse --only-dir \${BACKUP_DIR}/ \${GCS_BUCKET} \${BORG_REPO}
+fi
+
+
+# set borg restore mount point
+BORGMOUNT=/mnt/\${PACKAGE}
+if [ ! -d "\${BORGMOUNT}" ]; then
+    mkdir \${BORGMOUNT}
+fi
+
+# mount restore point
+echo ""
+echo ""
+echo "Please use ctrl-c to terminate this process."
+echo ""
+echo ""
+echo "Running borg mount as active foreground process..."
+echo "Terminal retains an active borg mount after password is entered."
+echo "Terminal will *hang* until ctrl-c is entered."
+echo ""
+echo "Please use another terminal/tool to view the archive while this one *hangs*."
+echo ""
+echo ""
+echo "Archive \${1} is borg mounted at: \${BORGMOUNT}."
+echo ""
+echo ""
+/usr/bin/borg mount -f \${BORG_REPO}::\${1} \${BORGMOUNT}
+echo ""
+echo "Borg mount \${BORGMOUNT} foreground process terminated."
+echo ""
+
+# unmount borg restore
+echo "Unmounting \${BORGMOUNT}..."
+/usr/bin/borg umount \${BORGMOUNT}
+echo "Unmounted \${BORGMOUNT}."
+echo ""
+
+# unmount fuse
+echo "Unmounting gcsfuse mount..."
+fusermount -u -z \${BORG_REPO}
+echo "Unmounted gcsfuse mount."
+echo ""
+
+exit 0
+EOF
+
+# make executable root only
+chmod 0700 ${FILE}
+
+# logrotate file for solr
+FILE=/etc/logrotate.d/borgbackup
+cat > ${FILE} <<EOF
+# Logrotate file for borgbackup
+
+/var/log/borgbackup/*.log {
+        compress
+    delaycompress
+        daily
+        missingok
+        rotate 7
+        notifempty
+}
+EOF
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

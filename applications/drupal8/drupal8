@@ -1,0 +1,249 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=drupal8
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# set specs
+DRUPAL_SPEC=^8.0
+DRUSH_SPEC=^8.0
+
+# set dirs
+DRUPAL_DIR=${PACKAGE}
+WWW_DIR=/var/www
+APP_DIR=${WWW_DIR}/${DRUPAL_DIR}
+
+# check dir
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: apache2
+DEPENDS=apache2
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: mysql
+DEPENDS=mysql
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: php
+DEPENDS=php
+if ! (hash php); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# select drupal modules to install
+DRUPAL_MODULE_LIST="\
+    drupal/advagg \
+    drupal/advanced_help \
+    drupal/background_image \
+    drupal/backup_migrate \
+    drupal/captcha \
+    drupal/components \
+    drupal/ctools \
+    drupal/devel \
+    drupal/features \
+    drupal/field_group \
+    drupal/fivestar \
+    drupal/honeypot \
+    drupal/image_style_quality \
+    drupal/imageapi_optimize \
+    drupal/imagemagick \
+    drupal/imce \
+    drupal/inline_entity_form \
+    drupal/module_filter \
+    drupal/panels \
+    drupal/pathauto \
+    drupal/recaptcha \
+    drupal/rules \
+    drupal/search_api_solr \
+    drupal/search_api_solr_defaults \
+    drupal/tagadelic \
+    drupal/views_bulk_operations \
+    drupal/zen
+"
+
+# set modules to enable in stack creation script
+ENABLE_MODULES="'"$(\
+    echo ${DRUPAL_MODULE_LIST} | \
+    sed -e "s/\sdrupal\/zen//g" | \
+    sed -e "s/\s/,'/g" | sed -e "s/,/',/g"  | \
+    sed -e "s/drupal\///g")"'"
+sed -i "s/modulesToEnable\ =\ \[\]/modulesToEnable\ =\ \[${ENABLE_MODULES}\]/" ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+
+# add drupal8 user to database
+mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
+
+# download latest drupal8 and install
+cd ${WWW_DIR}
+composer create-project drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
+
+# download and install modules
+cd ${APP_DIR}
+composer require ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# add drush symlinks
+ln -sf ${APP_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
+ln -sf ${APP_DIR}/vendor/drush/drush/drush.complete.sh /etc/bash_completion.d/drush
+
+# add drush configs
+mkdir -p /etc/drush
+cat > /etc/drush/drushrc.php <<EOF
+<?php
+// by default use the drupal root directory
+\$options['r'] = '${APP_DIR}';
+EOF
+
+# update settings
+CONF=${APP_DIR}/sites/default/settings.php
+cp ${APP_DIR}/sites/default/default.settings.php ${CONF}
+chown www-data:www-data ${CONF}
+
+# update nodejs to latest
+npm cache clean -f
+npm install -g n
+n stable
+
+# update npm to latest
+npm install -g npm@latest
+touch /usr/bin/npm
+rm /usr/bin/npm
+ln -s /usr/local/bin/npm /usr/bin/npm
+
+# install gulp-cli
+npm install -g gulp-cli
+
+# preload node_modules for themes
+# background safe: depends on gulp-cli
+mkdir -p ${APP_DIR}/themes/temp
+cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes/temp
+cd ${APP_DIR}/themes/temp
+npm install --unsafe-perm
+mv -f node_modules ${APP_DIR}/themes
+cd ${APP_DIR}
+rm -rf ${APP_DIR}/themes/temp
+
+# set cssadmin perms
+chown -R cssadmin:cssadmin ${APP_DIR}/themes
+
+# insert "www.example.com" as default trusted_host (inithook will adjust)
+NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.com\$',\n\);\n"
+sed -i "/trusted_host_patterns/,/\*\//{n;s|^$|${NEW_LINES}|}" ${CONF}
+
+# disable poor mans cron and setup drush cron
+cat >> ${CONF} <<EOF
+
+/**
+ * Disable Poor Man's Cron:
+ *
+ * Drupal 8 enables the built-in Poor Man's Cron by default.
+ * Poor Man's Cron relies on site activity to trigger Drupal's cron,
+ * and is not well suited for low activity websites.
+ *
+ * We will use the Linux system cron and override Poor Man's Cron
+ *
+ * To re-enable Poor Man's Cron:
+ *    Comment out the line below, and disable the system cron
+ *    in /etc/cron.hourly/drupal8
+ */
+\$config['automated_cron.settings']['interval'] = 0;
+EOF
+
+# Loop through all sites in drupal.
+# Drupal sites, by custom scripted design, will have a "." in their directory name.
+CRON_DRUPAL=/etc/cron.hourly/drupal8
+cat > ${CRON_DRUPAL} <<EOF
+#!/bin/bash -e
+# Trigger drush cron
+# Alternatively Drupal's poor mans cron: sites/default/settings.php
+[ -x /usr/local/bin/drush ] || exit 0
+# su www-data -c "/usr/local/bin/drush --quiet cron"
+# su www-data -s /bin/bash -c "/usr/local/bin/drush --quiet cron"
+# Drupal sites, by custom scripted design, will have a "." in their directory name.
+sites=()
+while read -r -d ''; do
+    sites+=("\$REPLY")
+done < <(cd ${APP_DIR}/sites/; find *.* -maxdepth 0 -type d -print0)
+# Run cron on the sites.
+len=\${#sites[*]}
+for((i=0; i<\$len; i++)); do
+    su www-data -s /bin/bash -c "/usr/local/bin/drush -r ${APP_DIR} --uri=http://\${sites[\${i}]} --quiet cron"
+done
+EOF
+chmod +x ${CRON_DRUPAL}
+
+# configure apache
+a2enmod rewrite
+
+# make copy of settings.php
+cp ${APP_DIR}/sites/default/settings.php ${APP_DIR}/sites/default/stack.settings.php
+
+# redirect default install.php to base site.
+INSTALL_DRUPAL=/var/www/drupal8/install.php
+rm -f ${INSTALL_DRUPAL}
+cat > ${INSTALL_DRUPAL} <<EOF
+<?php
+/* Redirect browser */
+header("Location: http://${APP_HOSTNAME}");
+
+/* Make sure that code below does not get executed when we redirect. */
+exit;
+?>
+EOF
+
+# create base site
+${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

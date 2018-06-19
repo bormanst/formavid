@@ -1,0 +1,18 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# initialize etckeeper and perform initial commit
+# ETCKEEPER_COMMIT: SKIP (if skip specified, exit)
+
+[ -n "${PASSWORDS_ONLY}" ] && exit 0
+
+[ "$ETCKEEPER_COMMIT" == "SKIP" ] && exit 0
+
+etckeeper uninit -f > /dev/null 2>&1
+etckeeper init >/dev/null
+etckeeper commit "initial commit" >/dev/null
+
+exit 0

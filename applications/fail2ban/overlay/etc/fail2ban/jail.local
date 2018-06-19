@@ -1,0 +1,143 @@
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+[DEFAULT]
+ignoreip  = 127.0.0.1
+bantime   = 172800
+destemail = root@localhost
+banaction = iptables-multiport
+action    = %(action_mwl)s
+
+
+#
+# SSH JAILS
+#
+[sshd]
+enabled   = true
+maxretry  = 3
+
+[ssh-ddos]
+enabled   = true
+maxretry  = 3
+
+[dropbear]
+enabled   = true
+maxretry  = 3
+
+[selinux-ssh]
+enabled   = true
+maxretry  = 3
+
+
+#
+# HTTP JAILS
+#
+[apache-auth]
+enabled = true
+
+[apache-badbots]
+enabled = true
+
+[apache-botsearch]
+enabled = true
+
+[apache-fakegooglebot]
+enabled = true
+
+[apache-modsecurity]
+enabled = true
+
+[apache-nohome]
+enabled = true
+
+[apache-noscript]
+enabled = true
+
+[apache-overflows]
+enabled = true
+
+[apache-shellshock]
+enabled = true
+
+[apache-w00tw00t]
+enabled   = true
+port      = http,https
+filter    = apache-w00tw00t
+banaction = iptables-allports
+action    = %(action_mwl)s
+logpath   = /var/log/apache*/*error.log
+maxretry  = 1
+
+[apache-myadmin]
+enabled   = true
+port      = http,https
+filter    = apache-myadmin
+banaction = iptables-allports
+action    = %(action_mwl)s
+logpath   = /var/log/apache*/*error.log
+maxretry  = 2
+
+
+#
+# Web Applications JAILS
+#
+#
+[drupal-auth]
+enabled   = true
+
+[webmin-auth]
+enabled   = true
+maxretry  = 3
+
+
+#
+# FTP servers
+#
+[proftpd]
+enabled   = true
+
+
+#
+# Mail JAILS
+#
+[postfix]
+enabled   = true
+
+[postfix-rbl]
+enabled   = true
+
+[postfix-sasl]
+enabled   = true
+
+[sendmail-auth]
+enabled   = true
+
+[sendmail-reject]
+enabled   = true
+
+[dovecot]
+enabled   = true
+
+
+#
+# Database JAILS
+#
+[mysqld-auth]
+enabled   = true
+
+
+#
+# etc JAILS
+#
+[pam-generic]
+enabled   = true
+banaction = iptables-allports
+
+[php-url-fopen]
+enabled   = true
+port      = http,https
+filter    = php-url-fopen
+logpath   = /var/log/apache*/*access.log
+maxretry  = 1

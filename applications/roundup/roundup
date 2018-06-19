@@ -1,0 +1,299 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=roundup
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check dir
+APP_DIR=/var/www/support
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: apache2
+DEPENDS=apache2
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: mysql
+DEPENDS=mysql
+if ! (systemctl -q is-active ${DEPENDS}); then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# setup database
+DB_NAME=${PACKAGE}
+DB_USER=${PACKAGE}
+
+# add roundup user for pip install
+if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
+    useradd -U -m -s /bin/bash ${DB_USER}
+fi
+
+BATCH_EX="--batch --execute"
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+MYSQL_ADMIN=/usr/bin/mysqladmin
+MYSQL_DUMP=/usr/bin/mysqldump
+
+# create database
+${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}
+
+# add database user
+QUERY="grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${ROUNDUP_PASS}'; flush privileges;"
+mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+
+# temp perms for install
+chown ${DB_USER}:${DB_USER} /var/www
+
+# install roundup to user home
+sudo -H -u ${DB_USER} bash -c "pip install ${PACKAGE} --user"
+
+# set home access perms
+HOME=/home/${DB_USER}/.local
+chmod -R 0775 ${HOME}
+chmod -R 0774 ${HOME}/share
+
+# add symlinks
+LOCAL=/usr/local
+TARGET=/bin/roundup-admin
+ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+TARGET=/bin/roundup-gettext
+ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+TARGET=/bin/roundup-mailgw
+ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+TARGET=/share/roundup
+ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+#TARGET=/share/doc/roundup
+#ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+#TARGET=/share/man/man1
+#ln -sf ${HOME}${TARGET}/* ${LOCAL}${TARGET}
+TARGET=/lib/python2.7
+ln -sf ${HOME}${TARGET}/site-packages/roundup ${LOCAL}${TARGET}/dist-packages/roundup
+ln -sf ${HOME}${TARGET}/site-packages/roundup-1.5.1.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-1.5.1.dist-info
+
+# tracker creation
+BACKEND=mysql
+TEMPLATE=classic
+OPTIONS="admin_email=admin,dispatcher_email=admin,tracker_web=/,mail_domain=${APP_HOSTNAME},mail_host=localhost,rdbms_password=${DB_PASS}"
+sudo -H -u ${DB_USER} bash -c "roundup-admin -i ${APP_DIR} install ${TEMPLATE} ${BACKEND} ${OPTIONS}"
+
+# tracker conf
+CONF=${APP_DIR}/config.ini
+
+# disable registration confirmation via email (requires mail server)
+OPTION=email_registration_confirmation
+sed -i "s|^${OPTION} = yes|${OPTION} = no|" ${CONF}
+
+# update title
+OPTION=name
+sed -i "s|^${OPTION} = /|${OPTION} = ${SITETITLE} Issue Tracker|" ${CONF}
+
+# use tls for mail
+OPTION=tls
+sed -i "s|^${OPTION} = /|${OPTION} = yes|" ${CONF}
+
+# update web location
+OPTION=web
+sed -i "s|^${OPTION} = /|${OPTION} = https://support.${APP_HOSTNAME}/support/|" ${CONF}
+
+#
+# HACK start:
+# need to install to a db that doesn't default to ROW_FORMAT=COMPACT
+# install into compatible docker db and restore to local mariadb
+#
+
+HACK=docker
+LOCAL_PORT=3306
+DOCKER_PORT=3310
+DOCKER_HOST=127.0.0.1
+
+# set docker db port
+OPTION=port
+sed -i "1,/^${OPTION} =/s/^${OPTION} =/${OPTION} = ${DOCKER_PORT}/" ${CONF}
+# docker needs actual 127.0.0.1 ip vs localhost
+OPTION=host
+sed -i "1,/^${OPTION} = localhost/s/^${OPTION} = localhost/${OPTION} = ${DOCKER_HOST}/" ${CONF}
+# docker needs "remote" db access so use root
+OPTION=user
+sed -i "1,/^${OPTION} = ${DB_USER}/s/^${OPTION} = ${DB_USER}/${OPTION} = root/" ${CONF}
+
+# docker: get docker
+curl -sSL https://get.${HACK}.com/ | sh
+
+# docker: start docker db with remove-on-stop flag --rm
+CONTAINER=mariadb-10133-container
+${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASS} -d mariadb:10.1.33
+
+# docker: have to wait for active container
+COUNTER=0
+until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 90 ]; do
+    sleep 1;
+    let COUNTER=COUNTER+1
+done;
+# docker: need extra delay
+sleep 45;
+
+# set roundup password
+# ${FORMAVID}/bin/initialize/python/roundup.py
+
+# initialise tracker using docker db
+sudo -H -u ${DB_USER} bash -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
+
+# dump docker db to home to avoid perm issues
+${HACK} exec ${CONTAINER} ${MYSQL_DUMP} ${ROOT_CREDS} ${DB_NAME} > ~/${DB_NAME}.sql
+
+# remove-on-stop docker
+${HACK} stop ${CONTAINER}
+
+# docker: disable but leave for adding tackers
+systemctl stop ${HACK}
+systemctl disable ${HACK}
+rm /etc/apt/sources.list.d/${HACK}.list
+
+# force ROW_FORMAT=DYNAMIC
+sed -i '/^) ENGINE/s/) ENGINE/) ROW_FORMAT=DYNAMIC ENGINE/g' ~/${DB_NAME}.sql
+
+# restore dump to local db
+mysql ${ROOT_CREDS} ${DB_NAME} < ~/${DB_NAME}.sql
+
+# remove dump
+rm ~/${DB_NAME}.sql
+
+# reset local db port - empty uses default
+OPTION=port
+sed -i "1,/^${OPTION} = ${DOCKER_PORT}/s/^${OPTION} = ${DOCKER_PORT}/${OPTION} =/" ${CONF}
+# reset localhost
+OPTION=host
+sed -i "1,/^${OPTION} = ${DOCKER_HOST}/s/^${OPTION} = ${DOCKER_HOST}/${OPTION} = localhost/" ${CONF}
+# reset user
+OPTION=user
+sed -i "1,/^${OPTION} = root/s/^${OPTION} = root/${OPTION} = ${DB_USER}/" ${CONF}
+
+#
+# HACK completed: continue usual
+#
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+# create etc dir
+ETC=/etc/${PACKAGE}
+mkdir -p ${ETC}
+
+# move tracker configuration to etc
+mv ${CONF} ${ETC}/tracker-config.ini
+ln -s ${ETC}/tracker-config.ini ${CONF}
+
+# don't display credit in popups
+for file in *.help*.html _generic.calendar.html; do
+    sed -i "s|</head>|<style type='text/css'> #formavid-credit { display: none; }</style>\n  </head>|" ${APP_DIR}/html/${file}
+done
+
+# create local documentation
+mkdir -p ${APP_DIR}/docs
+cp -rf ${HOME}/share/doc/roundup/html ${APP_DIR}/docs
+sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n:translate=\"\">local</a>);" ${APP_DIR}/html/page.html
+
+# apply theme header
+sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/html/page.html
+sed -i "s/sedtoolname/Support/g" ${APP_DIR}/html/page.html
+sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.html
+
+# create images dir: logo symlinked in create-drupal-stack.py
+mkdir -p ${APP_DIR}/html/images
+
+# restore apache2 perms
+chown www-data:www-data /var/www
+
+# give apache2 access
+chown -R www-data:www-data ${APP_DIR}
+
+# apache2: create conf
+CONF=${ETC}/apache.conf
+cat > ${CONF} <<EOF
+<VirtualHost *:443>
+    ServerName support.${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    SSLEngine on
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    RedirectMatch ^/$ /support/
+    PythonOptimize On
+    Alias /support/docs ${APP_DIR}/docs/html
+    Alias /support/theme /var/www/drupal8/themes/${SITENAME}
+    AliasMatch ^/support/@@file/(.*) ${APP_DIR}/html/\$1
+    AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
+    DocumentRoot ${APP_DIR}
+    <Directory ${APP_DIR}>
+        Require all granted
+        AllowOverride None
+        Options +FollowSymLinks
+        AddHandler python-program .py
+        PythonHandler roundup.cgi.apache
+        PythonOption TrackerHome ${APP_DIR}
+        PythonOption TrackerLanguage en
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName support.${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    RedirectPermanent /support/ "https://support.${APP_HOSTNAME}/support/"
+    RedirectPermanent / "https://support.${APP_HOSTNAME}/support/"
+</VirtualHost>
+EOF
+
+# apache2: set conf perms
+chmod 0644 ${CONF}
+
+# apache2: link conf file
+ln -s ${CONF} /etc/apache2/sites-available/${PACKAGE}.conf
+
+# apache2: enable conf
+a2ensite ${PACKAGE}
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0

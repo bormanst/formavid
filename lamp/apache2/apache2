@@ -1,0 +1,179 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=apache2
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check exists
+APACHE_CONF=/etc/apache2/sites-available/zzz-admin.${SITENAME}.conf
+if [ -f "${APACHE_CONF}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+
+strip() {
+    echo $1 | sed "s/\n//";
+}
+
+# configure apache
+a2enmod authn_dbm
+a2enmod cgi
+a2enmod rewrite
+a2enmod ssl
+a2enmod substitute
+
+# remove default site
+a2dissite 000-default
+rm -rf /var/www/html
+
+# get ssl cert
+PRIVATE=/etc/ssl/private
+openssl dhparam -out ${PRIVATE}/dhparams.pem 2048 > /dev/null 2>&1
+chmod 400 ${PRIVATE}/dhparams.pem
+/usr/local/bin/make-ssl-cert --default --force-overwrite
+update-ca-certificates
+
+# update ssl.conf
+CONF=/etc/apache2/mods-available/ssl.conf
+sed -i "s|^\(\s*SSLCipherSuite\s\+\).*$|\1${SECURE_CIPHER_LIST}|g" ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a        SSLCertificateFile /etc/ssl/private/cert.pem' ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a        # Default certificate file' ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a        SSLCompression off' ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a        # Disable ssl compression' ${CONF}
+
+# update security.conf
+CONF=/etc/apache2/conf-available/security.conf
+sed -i "s|^\(\s*ServerTokens\s\+\).*$|\1Prod|g" ${CONF}
+sed -i "s|^\(\s*ServerSignature\s\+\).*$|\1Off|g" ${CONF}
+
+# update status.conf: in reverse order
+CONF=/etc/apache2/mods-available/status.conf
+sed -i "/Require ip/a\                Substitute 's|<body>|<body><header class=\"header\" id=\"header\" role=\"banner\"><div class=\"header__name-and-slogan\" id=\"name-and-slogan\"><h1 class=\"header__site-name\" id=\"site-name\"><a href=\"/\" title=\"Home\" rel=\"home\" class=\"header__logo\" id=\"logo\"><img src=\"/theme/logo.svg\" alt=\"Home\" class=\"header__logo-image\" /></a><a href=\"/\" title=\"Home\" class=\"header__site-link\" rel=\"home\"><span>${SITETITLE} Admin</span></a></h1></div></header>|i'" ${CONF}
+sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"shortcut icon\" href=\"/theme/favicon.ico\" type=\"image/vnd.microsoft.icon\" /><style>@import url(\"/theme/css/layouts/responsive-sidebars.css?\");@import url(\"/theme/css/pages.css?\");@import url(\"/theme/css/styles.css?\");</style>|i'" ${CONF}
+sed -i "/Require ip/a\                Deny from all" ${CONF}
+sed -i "/Require ip/a\                Order deny,allow" ${CONF}
+
+# set toolsadmin apache password
+${FORMAVID}/bin/initialize/python/tools.py
+
+# tools: create conf
+APP_DIR=/var/www/admin
+APACHE_CONF=/etc/apache2/sites-available/zzz-admin.${SITENAME}.conf
+cat > ${APACHE_CONF} <<EOF
+<VirtualHost *:443>
+    ServerName admin.${APP_HOSTNAME}
+    ServerAdmin admin@${APP_HOSTNAME}
+    UseCanonicalName Off
+    SSLEngine on
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    Alias /theme /var/www/drupal8/themes/${SITENAME}
+    DocumentRoot ${APP_DIR}
+    <Directory ${APP_DIR}>
+        Order deny,allow
+        Deny from all
+        Satisfy Any
+        AuthName "password protected area"
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/admintools/passwords.dbm
+    </Directory>
+    <Location /server-status>
+        SetHandler server-status
+        Order deny,allow
+        Deny from all
+        Satisfy Any
+        Options none
+        Allow from localhost ip6-localhost
+        AuthName "password protected area"
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/admintools/passwords.dbm
+    </Location>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName admin.${APP_HOSTNAME}
+    ServerAdmin admin@${APP_HOSTNAME}
+    UseCanonicalName Off
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    RedirectPermanent / "https://admin.${APP_HOSTNAME}/"
+</VirtualHost>
+EOF
+
+# default credit styling
+STYLE="
+#formavid-credit {
+    font-family: Tahoma,Sans,Arial,Helvetica,Verdana,sans-serif;
+    font-size: 11px;
+    text-align: center;
+}
+#formavid-credit a {
+    text-decoration: none;
+}
+#formavid-credit a:hover {
+    text-decoration: underline;
+}
+"
+HEAD="
+<style type=\\\"text/css\\\">
+${STYLE}
+</style>
+"
+BODY="
+<div id=\\\"formavid-credit\\\">
+    <div style=\\\"clear: both;\\\">
+    <a href=\\\"https://formavid.org\\\">FormaVid</a> -
+    Powered by <a href=\\\"https://formavid.org\\\">FormaVid Small Business Appliance</a>
+    </div>
+</div>
+"
+set ${CREDIT_LOCATION:=/}
+cat > /etc/apache2/mods-available/substitute.conf <<EOF
+# Support FormaVid by adding credit to footer
+<Location $CREDIT_LOCATION>
+    AddOutputFilterByType INFLATE;SUBSTITUTE;DEFLATE text/html
+    Substitute "s|</head>|$(strip "$HEAD")</head>|i"
+    Substitute "s|</body>|$(strip "$BODY")</body>|i"
+</Location>
+EOF
+
+# tools: enable conf
+a2ensite zzz-admin.${SITENAME}.conf
+
+# restart service
+systemctl restart ${PACKAGE}
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0
