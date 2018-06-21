@@ -20,18 +20,19 @@ from local_methods import *
 def main():
     # Get envars.
     adminpass = os.environ.get("APP_PASS")
+    formavid = os.environ.get("FORMAVID")
 
     # Borgbackup password.
-    system("python borgbackup.py")
+    system("python %s/bin/initialize/python/borgbackup.py" % formavid)
 
     # Roundup password.
-    system("python roundup.py")
+    system("python %s/bin/initialize/python/roundup.py" % formavid)
 
     # Simple Invoices password.
-    system("python simpleinvoices.py")
+    system("python %s/bin/initialize/python/simpleinvoices.py" % formavid)
 
     # Tools password.
-    system("python tools.py")
+    system("python %s/bin/initialize/python/tools.py" % formavid)
 
     # Drupal - check change admin/password.
     try:

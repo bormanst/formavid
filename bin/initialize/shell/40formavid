@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
@@ -7,5 +7,3 @@
 # set site values
 
 ${FORMAVID}/bin/initialize/python/formavid.py
-
-exit 0

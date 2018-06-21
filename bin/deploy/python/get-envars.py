@@ -95,16 +95,16 @@ def main():
 
         # Set envars for passwords.
         os.environ["APP_PASS"] = d.get_password(
-            "Drupal/Solr admin and cssadmin password",
-            "Please enter password for Drupal/Solr admin and cssadmin accounts.")
+            "Drupal admin and cssadmin password",
+            "Please enter password for Drupal admin and cssadmin accounts.")
 
         os.environ["BORGBACKUP_OLD"] = d.get_password(
-            "Borgbackup repository existing password",
-            "Please enter existing password for the Borgbackup repository.")
+            "Borgbackup repository CURRENT password",
+            "Please enter CURRENT password for the Borgbackup repository.")
 
         os.environ["BORGBACKUP_PASS"] = d.get_password(
-            "Borgbackup repository new password",
-            "Please enter new password for the Borgbackup repository.")
+            "Borgbackup repository NEW password",
+            "Please enter NEW password for the Borgbackup repository.")
 
         os.environ["DB_PASS"] = d.get_password(
             "MySQL password",

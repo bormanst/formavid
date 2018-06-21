@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
@@ -7,5 +7,3 @@
 # set mysql root password
 
 ${FORMAVID}/bin/initialize/python/mysqlconf.py --user=root --pass="${DB_PASS}"
-
-exit 0
