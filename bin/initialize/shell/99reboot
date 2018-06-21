@@ -10,7 +10,7 @@ reboot() {
     shutdown -r now
 }
 
-if [ "$REBOOT" == "SKIP" ] || [ -z "${PASSWORDS_ONLY}" ]; then
+if [ "${REBOOT}" == "SKIP" ] || [ -z "${PASSWORDS_ONLY}" ]; then
     ${FORMAVID}/bin/initialize/python/reboot-ask.py && reboot
 fi
 

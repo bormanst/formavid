@@ -21,9 +21,6 @@ DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
 
 def main():
     bucket = os.environ.get("GCS_BUCKET")
-    dbpass = os.environ.get("DB_PASS")
-    email = os.environ.get("APP_EMAIL")
-    hostname = os.environ.get("APP_HOSTNAME")
     old = os.environ.get("BORGBACKUP_OLD")
     password = os.environ.get("BORGBACKUP_PASS")
 
@@ -36,12 +33,12 @@ def main():
 
     if not old:
         old = d.get_password(
-            "Borgbackup repository current password",
+            "Borgbackup repository CURRENT password",
             "Please enter current password for the Borgbackup repository.")
 
     if not password:
         password = d.get_password(
-            "Borgbackup repository new password",
+            "Borgbackup repository NEW password",
             "Please enter new password for the Borgbackup repository.")
 
     # mount fuse to BACKUP_DIR

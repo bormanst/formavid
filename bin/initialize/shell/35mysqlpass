@@ -6,6 +6,6 @@
 
 # set mysql root password
 
-${FORMAVID}/bin/initialize/python/mysqlconf.py --user=root --pass="$DB_PASS"
+${FORMAVID}/bin/initialize/python/mysqlconf.py --user=root --pass="${DB_PASS}"
 
 exit 0

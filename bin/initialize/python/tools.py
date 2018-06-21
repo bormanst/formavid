@@ -41,6 +41,9 @@ def main():
     # set webmin root password
     system("/usr/share/webmin/changepass.pl /etc/webmin root %s" % password)
 
+    # restart apache2
+    system('systemctl restart apache2')
+
 if __name__ == "__main__":
     main()
 
