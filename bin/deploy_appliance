@@ -6,6 +6,9 @@
 
 PACKAGE=deploy_appliance
 
+echo ""
+echo ""
+echo ""
 echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
 echo "This program is free software: you can redistribute it and/or modify"
 echo "it under the terms of the GNU General Public License as published by"

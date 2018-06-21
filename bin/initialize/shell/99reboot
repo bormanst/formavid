@@ -11,7 +11,7 @@ reboot() {
 }
 
 if [ "$REBOOT" == "SKIP" ] || [ -z "${PASSWORDS_ONLY}" ]; then
-    /usr/local/formavid-gce/bin/initialize/python/reboot-ask.py && reboot
+    ${FORMAVID}/bin/initialize/python/reboot-ask.py && reboot
 fi
 
 exit 0

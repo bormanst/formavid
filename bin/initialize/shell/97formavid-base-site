@@ -6,7 +6,7 @@
 
 # Create initial base site stack.
 
-SCRIPT_DIR=/usr/local/formavid-gce/bin/initialize/python
+SCRIPT_DIR=${FORMAVID}/bin/initialize/python
 
 # Requires envars.
 if  [ -n "${PASSWORDS_ONLY}" ] || ([ -n "${APP_EMAIL}" ] && [ -n "${DOMAIN}" ] && [ -n "${SITETITLE}" ]); then

@@ -6,9 +6,24 @@
 
 PACKAGE=initialize_appliance
 
+# set default FORMAVID
+export FORMAVID=/usr/local/formavid
+
 # check FORMAVID
-if [ -z "${FORMAVID}" ]; then
-    FORMAVID=/usr/local/formavid
+if [ ! -d "${FORMAVID}" ]; then
+    # dir should exist: this script is supposed to be located in formavid/bin
+    export FORMAVID=$(find /usr/local -name "formavid")
+    if [ -z "${FORMAVID}" ]; then
+        echo ""
+        echo ""
+        echo "WARNING! ${PACKAGE} depends on formavid's location being in /usr/local."
+        echo "WARNING! Please ensure that formavid is located in /usr/local."
+        echo "WARNING! OR"
+        echo "WARNING! Modify formavid's default location formavid/bin/${PACKAGE}."
+        echo ""
+        echo ""
+        exit 0
+    fi
 fi
 
 # set bin dir

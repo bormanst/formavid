@@ -6,6 +6,6 @@
 
 # set site values
 
-/usr/local/formavid-gce/bin/initialize/python/formavid.py
+${FORMAVID}/bin/initialize/python/formavid.py
 
 exit 0
