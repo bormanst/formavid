@@ -30,9 +30,6 @@ def main():
     # Simple Invoices password.
     system("python simpleinvoices.py")
 
-    # Solr - finish password protection.
-    system("python solr.py")
-
     # Tools password.
     system("python tools.py")
 
