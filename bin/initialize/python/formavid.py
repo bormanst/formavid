@@ -22,9 +22,6 @@ def main():
     adminpass = os.environ.get("APP_PASS")
     formavid = os.environ.get("FORMAVID")
 
-    # Borgbackup password.
-    system("python %s/bin/initialize/python/borgbackup.py" % formavid)
-
     # Roundup password.
     system("python %s/bin/initialize/python/roundup.py" % formavid)
 

@@ -98,13 +98,9 @@ def main():
             "Drupal admin and cssadmin password",
             "Please enter password for Drupal admin and cssadmin accounts.")
 
-        os.environ["BORGBACKUP_OLD"] = d.get_password(
-            "Borgbackup repository CURRENT password",
-            "Please enter CURRENT password for the Borgbackup repository.")
-
         os.environ["BORGBACKUP_PASS"] = d.get_password(
-            "Borgbackup repository NEW password",
-            "Please enter NEW password for the Borgbackup repository.")
+            "Borgbackup repository password",
+            "Please enter password for the Borgbackup repository.")
 
         os.environ["DB_PASS"] = d.get_password(
             "MySQL password",
