@@ -90,7 +90,7 @@ fi
 ${FORMAVID}/bin/deploy/shell/dependencies
 
 # check envars
-if [ -n "${APP_EMAIL}" ] || [ -n "${PASSWORDS_ONLY}" ]; then
+if [ -n "${APP_EMAIL}" ]; then
     # Note: apt-get locks so cannot run parallel jobs
     # Note: apt cron daemon is just a serializer so no better
     # install all packages prior to configuration scripts
@@ -280,6 +280,9 @@ if [ -n "${APP_EMAIL}" ] || [ -n "${PASSWORDS_ONLY}" ]; then
     # restart apache2
     if (systemctl -q is-active apache2); then systemctl restart apache2; fi
 
+    # initialize etckeeper
+    ${FORMAVID}/bin/initialize/shell/92etckeeper
+
     echo ""
     MESSSAGE="$( date ) Install and configuration completed."
     echo "#############################################"
@@ -290,65 +293,6 @@ if [ -n "${APP_EMAIL}" ] || [ -n "${PASSWORDS_ONLY}" ]; then
     echo "#"
     echo "#############################################"
     echo ${MESSSAGE} >> ${LOG}
-
-    # initialize appliance
-    # ${FORMAVID}/bin/initialize_appliance
-
-    # initial hourly borgbackup
-    # SCRIPT=/etc/cron.hourly/borgbackup
-    SCRIPT=DONTBACKUP
-    if [ -f "${SCRIPT}" ]; then
-        echo ""
-        MESSSAGE="$( date ) Performing initial hourly borgbackup..."
-        echo "#############################################"
-        echo "#"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-        # initial hourly borgbackup
-        ${SCRIPT}
-        echo ""
-        MESSSAGE="$( date ) Initial hourly borgbackup completed."
-        echo "#############################################"
-        echo "#"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-    fi
-
-    # initial daily borgbackup
-    # SCRIPT=/etc/cron.daily/borgbackup
-    SCRIPT=DONTBACKUP
-    if [ -f "${SCRIPT}" ]; then
-        echo ""
-        MESSSAGE="$( date ) Performing initial daily borgbackup..."
-        echo "#############################################"
-        echo "#"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-        # initial daily borgbackup
-        ${SCRIPT}
-        echo ""
-        MESSSAGE="$( date ) Initial daily borgbackup completed."
-        echo "#############################################"
-        echo "#"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-    fi
 fi
 
 # end deployment

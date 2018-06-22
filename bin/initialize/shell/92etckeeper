@@ -9,8 +9,6 @@
 
 [ -n "${PASSWORDS_ONLY}" ] && exit 0
 
-[ "$ETCKEEPER_COMMIT" == "SKIP" ] && exit 0
-
 etckeeper uninit -f > /dev/null 2>&1
 etckeeper init >/dev/null
 etckeeper commit "initial commit" >/dev/null

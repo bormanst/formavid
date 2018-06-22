@@ -26,18 +26,18 @@ if [ ! -d "${FORMAVID}" ]; then
     fi
 fi
 
-# set bin dir
-BIN_DIR=${FORMAVID}/bin
-
-# check envars
-if [ -z "${APP_EMAIL}" ]; then
-    # set passwords only
-    export PASSWORDS_ONLY="True";
-    ${BIN_DIR}/deploy/python/get-envars.py;
-fi
+# check PASSWORDS_ONLY
+printf "\n\n\nThis script will regen ssh keys, reset etckeeper, and reset all passwords.\n"
+printf "The scripts can be run individually in bin/initialize/shell if desired.\n"
+printf "This script can reset only the passwords if desired.\n\n"
+read -p "Reset passwords only (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) export PASSWORDS_ONLY="True";;
+  * ) :;;
+esac
 
 # run sub-scripts
-SCRIPT_DIR=${BIN_DIR}/initialize/shell
+SCRIPT_DIR=${FORMAVID}/bin/initialize/shell
 
 # check script dir
 if [ ! -d "${SCRIPT_DIR}" ]; then exit 0; fi
