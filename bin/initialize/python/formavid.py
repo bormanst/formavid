@@ -10,38 +10,37 @@ Set admin passwords, emails, and host data
 
 """
 
+import MySQLdb as mdb
 import os
 import pwd
 import string
 
-from mysqlconf import MySQL
 from local_methods import *
 
 def main():
     # Get envars.
     adminpass = os.environ.get("APP_PASS")
-    formavid = os.environ.get("FORMAVID")
-
-    # Roundup password.
-    system("python %s/bin/initialize/python/roundup.py" % formavid)
-
-    # Simple Invoices password.
-    system("python %s/bin/initialize/python/simpleinvoices.py" % formavid)
-
-    # Tools password.
-    system("python %s/bin/initialize/python/tools.py" % formavid)
 
     # Drupal - check change admin/password.
+    con = ""
     try:
         pwd.getpwnam('admin')
         system("echo admin:%s | chpasswd" % adminpass)
-        m = MySQL()
-        m.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD(%s);' % adminpass)
+        # Get db conection.
+        con = mdb.connect(host="localhost", user="root", passwd="%s" % os.environ.get("DB_PASS"))
+        # Get db cursor.
+        cur = con.cursor()
+        # Update email and password.
+        cur.execute('SET PASSWORD FOR admin@localhost = PASSWORD("%s"); flush privileges;' % adminpass)
+        cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % adminpass)
     except KeyError:
         # Error admin.
         system("")
         system("echo 'Unable to update password for admin. Ensure admin account exists.'")
         system("")
+    finally:
+        if con:
+            con.close()
 
     # Drupal - check change cssadmin/password with toggle to create base site.
     try:

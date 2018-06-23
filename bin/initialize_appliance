@@ -36,19 +36,10 @@ case "${CHOICE^^}" in
   * ) :;;
 esac
 
-# run sub-scripts
-SCRIPT_DIR=${FORMAVID}/bin/initialize/shell
+# load default envars
+. ${FORMAVID}/bin/deploy/shell/default_envars
 
-# check script dir
-if [ ! -d "${SCRIPT_DIR}" ]; then exit 0; fi
-
-# loop through scripts
-for SCRIPT in $(find ${SCRIPT_DIR} -type f -or -type l | sort); do
-    # check executable
-    [ -x "${SCRIPT}" ] || continue
-    # execute script
-    echo "# ${SCRIPT}"
-    ${SCRIPT}
-done
+# run get-envars
+${FORMAVID}/bin/deploy/python/get-envars.py
 
 exit 0

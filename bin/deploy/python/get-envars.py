@@ -33,6 +33,10 @@ def main():
     user_defined = True
     reset_passwords_only = False
 
+    # Get envars.
+    formavid = /usr/local/formavid
+    if "FORMAVID" in os.environ: formavid = os.environ.get("FORMAVID")
+
     # Assign common dialog header.
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
@@ -119,7 +123,22 @@ def main():
             "Please enter password for tools page admin access.")
     else:
         # Use defaults.
-        system("%s/bin/deploy/shell/default_envars" % os.environ.get("FORMAVID"))
+        system("%s/bin/deploy/shell/default_envars" % formavid)
+
+    # MariaDB password.
+    system("python %s/bin/initialize/python/mysqlconf.py" % formavid)
+
+    # Drupal password.
+    system("python %s/bin/initialize/python/formavid.py" % formavid)
+
+    # Roundup password.
+    system("python %s/bin/initialize/python/roundup.py" % formavid)
+
+    # Simple Invoices password.
+    system("python %s/bin/initialize/python/simpleinvoices.py" % formavid)
+
+    # Tools password.
+    system("python %s/bin/initialize/python/tools.py" % formavid)
 
 if __name__ == "__main__":
     main()

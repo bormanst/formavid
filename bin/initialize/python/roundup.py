@@ -11,8 +11,8 @@ Set Roundup admin password and email
 """
 
 import hashlib
-import os
 import MySQLdb as mdb
+import os
 
 from dialog_wrapper import Dialog
 from local_methods import *
@@ -54,12 +54,12 @@ def main():
         # Get db cursor.
         cur = con.cursor()
         # Update email and password.
-        cur.execute('UPDATE roundup._user SET _address=\"%s\" WHERE _username=\"admin\";' % email)
+        cur.execute('SET PASSWORD FOR roundup@localhost = PASSWORD("%s"); flush privileges;' % password)
         cur.execute('UPDATE roundup._user SET _password=\"%s\" WHERE _username=\"admin\";' % hashpass)
+        cur.execute('UPDATE roundup._user SET _address=\"%s\" WHERE _username=\"admin\";' % email)
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
-
     finally:
         if con:
             con.close()
