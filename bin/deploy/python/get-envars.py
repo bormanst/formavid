@@ -34,7 +34,7 @@ def main():
     reset_passwords_only = False
 
     # Get envars.
-    formavid = /usr/local/formavid
+    formavid = "/usr/local/formavid"
     if "FORMAVID" in os.environ: formavid = os.environ.get("FORMAVID")
 
     # Assign common dialog header.
@@ -129,7 +129,7 @@ def main():
     system("python %s/bin/initialize/python/mysqlconf.py" % formavid)
 
     # Drupal password.
-    system("python %s/bin/initialize/python/formavid.py" % formavid)
+    system("python %s/bin/initialize/python/drupal8.py" % formavid)
 
     # Roundup password.
     system("python %s/bin/initialize/python/roundup.py" % formavid)
