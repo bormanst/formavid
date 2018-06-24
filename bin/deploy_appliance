@@ -80,7 +80,7 @@ if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; the
     done
 else
     # set envars by input
-    . ${FORMAVID}/bin/deploy/shell/get_envars
+    . ${FORMAVID}/bin/deploy/shell/set_envars
 fi
 
 # set passwords by input
@@ -281,7 +281,7 @@ if [ -n "${APP_EMAIL}" ]; then
     if (systemctl -q is-active apache2); then systemctl restart apache2; fi
 
     # initialize etckeeper
-    ${FORMAVID}/bin/initialize/shell/92etckeeper
+    ${FORMAVID}/bin/initialize/shell/init_etckeeper
 
     echo ""
     MESSSAGE="$( date ) Install and configuration completed."

@@ -4,13 +4,22 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-# initialize etckeeper and perform initial commit
-# ETCKEEPER_COMMIT: SKIP (if skip specified, exit)
+# set log
+LOG=/var/log/formavid/deploy_appliance.log
 
-[ -n "${PASSWORDS_ONLY}" ] && exit 0
+MESSSAGE="$( date ) Initializing etckeeper..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
+# uninit etckeeper
 etckeeper uninit -f > /dev/null 2>&1
+
+# initialize etckeeper
 etckeeper init >/dev/null
+
+# initial commit
 etckeeper commit "initial commit" >/dev/null
+
+MESSSAGE="$( date ) Initialized and committed etckeeper..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

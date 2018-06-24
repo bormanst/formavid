@@ -1,0 +1,25 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# set log
+LOG=/var/log/formavid/deploy_appliance.log
+
+MESSSAGE="$( date ) Regenerating SSH cryptographic keys..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# remove existing ssh keys and generate new ones
+rm -f /etc/ssh/*_key{,.pub}
+
+# reconfigure openssh-server
+dpkg-reconfigure openssh-server
+
+# ssh daemon needs to be restarted for changes to take effect
+systemctl restart ssh
+
+MESSSAGE="$( date ) Cryptographic keys regenerated and SSH server restarted."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0

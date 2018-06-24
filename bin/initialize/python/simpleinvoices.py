@@ -41,7 +41,7 @@ def main():
         email = d.get_email(
             "Simple Invoices admin Email",
             "Enter email address for the Simple Invoices admin account.",
-            "admin@%s" % hostname)
+            "%s@%s" % (username, hostname))
 
     if not dbpass:
         dbpass = d.get_input(

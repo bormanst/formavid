@@ -16,13 +16,11 @@ import string
 from dialog_wrapper import Dialog
 from local_methods import *
 
-ENVARS_TEXT = """This sets custom variables such as domain, emails, and passwords.
+ENVARS_TEXT = """This sets passwords.
 
 Warning!!! It is a major security risk to use defaults. Minimally, reset passwords before moving to production.
 
-Run formavid/bin/initialize_appliance script to reset only the passwords.
-
-Site build defaults are located formavid/bin/deploy/shell/default_envars."""
+This script uses the site build defaults located in formavid/bin/deploy/shell/default_envars."""
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
 DEFAULT_DOMAIN = "www.examplesitename.com"
@@ -44,10 +42,6 @@ def main():
     os.environ["APP_PASS"] = d.get_password(
         "Drupal admin and cssadmin password",
         "Please enter password for Drupal admin and cssadmin accounts.")
-
-    os.environ["BORGBACKUP_PASS"] = d.get_password(
-        "Borgbackup repository password",
-        "Please enter password for the Borgbackup repository.")
 
     os.environ["DB_PASS"] = d.get_password(
         "MySQL password",
