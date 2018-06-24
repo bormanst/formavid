@@ -1,0 +1,75 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=initialize_appliance
+
+# set default FORMAVID
+export FORMAVID=/usr/local/formavid
+
+# check FORMAVID
+if [ ! -d "${FORMAVID}" ]; then
+    # dir should exist: this script is supposed to be located in formavid/bin
+    export FORMAVID=$(find /usr/local -name "formavid")
+    if [ -z "${FORMAVID}" ]; then
+        echo ""
+        echo ""
+        echo "WARNING! ${PACKAGE} depends on formavid's location being in /usr/local."
+        echo "WARNING! Please ensure that formavid is located in /usr/local."
+        echo "WARNING! OR"
+        echo "WARNING! Modify formavid's default location formavid/bin/${PACKAGE}."
+        echo ""
+        echo ""
+        exit 0
+    fi
+fi
+
+# confirm initialization
+echo "WARNING! You are about to initialize the appliance."
+echo "WARNING! This includes resetting passwords, ssh keys, and etckeeper."
+echo "WARNING! Each script can be run individually as well, refer to script."
+echo "WARNING! It does not include backups, databases, logs, home, etc."
+echo "WARNING! Those need to be reset or cleaned manually."
+echo ""
+echo "WARNING! The appliance will automatically reboot!"
+echo "WARNING! Save any work prior to running this script."
+echo "WARNING! Please notify other users if applicable."
+echo ""
+read -p "Continue with initialization and reboot (y/n)?" CHOICE
+case "${CHOICE^^}" in
+    Y|YES ) :;;
+    * ) exit 0;;
+esac
+
+# set log dir
+FORMAVID_LOGS=/var/log/formavid
+
+# check log dir exists
+if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
+
+# export log
+export LOG=${FORMAVID_LOGS}/deploy_appliance.log
+
+MESSSAGE="$( date ) Initializing appliance..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# set envars by input
+. ${FORMAVID}/bin/deploy/shell/set_envars
+
+# set passwords by input
+${FORMAVID}/bin/initialize/python/change-passwords.py
+
+# regen ssh keys
+${FORMAVID}/bin/initialize/shell/regen_sshkeys
+
+# initialize etckeeper
+${FORMAVID}/bin/initialize/shell/init_etckeeper
+
+# reboot appliance
+MESSSAGE="$( date ) Rebooting appliance..."
+echo ${MESSSAGE} | tee -a ${LOG}
+shutdown -r now
+
+exit 0
