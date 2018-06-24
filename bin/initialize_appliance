@@ -27,6 +27,8 @@ if [ ! -d "${FORMAVID}" ]; then
 fi
 
 # confirm initialization
+echo ""
+echo ""
 echo "WARNING! You are about to initialize the appliance."
 echo "WARNING! This includes resetting passwords, ssh keys, and etckeeper."
 echo "WARNING! Each script can be run individually as well, refer to script."
