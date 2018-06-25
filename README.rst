@@ -32,48 +32,48 @@ and large community-driven websites.
    - Site stacks are created in /var/www/drupal8/sites.
    - Each site stack has its own corresponding apache.conf stack file.
 
-- Additional Drupal 8 modules and dependencies:
+- Additional Drupal 8 modules:
 
-   - `Advagg`_: Advanced CSS/JS Aggregation.
-   - `Advanced help`_: Allows developers to store help outside the system.
-   - `Background Image`_: Allows utilizing background images.
-   - `Backup and migrate`_: Backup and restore your Drupal site
+   - Advagg: Advanced CSS/JS Aggregation.
+   - Advanced help: Allows developers to store help outside the system.
+   - Background Image: Allows utilizing background images.
+   - Backup and migrate: Backup and restore your Drupal site
      on-demand or on a schedule.
-   - `CAPTCHA`_: A challenge-response test for forms.
-   - `Component Libraries`_: Registers “component libraries” defined by
+   - CAPTCHA: A challenge-response test for forms.
+   - Component Libraries: Registers “component libraries” defined by
      your theme or module as Twig namespaces.
-   - `Chaos tool suite`_: Set of APIs and tools for developers.
-   - `Devel`_: A suite of helper modules for Drupal module and theme
+   - Chaos tool suite: Set of APIs and tools for developers.
+   - Devel: A suite of helper modules for Drupal module and theme
      developers.
-   - `Drush`_: a command line shell and Unix scripting interface for
+   - Drush: a command line shell and Unix scripting interface for
      Drupal.
-   - `Features`_: Enables the capture and management of features.
-   - `Field Group`_: Enables grouping fields together.
-   - `FiveStar`_: Simple five-star voting widget for nodes.
-   - `Honeypot`_: Methods for deterring spam bots.
-   - `Image Style Quality`_: Allows you to specify a custom quality on
+   - Features: Enables the capture and management of features.
+   - Field Group: Enables grouping fields together.
+   - FiveStar: Simple five-star voting widget for nodes.
+   - Honeypot: Methods for deterring spam bots.
+   - Image Style Quality: Allows you to specify a custom quality on
      individual image styles.
-   - `ImageAPI Optimize`_: allows you to use your preferred toolkit and
+   - ImageAPI Optimize: allows you to use your preferred toolkit and
      optimize (losslessly) the image when it is saved.
-   - `ImageMagick`_: Allows to use ImageMagick or GraphicsMagick as image
+   - ImageMagick: Allows to use ImageMagick or GraphicsMagick as image
      toolkit for Image API.
-   - `Imce`_: Powerful image file uploader and browser, with support for
+   - Imce: Powerful image file uploader and browser, with support for
      on the fly resizing.
-   - `Inline Entity Form`_: Provides a widget for inline management
+   - Inline Entity Form: Provides a widget for inline management
      (creation, modification, removal) of referenced entities.
-   - `Module Filter`_: The ability to quickly find  modules.
-   - `Panels`_: Drag and drop customized layouts for pages, nodes and
+   - Module Filter: The ability to quickly find  modules.
+   - Panels: Drag and drop customized layouts for pages, nodes and
      blocks.
-   - `PathAuto`_: Auto-generate search engine friendly URLs (SEO).
-   - `Recaptcha`_: Thwart spammers by adding image or text based
+   - PathAuto: Auto-generate search engine friendly URLs (SEO).
+   - Recaptcha: Thwart spammers by adding image or text based
      CAPTCHAs to your site.
-   - `Rules`_: Allows site administrators to define conditionally
+   - Rules: Allows site administrators to define conditionally
      executed actions based on occurring events.
-   - `Search API Solr Search`_: Optional customizable search support.
-   - `Tagadelic`_: Makes weighted tag clouds from your taxonomy terms.
-   - `Views Bulk Operations`_: augments Views by allowing bulk operations
+   - Search API Solr Search: Optional customizable search support.
+   - Tagadelic: Makes weighted tag clouds from your taxonomy terms.
+   - Views Bulk Operations: augments Views by allowing bulk operations
      to be executed on the displayed rows.
-   - `Zen`_: a modern, powerful, HTML5 starting theme with component-based
+   - Zen: a modern, powerful, HTML5 starting theme with component-based
      CSS and a responsive, mobile-first grid design.
 
 
@@ -87,8 +87,7 @@ desk support, and sales lead tracking.
 
 - Roundup configurations:
 
-   - Installed from package management to /var/www/support instead
-     of default /var/lib/roundup.
+   - Installed via pip into user`s roundup home folder.
    - Uses Apache2 to serve roundup (instead of roundup-server).
    - Disabled registration confirmation via email (requires mail
      server).
@@ -149,7 +148,7 @@ Additional Features
 - `Fail2ban`_ bans IPs that show malicious signs.
 
 
-Credentials *(passwords set at first boot)*
+Credentials *(passwords required for initialization)*
 -------------------------------------------
 
 -  Webmin, Webshell, SSH, MariaDB, Adminer: username **root**
