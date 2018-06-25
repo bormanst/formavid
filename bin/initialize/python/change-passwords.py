@@ -39,13 +39,13 @@ def main():
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
     # Set envars for passwords.
-    os.environ["APP_PASS"] = d.get_password(
-        "Drupal admin and cssadmin password",
-        "Please enter password for Drupal admin and cssadmin accounts.")
-
     os.environ["DB_PASS"] = d.get_password(
         "MySQL password",
         "Please enter new password for the MySQL 'root' account.")
+
+    os.environ["APP_PASS"] = d.get_password(
+        "Drupal admin and cssadmin password",
+        "Please enter password for Drupal admin and cssadmin accounts.")
 
     os.environ["ROUNDUP_PASS"] = d.get_password(
         "Roundup admin password",

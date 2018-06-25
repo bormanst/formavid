@@ -262,13 +262,17 @@ cat > ${CONF} <<EOF
     AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
-        Require all granted
-        AllowOverride None
+        AllowOverride All
         Options +FollowSymLinks
         AddHandler python-program .py
         PythonHandler roundup.cgi.apache
         PythonOption TrackerHome ${APP_DIR}
         PythonOption TrackerLanguage en
+        AuthName "password protected area"
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
     </Directory>
 </VirtualHost>
 
@@ -288,6 +292,26 @@ chmod 0644 ${CONF}
 
 # apache2: link conf file
 ln -s ${CONF} /etc/apache2/sites-available/${PACKAGE}.conf
+
+# apache2: create htaccess
+CONF=${APP_DIR}/.htaccess
+cat > ${CONF} <<EOF
+IndexIgnore *
+<ifModule mod_php7.c>
+    php_value max_execution_time 90
+    php_value memory_limit 64M
+</ifModule>
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|tpl)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+<FilesMatch "\.(htm|html|css|js|php)$">
+    AddDefaultCharset UTF-8
+</FilesMatch>
+EOF
+
+# apache2: set htaccess perms
+chmod 0644 ${CONF}
 
 # apache2: enable conf
 a2ensite ${PACKAGE}

@@ -146,9 +146,18 @@ chmod 0640 ${CONF}
 ETC=/etc/${PACKAGE}
 mkdir -p ${ETC}
 
+# move config.php to etc
+mv ${CONF} ${ETC}/config.php
+ln -s ${ETC}/config.php ${CONF}
+
+# move define.php to etc
+CONF=${APP_DIR}/config/define.php
+mv ${CONF} ${ETC}/define.php
+ln -s ${ETC}/define.php ${CONF}
+
 # apache2: create conf
-APACHE_CONF=${ETC}/apache.conf
-cat > ${APACHE_CONF} <<EOF
+CONF=${ETC}/apache.conf
+cat > ${CONF} <<EOF
 <VirtualHost *:443>
     ServerName billing.${APP_HOSTNAME}
     ServerAdmin webmaster@localhost
@@ -180,10 +189,10 @@ cat > ${APACHE_CONF} <<EOF
 EOF
 
 #  apache2: set conf perms
-chmod 0644 ${APACHE_CONF}
+chmod 0644 ${CONF}
 
 # apache2: link conf file
-ln -s ${APACHE_CONF} ${AVAILABLE}/${PACKAGE}.conf
+ln -s ${CONF} ${AVAILABLE}/${PACKAGE}.conf
 
 # apache2: enable conf
 a2enmod rewrite

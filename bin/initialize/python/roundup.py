@@ -6,7 +6,7 @@
 
 """
 
-Set Roundup admin password and email
+Set Roundup admin password.
 
 """
 
@@ -23,7 +23,6 @@ def main():
     # Get envars.
     apachepass = os.environ.get("TOOLS_PASS")
     dbpass = os.environ.get("DB_PASS")
-    email = os.environ.get("APP_EMAIL")
     hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("ROUNDUP_PASS")
 
@@ -37,12 +36,6 @@ def main():
         password = d.get_password(
             "Roundup admin password",
             "Please enter password for the Roundup admin account.")
-
-    if not email:
-        email = d.get_email(
-            "Roundup admin Email",
-            "Please enter email address for the Roundup admin account.",
-            "%s@%s" % (username, hostname))
 
     if not dbpass:
         dbpass = d.get_input(
@@ -66,8 +59,6 @@ def main():
         system("sed -i 's/^password = \(.*\)/password = %s/' /etc/roundup/tracker-config.ini" % password)
         # Update tracker admin password.
         system('roundup-admin -i /var/www/support set user1 password="%s"' % password)
-        # Update tracker admin email.
-        system('roundup-admin -i /var/www/support set user1 address="%s"' % email)
         # Set apache2 htdbm password.
         directory = "/usr/local/apache2/passwd/roundup"
         if os.path.isdir(directory): system("rm -rf %s" % directory)

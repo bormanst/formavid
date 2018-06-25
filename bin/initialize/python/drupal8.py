@@ -15,6 +15,7 @@ import os
 import pwd
 import string
 
+from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
@@ -62,13 +63,13 @@ def main():
         # Update mariaDB user passwords.
         cur.execute('SET PASSWORD FOR admin@localhost = PASSWORD("%s"); flush privileges;' % password)
         cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % password)
-        # Update email.
-        cur.execute('UPDATE drupal8.users_field_data SET mail=\"%s\" WHERE name=\"admin\";' % email)
-        cur.execute('UPDATE drupal8.users_field_data SET init=\"%s\" WHERE name=\"admin\";' % email)
         # Update site db access password.
         system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, hostname))
         # Update site admin password.
         system('drush -r %s -l https://%s user-password admin --password="%s"' % (drupaldir, hostname, password))
+        # Update email.
+        system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET mail=\'%s\' WHERE name=\'admin\';"' % (drupaldir, hostname, email))
+        system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET init=\'%s\' WHERE name=\'admin\';"' % (drupaldir, hostname, email))
         # Clear site cache.
         system('drush -r %s -l https://%s cache-rebuild' % (drupaldir, hostname))
         # restart apache2

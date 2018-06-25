@@ -268,6 +268,9 @@ if [ -n "${APP_EMAIL}" ]; then
     # wait for processes completed
     wait
 
+    # clean up mod_php5 references in webroot
+    find /var/www -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+
     # restart stunnel4
     if (systemctl -q is-active stunnel4); then systemctl restart stunnel4; fi
 
