@@ -17,20 +17,16 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME = "examplesitename.com"
 
 def main():
     # Get envars.
     apachepass = os.environ.get("TOOLS_PASS")
     dbpass = os.environ.get("DB_PASS")
-    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("ROUNDUP_PASS")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
     username = "admin"
-
-    if not hostname: hostname = DEFAULT_HOSTNAME
 
     if not password:
         password = d.get_password(

@@ -168,9 +168,6 @@ done;
 # docker: need extra delay
 sleep 45;
 
-# set roundup password
-# ${FORMAVID}/bin/initialize/python/roundup.py
-
 # initialise tracker using docker db
 sudo -H -u ${DB_USER} bash -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
 
@@ -220,6 +217,9 @@ mkdir -p ${ETC}
 mv ${CONF} ${ETC}/tracker-config.ini
 ln -s ${ETC}/tracker-config.ini ${CONF}
 
+# set roundup passwords
+${FORMAVID}/bin/initialize/python/roundup.py
+
 # don't display credit in popups
 for file in *.help*.html _generic.calendar.html; do
     sed -i "s|</head>|<style type='text/css'> #formavid-credit { display: none; }</style>\n  </head>|" ${APP_DIR}/html/${file}
@@ -262,7 +262,8 @@ cat > ${CONF} <<EOF
     AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
-        AllowOverride All
+        Require all granted
+        AllowOverride None
         Options +FollowSymLinks
         AddHandler python-program .py
         PythonHandler roundup.cgi.apache
@@ -292,26 +293,6 @@ chmod 0644 ${CONF}
 
 # apache2: link conf file
 ln -s ${CONF} /etc/apache2/sites-available/${PACKAGE}.conf
-
-# apache2: create htaccess
-CONF=${APP_DIR}/.htaccess
-cat > ${CONF} <<EOF
-IndexIgnore *
-<ifModule mod_php7.c>
-    php_value max_execution_time 90
-    php_value memory_limit 64M
-</ifModule>
-<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|tpl)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-<FilesMatch "\.(htm|html|css|js|php)$">
-    AddDefaultCharset UTF-8
-</FilesMatch>
-EOF
-
-# apache2: set htaccess perms
-chmod 0644 ${CONF}
 
 # apache2: enable conf
 a2ensite ${PACKAGE}
