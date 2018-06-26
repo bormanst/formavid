@@ -220,6 +220,12 @@ ln -s ${ETC}/tracker-config.ini ${CONF}
 # set roundup passwords
 ${FORMAVID}/bin/initialize/python/roundup.py
 
+# hide issues until authenticated
+PTION="for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':"
+sed -i "1,/^${OPTION}/s/^${OPTION}/#${OPTION}/" ${APP_DIR}/schema.py
+OPTION="db.security.addPermissionToRole('Anonymous', 'View', cl)"
+sed -i "1,/^\([[:blank:]]*\)${OPTION}/s/^\([[:blank:]]*\)${OPTION}/#\1${OPTION}/" ${APP_DIR}/schema.py
+
 # don't display credit in popups
 for file in *.help*.html _generic.calendar.html; do
     sed -i "s|</head>|<style type='text/css'> #formavid-credit { display: none; }</style>\n  </head>|" ${APP_DIR}/html/${file}
@@ -262,17 +268,13 @@ cat > ${CONF} <<EOF
     AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
+        Require all granted
         AllowOverride None
         Options +FollowSymLinks
         AddHandler python-program .py
         PythonHandler roundup.cgi.apache
         PythonOption TrackerHome ${APP_DIR}
         PythonOption TrackerLanguage en
-        AuthName "password protected area"
-        AuthType Basic
-        Require valid-user
-        AuthBasicProvider dbm
-        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
     </Directory>
 </VirtualHost>
 
