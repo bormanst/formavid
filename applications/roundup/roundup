@@ -262,7 +262,6 @@ cat > ${CONF} <<EOF
     AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
-        Require all granted
         AllowOverride None
         Options +FollowSymLinks
         AddHandler python-program .py
