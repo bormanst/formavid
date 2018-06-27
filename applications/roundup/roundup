@@ -221,7 +221,7 @@ ln -s ${ETC}/tracker-config.ini ${CONF}
 ${FORMAVID}/bin/initialize/python/roundup.py
 
 # hide issues until authenticated
-PTION="for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':"
+OPTION="for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':"
 sed -i "1,/^${OPTION}/s/^${OPTION}/#${OPTION}/" ${APP_DIR}/schema.py
 OPTION="db.security.addPermissionToRole('Anonymous', 'View', cl)"
 sed -i "1,/^\([[:blank:]]*\)${OPTION}/s/^\([[:blank:]]*\)${OPTION}/#\1${OPTION}/" ${APP_DIR}/schema.py
