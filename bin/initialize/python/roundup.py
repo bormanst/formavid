@@ -55,15 +55,6 @@ def main():
         system("sed -i 's/^password = \(.*\)/password = %s/' /etc/roundup/tracker-config.ini" % password)
         # Update tracker admin password.
         system('roundup-admin -i /var/www/support set user1 password="%s"' % password)
-        # Set apache2 htdbm password.
-        directory = "/usr/local/apache2/passwd/roundup"
-        if os.path.isdir(directory): system("rm -rf %s" % directory)
-        system("mkdir -p %s" % directory)
-        directory = "".join([directory, '/passwords.dbm'])
-        command = " ".join(['htdbm -bc', directory, username, apachepass])
-        system(command)
-        # restart apache2
-        system('systemctl restart apache2')
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
