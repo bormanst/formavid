@@ -62,7 +62,7 @@ DB_USER=${PACKAGE}
 
 # add roundup user for pip install
 if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
-    useradd -U -m -s /bin/bash ${DB_USER}
+    adduser --disabled-login --gecos 'roundup' ${DB_USER}
 fi
 
 BATCH_EX="--batch --execute"
