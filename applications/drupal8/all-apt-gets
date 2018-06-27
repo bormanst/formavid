@@ -29,7 +29,7 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add node.js source
-    curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_9.x | bash -
     # install dependencies
     export APTGETS="checkinstall composer libjs-jquery-colorbox libssl-dev nodejs php-curl php-gd php-getid3 php-gmp php-readline php-ssh2 php-twig php-xml python-yaml"
     export "${PACKAGE^^}"="True"
