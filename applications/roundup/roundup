@@ -161,7 +161,7 @@ ${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PO
 
 # docker: have to wait for active container
 COUNTER=0
-until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 120 ]; do
+until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 180 ]; do
     sleep 1;
     let COUNTER=COUNTER+1
 done;
@@ -218,7 +218,7 @@ mv ${CONF} ${ETC}/tracker-config.ini
 ln -s ${ETC}/tracker-config.ini ${CONF}
 
 # set roundup passwords
-${FORMAVID}/bin/initialize/python/roundup.py
+# ${FORMAVID}/bin/initialize/python/roundup.py
 
 # hide issues until authenticated
 OPTION="for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':"
