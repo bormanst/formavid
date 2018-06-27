@@ -11,7 +11,7 @@ export_user_input () {
     # prompt for input with default
     read -p "Please enter ${1} or press enter to select the default of [${2}]:" ${1}
     # export based on intput
-    if [[ -z "${!1// }" ]]; then export ${1}=${2}; else export ${1}=${!1}; fi
+    if [[ -z "${!1// }" ]]; then export ${1}="${2}"; else export ${1}="${!1}"; fi
 }
 
 # get envars
@@ -22,7 +22,7 @@ for ENVAR in ${ENVAR_REQ_LIST}; do
         # get inputs
         export_user_input "${ENVAR}" "${!ENVAR}"
         # update default
-        sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=${!ENVAR}/" ${DEFAULT_ENVARS}
+        sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=\"${!ENVAR}\"/" ${DEFAULT_ENVARS}
     fi
     # args++
     let ARG=ARG+1

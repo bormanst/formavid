@@ -62,7 +62,7 @@ DB_USER=${PACKAGE}
 
 # add roundup user for pip install
 if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
-    adduser --disabled-login --gecos 'roundup' ${DB_USER}
+    useradd -U -m -r -s /bin/bash ${DB_USER}
 fi
 
 BATCH_EX="--batch --execute"
@@ -161,12 +161,12 @@ ${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PO
 
 # docker: have to wait for active container
 COUNTER=0
-until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 90 ]; do
+until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 120 ]; do
     sleep 1;
     let COUNTER=COUNTER+1
 done;
 # docker: need extra delay
-sleep 45;
+sleep 60;
 
 # initialise tracker using docker db
 su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
