@@ -27,7 +27,7 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add base packages
-    export APTGETS="apt-show-versions apt-transport-https build-essential cron-apt curl dtach etckeeper git monit openssl perl unzip libauthen-pam-perl libffi-dev libio-pty-perl libnet-ssleay-perl libssl-dev ncurses-term python-babel python-debtcollector python-dev python-dialog python-funcsigs python-requests-futures python-iso8601 python-keystoneauth1 python-monotonic python-msgpack python-netaddr python-netifaces python-oslo.config python-oslo.i18n python-oslo.utils python-oslo.serialization python-pbr python-pip python-openssl python-pyparsing python-keystoneclient python-swiftclient python-rfc3986 python-stevedore python-wrapt rsync shellinabox stunnel4"
+    export APTGETS="apt-show-versions apt-transport-https build-essential cron-apt dtach etckeeper git monit openssl perl unzip libauthen-pam-perl libffi-dev libio-pty-perl libnet-ssleay-perl libssl-dev ncurses-term python-babel python-debtcollector python-dev python-dialog python-funcsigs python-requests-futures python-iso8601 python-keystoneauth1 python-monotonic python-msgpack python-netaddr python-netifaces python-oslo.config python-oslo.i18n python-oslo.utils python-oslo.serialization python-pbr python-pip python-openssl python-pyparsing python-keystoneclient python-swiftclient python-rfc3986 python-stevedore python-wrapt rsync shellinabox stunnel4"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

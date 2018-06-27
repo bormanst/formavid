@@ -33,6 +33,9 @@ if [ $(swapon -s | grep -ci "${SWAPFILE}") -eq 0 ];  then
     echo "${SWAPFILE} none swap sw 0 0" >> /etc/fstab
 fi
 
+# required for all-apt-gets
+apt-get install -y curl
+
 echo ""
 echo ""
 echo "Package ${PACKAGE} install has completed."
