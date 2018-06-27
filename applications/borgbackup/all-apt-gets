@@ -27,11 +27,17 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add base packages
-    # using gcsfuse to directly temp mount storage buckets instead of rclone, etc.
-    export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
-    echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-    export APTGETS="${PACKAGE} ${PACKAGE}-doc gcsfuse"
+    # check install gcsfuse
+    if [ "${GCS_BUCKET}" != "None" ] && [ "${GCS_PROJECT_ID}" != "None" ]; then
+        # using gcsfuse to directly temp mount storage buckets instead of rclone, etc.
+        export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+        echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+        export APTGETS="${PACKAGE} ${PACKAGE}-doc gcsfuse"
+    else
+        # no gcsfuse
+        export APTGETS="${PACKAGE} ${PACKAGE}-doc"
+    fi
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
