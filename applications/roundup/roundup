@@ -81,7 +81,7 @@ mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
 chown ${DB_USER}:${DB_USER} /var/www
 
 # install roundup to user home
-sudo -H -u ${DB_USER} bash -c "pip install ${PACKAGE} --user"
+su - ${DB_USER} -c "pip install ${PACKAGE} --user"
 
 # set home access perms
 HOME=/home/${DB_USER}/.local
@@ -110,7 +110,7 @@ ln -sf ${HOME}${TARGET}/site-packages/roundup-1.5.1.dist-info ${LOCAL}${TARGET}/
 BACKEND=mysql
 TEMPLATE=classic
 OPTIONS="admin_email=admin,dispatcher_email=admin,tracker_web=/,mail_domain=${APP_HOSTNAME},mail_host=localhost,rdbms_password=${DB_PASS}"
-sudo -H -u ${DB_USER} bash -c "roundup-admin -i ${APP_DIR} install ${TEMPLATE} ${BACKEND} ${OPTIONS}"
+su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} install ${TEMPLATE} ${BACKEND} ${OPTIONS}"
 
 # tracker conf
 CONF=${APP_DIR}/config.ini
@@ -169,7 +169,7 @@ done;
 sleep 45;
 
 # initialise tracker using docker db
-sudo -H -u ${DB_USER} bash -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
+su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
 
 # dump docker db to home to avoid perm issues
 ${HACK} exec ${CONTAINER} ${MYSQL_DUMP} ${ROOT_CREDS} ${DB_NAME} > ~/${DB_NAME}.sql
