@@ -14,8 +14,11 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
+# set tracker name
+TRACKER="support"
+
 # check dir
-APP_DIR=/var/www/support
+APP_DIR=/var/www/${TRACKER}
 if [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""
@@ -42,6 +45,7 @@ fi
 
 # dependencies check: mysql
 DEPENDS=mysql
+systemctl start ${DEPENDS} && sleep 10
 if ! (systemctl -q is-active ${DEPENDS}); then
     echo ""
     echo ""
@@ -71,40 +75,48 @@ MYSQL_ADMIN=/usr/bin/mysqladmin
 MYSQL_DUMP=/usr/bin/mysqldump
 
 # create database
-${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}
 
-# add database user
-QUERY="grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${ROUNDUP_PASS}'; flush privileges;"
-mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+if (${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}); then
+    # add database user
+    QUERY="grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${ROUNDUP_PASS}'; flush privileges;"
+    mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+else
+    echo ""
+    echo ""
+    echo "WARNING! The ${DB_NAME} database already exists."
+    echo "WARNING! Please drop the database before running this script."
+    echo "WARNING! Be sure to make a backup if applicable."
+    echo ""
+    echo ""
+    exit 0
+fi
 
 # temp perms for install
 chown ${DB_USER}:${DB_USER} /var/www
 
-# install roundup to user home
-su - ${DB_USER} -c "pip install ${PACKAGE} --user"
-
-# set home access perms
-HOME=/home/${DB_USER}/.local
-chmod -R 0775 ${HOME}
-chmod -R 0774 ${HOME}/share
-
-# add symlinks
-LOCAL=/usr/local
-TARGET=/bin/roundup-admin
-ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-TARGET=/bin/roundup-gettext
-ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-TARGET=/bin/roundup-mailgw
-ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-TARGET=/share/roundup
-ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-#TARGET=/share/doc/roundup
-#ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-#TARGET=/share/man/man1
-#ln -sf ${HOME}${TARGET}/* ${LOCAL}${TARGET}
-TARGET=/lib/python2.7
-ln -sf ${HOME}${TARGET}/site-packages/roundup ${LOCAL}${TARGET}/dist-packages/roundup
-ln -sf ${HOME}${TARGET}/site-packages/roundup-1.5.1.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-1.5.1.dist-info
+# check pip install
+DEPENDS="/home/roundup/.local"
+if [ ! -d "${DEPENDS}" ]; then
+    # install roundup to user home
+    su - ${DB_USER} -c "pip install ${PACKAGE} --user"
+    # set home access perms
+    HOME=/home/${DB_USER}/.local
+    chmod -R 0775 ${HOME}
+    chmod -R 0774 ${HOME}/share
+    # add symlinks
+    LOCAL=/usr/local
+    TARGET=/bin/roundup-admin
+    ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+    TARGET=/bin/roundup-gettext
+    ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+    TARGET=/bin/roundup-mailgw
+    ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+    TARGET=/share/roundup
+    ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
+    TARGET=/lib/python2.7
+    ln -sf ${HOME}${TARGET}/site-packages/roundup ${LOCAL}${TARGET}/dist-packages/roundup
+    ln -sf ${HOME}${TARGET}/site-packages/roundup-1.5.1.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-1.5.1.dist-info
+fi
 
 # tracker creation
 BACKEND=mysql
@@ -121,11 +133,12 @@ sed -i "s|^${OPTION} = yes|${OPTION} = no|" ${CONF}
 
 # update title
 OPTION=name
-sed -i "s|^${OPTION} = /|${OPTION} = ${SITETITLE} Issue Tracker|" ${CONF}
+# TODO: not right
+sed -i "s|^${OPTION} = Roundup issue tracker|${OPTION} = ${SITETITLE} Issue Tracker|" ${CONF}
 
 # use tls for mail
 OPTION=tls
-sed -i "s|^${OPTION} = /|${OPTION} = yes|" ${CONF}
+sed -i "s|^${OPTION} = no|${OPTION} = yes|" ${CONF}
 
 # update web location
 OPTION=web
@@ -152,27 +165,43 @@ sed -i "1,/^${OPTION} = localhost/s/^${OPTION} = localhost/${OPTION} = ${DOCKER_
 OPTION=user
 sed -i "1,/^${OPTION} = ${DB_USER}/s/^${OPTION} = ${DB_USER}/${OPTION} = root/" ${CONF}
 
-# docker: get docker
-curl -sSL https://get.${HACK}.com/ | sh
+# check docker exists
+if ! ( hash ${HACK} ); then
+    # docker: get docker
+    curl -sSL https://get.${HACK}.com/ | sh
+else
+    # docker: start docker
+    systemctl enable ${HACK}
+    systemctl start ${HACK}
+fi
 
-# docker: start docker db with remove-on-stop flag --rm
+# docker: check container is active
 CONTAINER=mariadb-10133-container
-${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASS} -d mariadb:10.1.33
+if [ ! "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`" == "true" ]; then
+    # docker: start docker db with remove-on-stop flag --rm
+    ${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASS} -d mariadb:10.1.33
+fi
 
-# docker: have to wait for active container
+# docker: have to wait for active container db
 COUNTER=0
-until [ "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`"=="true" ] || [ ${COUNTER} -gt 180 ]; do
-    sleep 1;
+while ! (${HACK} exec ${CONTAINER} ${MYSQL_ADMIN} ${ROOT_CREDS} --host "${DOCKER_HOST}" ping --silent &> /dev/null); do
+    # sleep a bit
+    sleep 2
+    # check COUNTER for exit in case of "hang"
+    if [ ${COUNTER} -gt 120 ]; then exit 0; fi
+    # inc COUNTER
     let COUNTER=COUNTER+1
-done;
-# docker: need extra delay
-sleep 60;
+done
 
 # initialise tracker using docker db
 su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
 
 # dump docker db to home to avoid perm issues
 ${HACK} exec ${CONTAINER} ${MYSQL_DUMP} ${ROOT_CREDS} ${DB_NAME} > ~/${DB_NAME}.sql
+
+# drop docker db
+QUERY="drop database ${DB_NAME};"
+${HACK} exec ${CONTAINER} mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
 
 # remove-on-stop docker
 ${HACK} stop ${CONTAINER}
@@ -210,7 +239,7 @@ OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
 
 # create etc dir
-ETC=/etc/${PACKAGE}
+ETC=/etc/${PACKAGE}/${TRACKER}
 mkdir -p ${ETC}
 
 # move tracker configuration to etc
@@ -260,12 +289,12 @@ cat > ${CONF} <<EOF
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    RedirectMatch ^/$ /support/
+    RedirectMatch ^/$ /${TRACKER}/
     PythonOptimize On
-    Alias /support/docs ${APP_DIR}/docs/html
-    Alias /support/theme /var/www/drupal8/themes/${SITENAME}
-    AliasMatch ^/support/@@file/(.*) ${APP_DIR}/html/\$1
-    AliasMatch ^/support/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
+    Alias /${TRACKER}/docs ${APP_DIR}/docs/html
+    Alias /${TRACKER}/theme /var/www/drupal8/themes/${SITENAME}
+    AliasMatch ^/${TRACKER}/@@file/(.*) ${APP_DIR}/html/\$1
+    AliasMatch ^/${TRACKER}/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
         Require all granted
@@ -284,8 +313,8 @@ cat > ${CONF} <<EOF
     UseCanonicalName Off
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    RedirectPermanent /support/ "https://support.${APP_HOSTNAME}/support/"
-    RedirectPermanent / "https://support.${APP_HOSTNAME}/support/"
+    RedirectPermanent /${TRACKER}/ "https://support.${APP_HOSTNAME}/${TRACKER}/"
+    RedirectPermanent / "https://support.${APP_HOSTNAME}/${TRACKER}/"
 </VirtualHost>
 EOF
 
@@ -293,10 +322,10 @@ EOF
 chmod 0644 ${CONF}
 
 # apache2: link conf file
-ln -s ${CONF} /etc/apache2/sites-available/${PACKAGE}.conf
+ln -s ${CONF} /etc/apache2/sites-available/${TRACKER}.conf
 
 # apache2: enable conf
-a2ensite ${PACKAGE}
+a2ensite ${TRACKER}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
