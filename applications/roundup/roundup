@@ -60,8 +60,8 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# setup database
-DB_NAME=${PACKAGE}
+# set database vars
+DB_NAME=${TRACKER}
 DB_USER=${PACKAGE}
 
 # add roundup user for pip install
@@ -69,13 +69,13 @@ if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
     useradd -U -m -r -s /bin/bash ${DB_USER}
 fi
 
+# set mysql vars
 BATCH_EX="--batch --execute"
 ROOT_CREDS="--user=root --password=${DB_PASS}"
 MYSQL_ADMIN=/usr/bin/mysqladmin
 MYSQL_DUMP=/usr/bin/mysqldump
 
 # create database
-
 if (${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}); then
     # add database user
     QUERY="grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${ROUNDUP_PASS}'; flush privileges;"
@@ -95,12 +95,11 @@ fi
 chown ${DB_USER}:${DB_USER} /var/www
 
 # check pip install
-DEPENDS="/home/roundup/.local"
-if [ ! -d "${DEPENDS}" ]; then
+HOME="/home/${DB_USER}/.local"
+if [ ! -d "${HOME}" ]; then
     # install roundup to user home
     su - ${DB_USER} -c "pip install ${PACKAGE} --user"
     # set home access perms
-    HOME=/home/${DB_USER}/.local
     chmod -R 0775 ${HOME}
     chmod -R 0774 ${HOME}/share
     # add symlinks
@@ -133,7 +132,6 @@ sed -i "s|^${OPTION} = yes|${OPTION} = no|" ${CONF}
 
 # update title
 OPTION=name
-# TODO: not right
 sed -i "s|^${OPTION} = Roundup issue tracker|${OPTION} = ${SITETITLE} Issue Tracker|" ${CONF}
 
 # use tls for mail
@@ -142,7 +140,7 @@ sed -i "s|^${OPTION} = no|${OPTION} = yes|" ${CONF}
 
 # update web location
 OPTION=web
-sed -i "s|^${OPTION} = /|${OPTION} = https://support.${APP_HOSTNAME}/support/|" ${CONF}
+sed -i "s|^${OPTION} = /|${OPTION} = https://support.${APP_HOSTNAME}/${TRACKER}/|" ${CONF}
 
 #
 # HACK start:
@@ -150,6 +148,7 @@ sed -i "s|^${OPTION} = /|${OPTION} = https://support.${APP_HOSTNAME}/support/|" 
 # install into compatible docker db and restore to local mariadb
 #
 
+# set docker vars
 HACK=docker
 LOCAL_PORT=3306
 DOCKER_PORT=3310
@@ -262,7 +261,7 @@ done
 
 # create local documentation
 mkdir -p ${APP_DIR}/docs
-cp -rf ${HOME}/share/doc/roundup/html ${APP_DIR}/docs
+ln -sf ${HOME}/share/doc/roundup/html ${APP_DIR}/docs
 sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n:translate=\"\">local</a>);" ${APP_DIR}/html/page.html
 
 # apply theme header
