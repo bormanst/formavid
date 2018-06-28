@@ -15,7 +15,7 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # set tracker name
-TRACKER="support"
+TRACKER=support
 
 # check dir
 APP_DIR=/var/www/${TRACKER}
@@ -61,7 +61,7 @@ MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
 # setup database vars
-DB_NAME=${PACKAGE}
+DB_NAME=${TRACKER}
 DB_USER=${PACKAGE}
 
 # add roundup user for pip install
@@ -120,27 +120,11 @@ fi
 # tracker creation
 BACKEND=mysql
 TEMPLATE=classic
-OPTIONS="admin_email=admin,dispatcher_email=admin,tracker_web=/,mail_domain=${APP_HOSTNAME},mail_host=localhost,rdbms_password=${DB_PASS}"
+OPTIONS="admin_email=admin,email_registration_confirmation=no,dispatcher_email=admin,tracker_name=\"${SITETITLE} Issue Tracker\",tracker_web=https://support.${APP_HOSTNAME}/${TRACKER}/,mail_domain=${APP_HOSTNAME},mail_host=localhost,rdbms_name=${TRACKER},rdbms_password=${DB_PASS}"
 su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} install ${TEMPLATE} ${BACKEND} ${OPTIONS}"
 
 # tracker conf
 CONF=${APP_DIR}/config.ini
-
-# disable registration confirmation via email (requires mail server)
-OPTION=email_registration_confirmation
-sed -i "s|^${OPTION} = yes|${OPTION} = no|" ${CONF}
-
-# update title
-OPTION=name
-sed -i "s|^${OPTION} = Roundup issue tracker|${OPTION} = ${SITETITLE} Issue Tracker|" ${CONF}
-
-# use tls for mail
-OPTION=tls
-sed -i "s|^${OPTION} = no|${OPTION} = yes|" ${CONF}
-
-# update web location
-OPTION=web
-sed -i "s|^${OPTION} = /|${OPTION} = https://support.${APP_HOSTNAME}/${TRACKER}/|" ${CONF}
 
 #
 # HACK start:
