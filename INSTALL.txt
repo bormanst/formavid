@@ -37,8 +37,6 @@ and https://cloud.google.com/storage/docs/access-control/ for more information.
 Depending on use case, it may be useful to retain the external ip address:
 https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address
 
-
-
 Install and initialization scripts are located in bin directory.
 Base lamp components, along with solr, are located in lamp directory.
 Minor or dependent applications are located in applications directory.
