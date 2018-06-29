@@ -148,12 +148,14 @@ printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
 echo ""
 echo ""
 echo ""
-echo "Please enable billing for project at:"
-echo "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}"
 echo "Billing needs to be enabled to create a nearline backup bucket."
 echo "Use the GCS user account ${GCS_ACCOUNT} for access."
+echo "Please enable billing for project at:"
+echo "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}"
+echo "If the 'Enable billing' option does not appear then it is already enabled."
+echo "Manage billing accounts at https://console.cloud.google.com/billing"
 echo ""
-read -p "Billing has been enabled (y/n)?" CHOICE
+read -p "Billing has been enabled for project ${GCS_PROJECT_ID} (y/n)?" CHOICE
 case "${CHOICE^^}" in
   Y|YES ) :;;
   * ) exit 0;;
