@@ -62,7 +62,7 @@ All scripts are pretty well documented and can serve as templates for any
 additional components. BorgBackup has an example of an all-apt-gets script that
 loads an optional repository if needed. The lamp/base component is an example
 of overlays to apply, but be careful as the overlays will clobber (overwrite)
-the corrsponding files on the base distribution. Overlays should be applied by
+the corresponding files on the base distribution. Overlays should be applied by
 the corresponding configuration script.
 
 Removal of components is as simple as removing the corresponding directory. The
