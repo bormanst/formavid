@@ -101,7 +101,6 @@ if [ ! -d "${HOME}" ]; then
     su - ${DB_USER} -c "pip install ${PACKAGE} --user"
     # set home access perms
     chmod -R 0775 ${HOME}
-    chmod -R 0774 ${HOME}/share
     # add symlinks
     LOCAL=/usr/local
     TARGET=/bin/roundup-admin
