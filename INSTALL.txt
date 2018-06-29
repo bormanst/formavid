@@ -29,7 +29,15 @@ Please review the script for details. Also of note, is that a single password
 is used for all applications if selecting the deployment option. All passwords
 can be changed after the installation, if desired. The standard install script
 may be used after creating an instance but all the instance configuartions will
-need to be done manually, i.e. firewall rules, etc.
+need to be done manually, i.e. firewall rules, etc. Once the installation is
+tested and confirmed, it may be wise to ensure that the compute instance and the
+nearline storage bucket are protected from accidental deletion. Please see:
+https://cloud.google.com/compute/docs/instances/preventing-accidental-vm-deletion
+and https://cloud.google.com/storage/docs/access-control/ for more information.
+Depending on use case, it may be useful to retain the external ip address:
+https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address
+
+
 
 Install and initialization scripts are located in bin directory.
 Base lamp components, along with solr, are located in lamp directory.
