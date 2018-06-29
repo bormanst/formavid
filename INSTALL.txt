@@ -52,10 +52,11 @@ of individual components. Major server components (like Tomcat, etc.) go in the
 lamp directory. Minor components or those with dependencies go in the
 applications directory. The deploy_appliance script sorts alphabetically so if
 additional components have "chained dependencies" then name the directories
-accordingly and remove the "&" for backgound execution in deploy_appliance, i.e.
-change "${SCRIPT} ${CHILD_DIR} &" to "${SCRIPT} ${CHILD_DIR}". Backgound "&"
-execution allows for quicker installs on multi-core cpus but lacks the execution
-order control that would be required for any "chained dependencies".
+accordingly (numbered prefixes work well) and remove the "&" for backgound
+execution in the deploy_appliance script, i.e. change "${SCRIPT} ${CHILD_DIR} &"
+to "${SCRIPT} ${CHILD_DIR}". Backgound "&" execution allows for quicker installs
+on threaded or multi-core cpus but lacks the execution order control that would
+be required for any "chained dependencies".
 
 All scripts are pretty well documented and can serve as templates for any
 additional components. BorgBackup has an example of an all-apt-gets script that
