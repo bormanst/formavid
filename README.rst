@@ -96,7 +96,7 @@ desk support, and sales lead tracking.
    - Default view hides all issues until user login.
 
 Initial tracker access: https://support.domain/support/
-Initial configuration: */etc/roundup/tracker-config.ini*
+Initial configuration: */etc/roundup/support/tracker-config.ini*
 
 **Required settings**::
 
