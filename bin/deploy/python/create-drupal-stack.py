@@ -147,7 +147,7 @@ def main():
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
     # List of solr related modules.
-    solrModules = ['facets', 'search_api_solr', 'search_api_solr_defaults']
+    solrModules = ['search_api_solr', 'search_api_solr_defaults']
     logging.info('Drupal solr related modules: %s' % solrModules)
 
     # List of modules to disable.
