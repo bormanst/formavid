@@ -1,0 +1,73 @@
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+Debian 9 or compatible base distro:
+The install bash script will deploy the appliance onto a compatible base distro.
+If the distro has a component already installed, such as apache or mysql, then
+the install script should automatically skip installing the corresponding
+component; it does depend on standard locations, Systemd, and bash being used.
+Please review and modify the available scripts before deploying on something
+other than Debian 9 Stretch. The scripts are well documented and relatively easy
+to read and edit (except for any regular expressions).
+
+Google GCE Debian 9 image:
+The gcloud-gce-deployment script is meant to be run from a local bash client
+using the google-cloud-sdk. It will prompt for information to create a template,
+a GCE instance using the template, a nearline storage bucket, and adds the
+required firewall rules. After the environment is configured it will ask if the
+appliance should be deployed. Selecting deployment will install the FormaVid git
+repository onto the newly created instance and then run the deploy_appliance
+script for a standard install. Note that the gcloud-gce-deployment script will
+modify the default gcloud environment on the client, if it was previously used.
+Please review the script for details. Also of note, is that a single password
+is used for all applications if selecting the deployment option. All passwords
+can be changed after the installation, if desired. The standard install script
+may be used after creating an instance but all the instance configuartions will
+need to be done manually, i.e. firewall rules, etc.
+
+Install and initialization scripts are located in bin directory.
+Base lamp components, along with solr, are located in lamp directory.
+Minor or dependent applications are located in applications directory.
+
+The main deployment script, deploy_appliance, is located in the bin directory.
+The deploy_appliance script has some key components:
+-Loads default envars located in bin/deploy/shell/default_envars.
+-Sets envars accordingly.
+-Gets passwords to use for install.
+-Searches lamp directory for and installs all apt packages.
+-Searches applications directory for and installs all apt packages.
+-Searches lamp directory for configuration files and overlays to apply.
+-Searches applications directory for configuration files and overlays to apply.
+-Initializes etckeeper.
+-Logs deployment information.
+
+The deployment format allows for the addition, removal, or custom configuration
+of individual components. Major server components (like Tomcat, etc.) go in the
+lamp directory. Minor components or those with dependencies go in the
+applications directory. The deploy_appliance script sorts alphabetically so if
+additional components have "chained dependencies" then name the directories
+accordingly and remove the "&" for backgound execution in deploy_appliance, i.e.
+change "${SCRIPT} ${CHILD_DIR} &" to "${SCRIPT} ${CHILD_DIR}". Backgound "&"
+execution allows for quicker installs on multi-core cpus but lacks the execution
+order control that would be required for any "chained dependencies".
+
+All scripts are pretty well documented and can serve as templates for any
+additional components. BorgBackup has an example of an all-apt-gets script that
+loads an optional repository if needed. The lamp/base component is an example
+of overlays to apply, but be careful as the overlays will clobber (overwrite)
+the corrsponding files on the base distribution. Overlays should be applied by
+the corresponding configuration script.
+
+Removal of components is as simple as removing the corresponding directory. The
+directory can be deleted or just moved to another location outside of the lamp
+or applications directories.
+
+The deploy_appliance script is designed to be re-run to install new or
+previously skipped components without affecting already installed components.
+If a component is skipped then the corresponding configurations and passwords
+are also skipped even though they may be requested by another script prompt.
+Please review thescripts involved before re-running any scripts. Many of the
+other scripts in the bin directory can be run individually, as well, to change
+passwords, etc.
