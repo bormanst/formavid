@@ -1,0 +1,373 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+echo ""
+echo ""
+echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
+echo "This program is free software: you can redistribute it and/or modify"
+echo "it under the terms of the GNU General Public License as published by"
+echo "the Free Software Foundation, either version 3 of the License, or"
+echo "(at your option) any later version."
+echo ""
+echo "This program is distributed in the hope that it will be useful,"
+echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
+echo "GNU General Public License for more details."
+echo ""
+echo "You should have received a copy of the GNU General Public License"
+echo "along with this program. If not, see <https://www.gnu.org/licenses/>."
+echo ""
+echo ""
+
+# Recommended: link/command
+# 1) Install Python 2.7 (available via apt for most systems): https://www.python.org/download/releases/2.7/
+# 2) Install gcloud: https://cloud.google.com/sdk/docs/quickstarts
+# 3) Initialize gcloud: gcloud --quiet --account=${GCS_ACCOUNT} init --console-only
+# 4) Create project: gcloud --quiet --account=${GCS_ACCOUNT} projects create ${GCS_PROJECT_ID} --folder=${GCS_FOLDER} --no-enable-cloud-apis --name=${GCS_NAME} --set-as-default
+# 5) Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}
+# 6) Select GCE_REGION: gcloud compute regions list
+# 7) Select GCE_ZONE: gcloud compute zones list
+# 8) Update metadata: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
+# 9) Update gcloud: gcloud --quiet --account=${GCS_ACCOUNT} init --console-only
+# 10) Create template: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,storage-full
+# 11) Create GCE instance: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
+# 12) Create bucket: gsutil mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
+
+# RSA_KEY_PASS=(created during gsutil install)
+
+# Create an environment variable for the correct distribution.
+export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+
+# Check for Cloud SDK apt list.
+if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
+    # Add the Cloud SDK distribution URI as a package source.
+    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    # Import the Google Cloud public key.
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+    # Update and install Python 2.7 and the Cloud SDK.
+    apt-get update
+    apt-get install -y python2.7 google-cloud-sdk
+fi
+
+# Get account to use.
+set ${GCS_ACCOUNT:=user@gmail.com}
+echo ""
+read -p "Please enter GCS user account [${GCS_ACCOUNT}]:" GCS_ACCOUNT
+GCS_ACCOUNT="${GCS_ACCOUNT,,}"
+
+# Get DOMAIN.
+set ${DOMAIN:=www.examplesitename.com}
+echo ""
+read -p "Please enter domain for the appliance [${DOMAIN}]:" DOMAIN
+
+# Force lowercase.
+DOMAIN="${DOMAIN,,}"
+
+# Set DOMAIN_NO_PERIODS.
+DOMAIN_NO_PERIODS=`echo ${DOMAIN} | sed 's/\.//g'`
+
+# Project IDs must be between 6 and 30 characters.
+GCS_PROJECT_ID_MIN=6
+GCS_PROJECT_ID_MAX=30
+let TRAILING_MIN=${GCS_PROJECT_ID_MIN}-1
+let TRAILING_MAX=${GCS_PROJECT_ID_MAX}-1
+
+# Use one less to account for a dash.
+let RSIZE=29-${#DOMAIN_NO_PERIODS}
+
+# Initialize GCS_PROJECT_ID.
+GCS_PROJECT_ID=""
+
+# Generate random project id based on domain if possible.
+if [ ${RSIZE} -ge 6 ]; then
+    # Get random extension.
+    RANDOM_EXT=`head /dev/urandom | tr -dc a-z0-9 | head -c ${RSIZE}; echo ''`
+    # Set example GCS_PROJECT_ID.
+    GCS_PROJECT_ID="${DOMAIN_NO_PERIODS}-${RANDOM_EXT}"
+    # Notify user.
+    printf "\nProject Id must be unique and is NOT re-usable even if the project is deleted.\nA random Project Id, based on domain, has been generated.\nIt still has to pass a uniqueness test within gcloud.\n\n"
+    # Prompt user.
+    read -p "Is the Project Id of ${GCS_PROJECT_ID} alright to use (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) :;;
+      * ) GCS_PROJECT_ID="";;
+    esac
+fi
+
+# Check GCS_PROJECT_ID exists.
+DATA=`gcloud projects list --format="value(PROJECT_ID)"`
+DATA=`echo ${DATA} | sed 's/\s/|/g'`
+if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+    printf "\nProject Id currently exists.\n"
+    read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) :;;
+      * ) GCS_PROJECT_ID="";;
+    esac
+fi
+
+# Verify format GCS_PROJECT_ID.
+until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le ${GCS_PROJECT_ID_MAX} && ! ( "${GCS_PROJECT_ID}" =~ [A-Z] ) && "${GCS_PROJECT_ID}" =~ ^[a-z] && "${GCS_PROJECT_ID}" == *[a-z0-9\-]* ]]; do
+    # notify GCS_PROJECT_ID restrictions.
+    printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n\n"
+    # get GCS_PROJECT_ID
+    read -p "Please enter a Project Id to use:" GCS_PROJECT_ID
+    printf "\n"
+    # Check GCS_PROJECT_ID exists.
+    if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+        printf "\nProject Id currently exists.\n"
+        read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+        case "${CHOICE^^}" in
+          Y|YES ) break;;
+          * ) GCS_PROJECT_ID="";;
+        esac
+    fi
+done
+
+# Set remaining vars.
+set ${GCS_FOLDER:="${GCS_PROJECT_ID}"}
+set ${GCS_NAME:="FormaVid Appliance"}
+set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
+set ${GCE_TEMPLATE:="f1-micro-template"}
+set ${GCS_BUCKET_TYPE:="nearline"}
+set ${GCS_BUCKET:="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"}
+
+# Check create project.
+if [[ ! ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+    # Try to create project:
+    gcloud --quiet --account=${GCS_ACCOUNT} projects create ${GCS_PROJECT_ID} --folder=${GCS_FOLDER} --no-enable-cloud-apis --name=${GCS_NAME} --set-as-default
+fi
+
+# Run the following at a command prompt.
+printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
+
+# Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}.
+echo ""
+echo ""
+echo ""
+echo "Please enable billing for project at:"
+echo "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}"
+echo "Billing needs to be enabled to create a nearline backup bucket."
+echo "Use the GCS user account ${GCS_ACCOUNT} for access."
+echo ""
+read -p "Billing has been enabled (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) :;;
+  * ) exit 0;;
+esac
+
+# Select GCE_REGION.
+GCE_REGION=""
+PS3="Select one of the GCE regions (closest is best):"
+DATA=`gcloud compute regions list --format="value(NAME)"`
+DATA=`echo ${DATA} | sed 's/\s/ /g'`
+OPTIONS=(${DATA})
+select option in "${OPTIONS[@]}"; do
+    if [ ! -z ${option} ]; then
+        GCE_REGION="${option}"
+        break
+    fi
+done
+
+# Select GCE_ZONE.
+GCE_ZONE=""
+PS3="Select one of the GCE zones:"
+DATA=`gcloud compute zones list --format="value(NAME)"`
+DATA=`echo ${DATA} | sed 's/\s/ /g'`
+OPTIONS=(${DATA})
+select option in "${OPTIONS[@]}"; do
+    if [ ! -z ${option} ]; then
+        GCE_ZONE="${option}"
+        break
+    fi
+done
+
+# Update metadata.
+gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
+
+# Update gcloud.
+printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
+
+# Create GCE template.
+if ! ( gcloud compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-ro,storage-full
+fi
+
+# Check GCE_INSTANCE exists.
+DATA=`gcloud compute instances list --format="value(NAME)"`
+DATA=`echo ${DATA} | sed 's/\s/|/g'`
+if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
+    # Notify user of problem.
+    echo "The instance of ${GCE_INSTANCE} already exists."
+    echo "Deployment terminated."
+    exit 0
+else
+    # Create GCE instance.
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
+fi
+
+# Check GCS_BUCKET exists.
+DATA=`gsutil ls -p ${GCS_PROJECT_ID}`
+DATA=`echo ${DATA} | sed 's/\s/|/g'`
+GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
+if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
+    echo "The storage bucket of ${GCS_BUCKET} already exists."
+    echo "If the borgbackup directory exists, it needs to be deleted prior to appliance deployment."
+    echo "Billing needs to be enabled to create a nearline backup bucket."
+    echo "Use the GCS user account ${GCS_ACCOUNT} for access."
+    echo ""
+    read -p "Billing has been enabled (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) :;;
+      * ) exit 0;;
+    esac
+else
+    # Create bucket.
+    gsutil -q mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
+fi
+
+# Get/format FIREWALL_NAMES.
+FIREWALL_ALLOWS=`gcloud compute firewall-rules list --format="value(ALLOW)"`
+FIREWALL_ALLOWS=`echo ${FIREWALL_ALLOWS} | sed 's/\s/|/g'`
+
+# Get/format FIREWALL_NAMES.
+FIREWALL_NAMES=`gcloud compute firewall-rules list --format="value(NAME)"`
+FIREWALL_NAMES=`echo ${FIREWALL_NAMES} | sed 's/\s/|/g'`
+
+# Add firewall rules to GCE.
+NAME=default-allow-http
+ALLOW="tcp:80"
+PRIORITY="1000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=default-allow-https
+ALLOW="tcp:443"
+PRIORITY="1000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=ftp
+ALLOW="tcp:21"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=imap
+ALLOW="tcp:143"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=smtp
+ALLOW="tcp:587"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=imaps
+ALLOW="tcp:993"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=shellinabox
+ALLOW="tcp:12320"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=webmin
+ALLOW="tcp:12321"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=adminer
+ALLOW="tcp:12322"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+
+# Finished: deploy appliance.
+echo ""
+echo ""
+echo ""
+echo "Everything should be ready to deploy the appliance."
+echo ""
+read -p "Deploy the appliance now (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) :;;
+  * ) exit 0;;
+esac
+
+# Get SITETITLE.
+set ${SITETITLE:="Example Site Name"}
+echo ""
+read -p "Please enter title for the appliance [${SITETITLE}]:" SITETITLE
+
+# Get APP_EMAIL.
+APP_EMAIL=`echo "${DOMAIN,,}" | sed 's/www.//'`
+APP_EMAIL="admin@${APP_EMAIL}"
+echo ""
+read -p "Please enter admin email for the appliance [${APP_EMAIL}]:" APP_EMAIL
+
+# Solr: ask install.
+echo ""
+echo "Do you wish to install the Solr search server?"
+echo "Although Drupal has built-in search capabilities,"
+echo "Solr is a more robust search solution that requires a JVM."
+echo "It is not recommended for a f1-micro instance, but it will run."
+echo "Solr can always be activated at a later time if desired."
+echo ""
+read -p "Install Solr (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) SOLR_INSTALL="True";;
+  * ) SOLR_INSTALL="False";;
+esac
+
+# Solr: check open firewall
+if [ "${SOLR_INSTALL}" == "True" ] ; then
+    NAME=solr
+    ALLOW="tcp:8983"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority='50000' --source-ranges='0.0.0.0/0'
+    fi
+fi
+
+# get default password
+PASSWORD=""
+PASSWORD_LENGTH=8
+printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed."
+# loop until valid password/check
+until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
+    # notify password restrictions
+    printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
+    # get password
+    read -p "Please enter default password for appliance:" -s PASSWORD
+    printf "\n"
+    # confirm password
+    read -p "Please confirm default password for appliance:" -s CHECK
+    # check passwords match
+    if [ ! "${PASSWORD}" == "${CHECK}" ]; then
+        # blank password
+        PASSWORD=""
+        # notify passwords do not match
+        printf "\n\n\n***Passwords do not match***\n\n"
+    fi
+done
+
+# Get USER.
+USER=${GCS_ACCOUNT%@*}
+
+# Commands to deploy.
+COMMANDS="sudo apt install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${PASSWORD}"
+
+# Remote deploy.
+gcloud compute ssh ${USER}@${GCE_INSTANCE} --command="${COMMANDS}"
+
+exit 0
