@@ -68,6 +68,6 @@ The deploy_appliance script is designed to be re-run to install new or
 previously skipped components without affecting already installed components.
 If a component is skipped then the corresponding configurations and passwords
 are also skipped even though they may be requested by another script prompt.
-Please review thescripts involved before re-running any scripts. Many of the
+Please review the scripts involved before re-running any scripts. Many of the
 other scripts in the bin directory can be run individually, as well, to change
 passwords, etc.
