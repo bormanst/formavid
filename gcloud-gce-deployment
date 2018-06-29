@@ -141,9 +141,6 @@ if [[ ! ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
     gcloud --quiet --account=${GCS_ACCOUNT} projects create ${GCS_PROJECT_ID} --folder=${GCS_FOLDER} --no-enable-cloud-apis --name=${GCS_NAME} --set-as-default
 fi
 
-# Run the following at a command prompt.
-printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
-
 # Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}.
 echo ""
 echo ""
@@ -193,13 +190,18 @@ gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute proj
 # Update gcloud.
 printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
 
+# Ensure default project.
+echo ""
+echo "Setting default project to ${GCS_PROJECT_ID}."
+gcloud config set core/project ${GCS_PROJECT_ID}
+
 # Create GCE template.
-if ! ( gcloud compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
+if ! ( gcloud --project=${GCS_PROJECT_ID} compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-ro,storage-full
 fi
 
 # Check GCE_INSTANCE exists.
-DATA=`gcloud compute instances list --format="value(NAME)"`
+DATA=`gcloud --project=${GCS_PROJECT_ID} compute instances list --format="value(NAME)"`
 DATA=`echo ${DATA} | sed 's/\s/|/g'`
 if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
     # Notify user of problem.
@@ -232,11 +234,11 @@ else
 fi
 
 # Get/format FIREWALL_NAMES.
-FIREWALL_ALLOWS=`gcloud compute firewall-rules list --format="value(ALLOW)"`
+FIREWALL_ALLOWS=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(ALLOW)"`
 FIREWALL_ALLOWS=`echo ${FIREWALL_ALLOWS} | sed 's/\s/|/g'`
 
 # Get/format FIREWALL_NAMES.
-FIREWALL_NAMES=`gcloud compute firewall-rules list --format="value(NAME)"`
+FIREWALL_NAMES=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(NAME)"`
 FIREWALL_NAMES=`echo ${FIREWALL_NAMES} | sed 's/\s/|/g'`
 
 # Add firewall rules to GCE.
