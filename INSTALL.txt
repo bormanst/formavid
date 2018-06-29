@@ -3,6 +3,8 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
+***The deployment requires root permissions so run as root or sudo.***
+
 Debian 9 or compatible base distro:
 The install bash script will deploy the appliance onto a compatible base distro.
 If the distro has a component already installed, such as apache or mysql, then
