@@ -338,7 +338,7 @@ APP_EMAIL="admin@${APP_EMAIL}"
 echo ""
 echo "Please enter admin email for the appliance."
 read -p "Or press enter to select the default of [${APP_EMAIL}]:" OPTION
-if [[ -z "${OPTION// }" ]]; then ${APP_EMAIL}=${OPTION}; fi
+if [[ -z "${OPTION// }" ]]; then APP_EMAIL=${OPTION}; fi
 echo "Admin email for the appliance set to ${APP_EMAIL}."
 
 # Solr: ask install.
