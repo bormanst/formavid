@@ -184,6 +184,12 @@ select option in "${OPTIONS[@]}"; do
     fi
 done
 
+echo ""
+echo ""
+echo "GCE region:zone set to ${GCE_REGION}:${GCE_ZONE}."
+echo ""
+echo ""
+
 # Update metadata.
 gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
 
@@ -211,6 +217,18 @@ if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
 else
     # Create GCE instance.
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
+fi
+
+# Check storage json api enabled.
+DATA=`gcloud --project=${GCS_PROJECT_ID} services list --format="value(NAME)"`
+DATA=`echo ${DATA} | sed 's/\s/|/g'`
+GCE_API="storage-api.googleapis.com"
+if [[ ${GCE_API} =~ ^${DATA}$ ]]; then
+    # Notify user of problem.
+    echo "The API ${GCE_API} is already enabled."
+else
+    # Enable storage json api.
+    gcloud --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} services enable ${GCE_API}
 fi
 
 # Check GCS_BUCKET exists.
@@ -318,7 +336,10 @@ read -p "Please enter title for the appliance [${SITETITLE}]:" SITETITLE
 APP_EMAIL=`echo "${DOMAIN,,}" | sed 's/www.//'`
 APP_EMAIL="admin@${APP_EMAIL}"
 echo ""
-read -p "Please enter admin email for the appliance [${APP_EMAIL}]:" APP_EMAIL
+echo "Please enter admin email for the appliance."
+read -p "Or press enter to select the default of [${APP_EMAIL}]:" OPTION
+if [[ -z "${OPTION// }" ]]; then ${APP_EMAIL}=${OPTION}; fi
+echo "Admin email for the appliance set to ${APP_EMAIL}."
 
 # Solr: ask install.
 echo ""
@@ -338,8 +359,9 @@ esac
 if [ "${SOLR_INSTALL}" == "True" ] ; then
     NAME=solr
     ALLOW="tcp:8983"
+    PRIORITY="50000"
     if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority='50000' --source-ranges='0.0.0.0/0'
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
     fi
 fi
 
