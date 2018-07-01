@@ -26,6 +26,7 @@ def main():
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
+    tracker="support"
     username = "admin"
 
     if not password:
@@ -52,9 +53,9 @@ def main():
         # Update mariaDB user password.
         cur.execute('SET PASSWORD FOR roundup@localhost = PASSWORD("%s"); flush privileges;' % password)
         # Set tracker db access password.
-        system("sed -i 's/^password = \(.*\)/password = %s/' /etc/roundup/tracker-config.ini" % password)
+        system("sed -i 's/^password = \(.*\)/password = %s/' /etc/roundup/%s/tracker-config.ini" % (password, tracker))
         # Update tracker admin password.
-        system('roundup-admin -i /var/www/support set user1 password="%s"' % password)
+        system('roundup-admin -i /var/www/%s set user1 password="%s"' % (tracker, password))
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
