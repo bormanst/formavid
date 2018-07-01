@@ -150,6 +150,9 @@ BACKUP_DIR=${BACKUP_DIR}
 # Setting this, so the repo does not need to be given on the commandline:
 export BORG_REPO=${MOUNT}
 
+# Break lock in case
+borg break-lock ${BORG_REPO}
+
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
 # or this to ask an external program to supply the passphrase:
@@ -294,6 +297,9 @@ else
     info "Pruning repository finished with no exceptions."
 fi
 
+# Break lock in case
+borg break-lock ${BORG_REPO}
+
 # unmount google fuse
 info "Unmounting gcsfuse mount..."
 fusermount -u -z ${MOUNT}
@@ -324,6 +330,9 @@ BACKUP_DIR=${BACKUP_DIR}
 
 # Setting this, so the repo does not need to be given on the commandline:
 export BORG_REPO=${MOUNT}
+
+# Break lock in case
+borg break-lock ${BORG_REPO}
 
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
@@ -436,6 +445,9 @@ elif [ \${exit_code} -gt 1 ]; then
 else
     info "Verifying main archives finished with no exceptions."
 fi
+
+# Break lock in case
+borg break-lock ${BORG_REPO}
 
 # unmount google fuse
 info "Unmounting gcsfuse mount..."
