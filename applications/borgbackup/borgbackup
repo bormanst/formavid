@@ -150,9 +150,6 @@ BACKUP_DIR=${BACKUP_DIR}
 # Setting this, so the repo does not need to be given on the commandline:
 export BORG_REPO=${MOUNT}
 
-# Break lock in case
-borg break-lock ${BORG_REPO}
-
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
 # or this to ask an external program to supply the passphrase:
@@ -191,6 +188,9 @@ else
     info "Mounting \${GCS_BUCKET}/\${BACKUP_DIR} to \${BORG_REPO} using gcsfuse..."
     gcsfuse --only-dir \${BACKUP_DIR}/ \${GCS_BUCKET} \${BORG_REPO}
 fi
+
+# Break lock in case
+borg break-lock ${MOUNT}
 
 info "Starting main backup..."
 
@@ -298,7 +298,7 @@ else
 fi
 
 # Break lock in case
-borg break-lock ${BORG_REPO}
+borg break-lock ${MOUNT}
 
 # unmount google fuse
 info "Unmounting gcsfuse mount..."
@@ -331,9 +331,6 @@ BACKUP_DIR=${BACKUP_DIR}
 # Setting this, so the repo does not need to be given on the commandline:
 export BORG_REPO=${MOUNT}
 
-# Break lock in case
-borg break-lock ${BORG_REPO}
-
 # Setting this, so you won't be asked for your repository passphrase:
 export BORG_PASSPHRASE='${BORGBACKUP_PASS}'
 # or this to ask an external program to supply the passphrase:
@@ -353,6 +350,9 @@ else
     info "Mounting \${GCS_BUCKET}/\${BACKUP_DIR} to \${BORG_REPO} using gcsfuse..."
     gcsfuse --only-dir \${BACKUP_DIR}/ \${GCS_BUCKET} \${BORG_REPO}
 fi
+
+# Break lock in case
+borg break-lock ${MOUNT}
 
 info "Starting logs backup..."
 
@@ -447,7 +447,7 @@ else
 fi
 
 # Break lock in case
-borg break-lock ${BORG_REPO}
+borg break-lock ${MOUNT}
 
 # unmount google fuse
 info "Unmounting gcsfuse mount..."
