@@ -259,7 +259,7 @@ def main():
         modulesToDisable = []
 
     if not dbpass or dbpass == "None":
-        dbpass = d.get_input(
+        dbpass = d.get_password(
             "Warning - verify resources exist for additional site.",
             "Please enter password for the MySQL root account.")
 
