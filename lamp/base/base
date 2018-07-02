@@ -165,9 +165,6 @@ while [ $COUNT -le 40 ]; do
     ((COUNT=$COUNT+1))
 done
 
-# update unattended-upgrades
-sed -i 's|//Unattended-Upgrade::Mail "root";|Unattended-Upgrade::Mail "root";|' /etc/apt/apt.conf.d/50unattended-upgrades
-
 # enable unattended-upgrades
 sed -i 's|//Unattended-Upgrade::Mail "root";|Unattended-Upgrade::Mail "root";|' /etc/apt/apt.conf.d/50unattended-upgrades
 
