@@ -60,11 +60,22 @@ update-ca-certificates
 
 # update ssl.conf
 CONF=/etc/apache2/mods-available/ssl.conf
+
+# update ciphers
 sed -i "s|^\(\s*SSLCipherSuite\s\+\).*$|\1${SECURE_CIPHER_LIST}|g" ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a        SSLCertificateFile /etc/ssl/private/cert.pem' ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a        # Default certificate file' ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a        SSLCompression off' ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a        # Disable ssl compression' ${CONF}
+
+# comment any old pems
+sed -i '/^\s*SSLCertificateChainFile/s/^/#\ /g' ${CONF}
+sed -i '/^\s*SSLCertificateKeyFile/s/^/#\ /g' ${CONF}
+sed -i '/^\s*SSLCertificateFile/s/^/#\ /g' ${CONF}
+
+# add default pems
+sed -i '/SSLStrictSNIVHostCheck/aSSLCertificateFile /etc/ssl/private/cert.pem' ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a# Default certificate file' ${CONF}
+
+# disable ssl compression
+sed -i '/SSLStrictSNIVHostCheck/aSSLCompression off' ${CONF}
+sed -i '/SSLStrictSNIVHostCheck/a# Disable ssl compression' ${CONF}
 
 # update security.conf
 CONF=/etc/apache2/conf-available/security.conf
