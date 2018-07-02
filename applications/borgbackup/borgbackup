@@ -218,6 +218,8 @@ borg create \\
     --exclude '/var/cache/*' \\
     --exclude '/var/lib/google/google_users' \\
     --exclude '/var/lib/monit/state' \\
+    --exclude '/var/lib/mysql/*/*.ibd' \\
+    --exclude '/var/lib/mysql/ib_*' \\
     --exclude '/var/lib/ntp/ntp.drift' \\
     --exclude '/var/lib/systemd/*' \\
     --exclude '/var/log/*' \\
