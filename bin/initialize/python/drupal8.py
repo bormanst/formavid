@@ -19,7 +19,6 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME = "examplesitename.com"
 
 def main():
     # Get envars.
@@ -33,12 +32,16 @@ def main():
     drupaldir = "/var/www/drupal8"
     username = "admin"
 
-    if not hostname: hostname = DEFAULT_HOSTNAME
-
     if not password:
         password = d.get_password(
             "Drupal admin and cssadmin password",
             "Please enter password for Drupal admin and cssadmin accounts.")
+
+    if not hostname:
+        hostname = d.get_input(
+            "Drupal site hostname",
+            "Please enter hostname to use for site.")
+        hostname = get_hostname(hostname)
 
     if not email:
         email = d.get_email(
@@ -47,7 +50,7 @@ def main():
             "%s@%s" % (username, hostname))
 
     if not dbpass:
-        dbpass = d.get_input(
+        dbpass = d.get_password(
             "MySQL 'root' password",
             "Please enter new password for the MySQL 'root' account.")
 
