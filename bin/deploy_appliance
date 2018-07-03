@@ -70,8 +70,8 @@ if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; the
     echo "$( date ) Using passed in envars." >> ${LOG}
     ARG=1
     for ENVAR in ${ENVAR_REQ_LIST}; do
-        # export envar
-        export ${ENVAR}="${!ARG}"
+        # set envar
+        ${ENVAR}="${!ARG}"
         # update default envars
         if [[ "${ENVAR}" != *"PASS"* ]]; then
             sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=\"${!ARG}\"/" ${DEFAULT_ENVARS}
