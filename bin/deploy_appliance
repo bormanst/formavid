@@ -74,7 +74,7 @@ if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; the
         export ${ENVAR}="${!ARG}"
         # update default envars
         if [[ "${ENVAR}" != *"PASS"* ]]; then
-            sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=${!ARG}/" ${DEFAULT_ENVARS}
+            sed -i "s/^export ${ENVAR}=\(.*\)/export ${ENVAR}=\"${!ARG}\"/" ${DEFAULT_ENVARS}
         fi
         # args++
         let ARG=ARG+1
