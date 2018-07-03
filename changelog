@@ -76,7 +76,7 @@ formavid (15.0.0) stable; urgency=low
     postfix         3.1.8
     roundup         1.5.1 (upstream archive)
     simpleinvoices  2011.1 (upstream archive)
-    solr (optional) 7.3.1 (upstream archive)
+    solr (optional) 7.4.0 (upstream archive)
 
  -- Sean Borman <bormanst@gmail.com>  Sun, 17 Jun 2018 23:11:03 -0500
 

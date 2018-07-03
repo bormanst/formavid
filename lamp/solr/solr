@@ -45,7 +45,7 @@ MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
 # set version
-SOLR_SPEC="7.3.1"
+SOLR_SPEC="7.4.0"
 
 # modify to location of compressed tgz
 SRC=/usr/local/src
@@ -121,7 +121,7 @@ EOF
 # ${FORMAVID}/bin/initialize/python/solr.py
 
 # add ssl for solr protection
-# https://lucene.apache.org/solr/guide/7_0/enabling-ssl.html#enabling-ssl
+# https://lucene.apache.org/solr/guide/7_4/enabling-ssl.html#enabling-ssl
 
 # initialize keystores
 # cd ${SOLR_LOCAL}/server/etc

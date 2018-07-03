@@ -162,10 +162,10 @@
   <div><h3><a href="https://lucene.apache.org/solr/" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div><br>
   <ul>
     <li><a href="/solr.php" title="Apache Solr Local Info">Apache Solr Local Info</a></li>
-    <li><a href="https://lucene.apache.org/solr/7_3_1/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
+    <li><a href="https://lucene.apache.org/solr/7_4_0/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
     <li><a href="https://lucene.apache.org/solr/quickstart.html" title="Apache Solr Quick Start">Apache Solr Quick Start</a></li>
-    <li><a href="https://lucene.apache.org/core/7_3_1/index.html" title="Apache Solr Core">Apache Solr Core</a></li>
-    <li><a href="http://archive.apache.org/dist/lucene/solr/ref-guide/apache-solr-ref-guide-7.3.pdf" title="Apache Solr Admin UI">Apache Solr Ref Guide</a></li>
+    <li><a href="https://lucene.apache.org/core/7_4_0/index.html" title="Apache Solr Core">Apache Solr Core</a></li>
+    <li><a href="http://archive.apache.org/dist/lucene/solr/ref-guide/apache-solr-ref-guide-7.4.pdf" title="Apache Solr Admin UI">Apache Solr Ref Guide</a></li>
     <li><a href="https://lucene.apache.org/solr/community.html" title="Apache Solr Community">Apache Solr Community</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
     <li><a href="https://www.apache.org/foundation/contributing.html" title="Apache Solr Donate">Apache Solr <b><i>Donate</i></b></a></li>
