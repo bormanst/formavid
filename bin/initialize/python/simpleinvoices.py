@@ -18,35 +18,26 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME = "examplesitename.com"
 
 def main():
     # Get envars.
     apachepass = os.environ.get("TOOLS_PASS")
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
-    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("SIMPLEINVOICES_PASS")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
+    update_email = False
     username = "admin"
-
-    if not hostname: hostname = DEFAULT_HOSTNAME
 
     if not password:
         password = d.get_password(
             "Simple Invoices admin Password",
             "Enter password for the Simple Invoices apache site access and admin account.")
 
-    if not email:
-        email = d.get_email(
-            "Simple Invoices admin Email",
-            "Enter email address for the Simple Invoices admin account.",
-            "%s@%s" % (username, hostname))
-
     if not dbpass:
-        dbpass = d.get_input(
+        dbpass = d.get_password(
             "MySQL 'root' Password",
             "Please enter new password for the MySQL 'root' account.")
 
@@ -54,6 +45,20 @@ def main():
         apachepass = d.get_password(
             "Apache access password",
             "Please enter password for Apache access to Simple Invoices.")
+
+    if not email:
+        # Check need update email.
+        update_email = not d.yesno(
+            "Change email",
+            "Do you wish to change the Simple Invoices admin email?",
+            "No",
+            "Yes")
+        # Check update email.
+        if update_email:
+            # Get email.
+            email = d.get_email(
+                "Simple Invoices admin Email",
+                "Enter email address for the Simple Invoices admin account.")
 
     hashpass = hashlib.md5(password).hexdigest()
 
@@ -66,7 +71,8 @@ def main():
         # Update simpleinvoices password.
         cur.execute('SET PASSWORD FOR simpleinvoices@localhost = PASSWORD("%s"); flush privileges;' % password)
         cur.execute('UPDATE simpleinvoices.si_user SET password=\"%s\" WHERE id=1;' % hashpass)
-        cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
+        # Check update email.
+        if update_email: cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
         system('sed -i "0,/params.password/s/params.password.*/params.password = %s/" /var/www/simpleinvoices/config/config.php' % password)
         system("sed -i 's|^encryption.default.key.*|encryption.default.key = %s|' /var/www/simpleinvoices/config/config.php" % password)
         # Set apache2 htdbm password.
