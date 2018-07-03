@@ -27,11 +27,13 @@ def get_immediate_subdirectories(a_dir):
 def main():
     # Get envars.
     dbpass = os.environ.get("DB_PASS")
+    email = os.environ.get("APP_EMAIL")
     password = os.environ.get("APP_PASS")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
     drupaldir = "/var/www/drupal8"
+    update_email = False
     username = "admin"
 
     if not password:
@@ -43,6 +45,19 @@ def main():
         dbpass = d.get_password(
             "MySQL 'root' password",
             "Please enter new password for the MySQL 'root' account.")
+
+    if not email:
+        # Check need update email.
+        update_email = not d.yesno(
+            "Change email",
+            "Do you wish to change the drupal admin email?",
+            "No",
+            "Yes")
+        if update_email:
+            # Get email.
+            email = d.get_email(
+                "Drupal admin Email",
+                "Please enter email address for the Drupal admin account.")
 
     # Drupal - check change admin/password.
     con = ""
@@ -68,6 +83,11 @@ def main():
                 system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
                 # Update site admin password.
                 system('drush -r %s -l https://%s user-password admin --password="%s"' % (drupaldir, site, password))
+                # Check emails too.
+                if update_email:
+                    # Update email.
+                    system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET mail=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
+                    system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET init=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                 # Clear site cache.
                 system('drush -r %s -l https://%s cache-rebuild' % (drupaldir, site))
         # restart apache2
