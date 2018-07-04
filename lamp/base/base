@@ -37,13 +37,13 @@ OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
 
 # create admin
-if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ];  then
+if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
     useradd -g adm -m -s /bin/bash admin
     echo admin:${APP_PASS} | chpasswd
 fi
 
 # create cssadmin user
-if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ];  then
+if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then
     useradd -U -m -s /bin/bash cssadmin
     echo cssadmin:${APP_PASS} | chpasswd
     echo "cd /var/www/drupal8/themes" >> /home/cssadmin/.bashrc
