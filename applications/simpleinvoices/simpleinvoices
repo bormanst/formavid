@@ -182,8 +182,8 @@ cat > ${CONF} <<EOF
     ServerName billing.${APP_HOSTNAME}
     ServerAdmin webmaster@localhost
     UseCanonicalName Off
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
     RedirectPermanent / "https://billing.${APP_HOSTNAME}/"
 </VirtualHost>
 EOF
