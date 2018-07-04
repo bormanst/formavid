@@ -109,7 +109,7 @@ def get_hostname(domain):
     return hostname
 
 # Get sitename.
-def get_sitename(domain): return get_hostname(domain).replace("." + get_tld(domain),"")
+def get_sitename(domain): return get_hostname(domain).replace(".","")
 
 # Get tld.
 def get_tld(domain):
