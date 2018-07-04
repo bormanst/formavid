@@ -23,14 +23,8 @@ Warning!!! It is a major security risk to use defaults. Minimally, reset passwor
 This script uses the site build defaults located in formavid/bin/deploy/shell/default_envars."""
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_DOMAIN = "www.examplesitename.com"
-DEFAULT_TITLE = "Example Site Name"
 
 def main():
-    # Initialize vars.
-    user_defined = True
-    reset_passwords_only = False
-
     # Get envars.
     formavid = "/usr/local/formavid"
     if "FORMAVID" in os.environ: formavid = os.environ.get("FORMAVID")
@@ -59,6 +53,10 @@ def main():
         "Tools page admin password",
         "Please enter password for tools page admin access.")
 
+    os.environ["WEBMIN_PASS"] = d.get_password(
+        "Webmin root password",
+        "Please enter password for Webmin root access.")
+
     # MariaDB password.
     system("python %s/bin/initialize/python/mysqlconf.py" % formavid)
 
@@ -73,6 +71,9 @@ def main():
 
     # Tools password.
     system("python %s/bin/initialize/python/tools.py" % formavid)
+
+    # Webmin password.
+    system("python %s/bin/initialize/python/webmin.py" % formavid)
 
 if __name__ == "__main__":
     main()

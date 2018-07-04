@@ -8,9 +8,6 @@
 
 Set tools password
 
-Option:
-    --pass=     unless provided, will ask interactively
-
 """
 
 import os
@@ -40,12 +37,8 @@ def main():
     command = " ".join(['htdbm -bc', directory, username, apachepass])
     system(command)
 
-    # set webmin root password
-    system("/usr/share/webmin/changepass.pl /etc/webmin root %s" % apachepass)
-
     # restart apache2
     system('systemctl restart apache2')
 
 if __name__ == "__main__":
     main()
-

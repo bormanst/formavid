@@ -146,6 +146,9 @@ fi
 echo "COMMIT" >> ${CONF}
 sed -i "/^$/d" ${CONF}
 
+# set Webmin root password
+${FORMAVID}/bin/initialize/python/webmin.py
+
 # clean up
 rm -f /etc/webmin/*.cache
 
