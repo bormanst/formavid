@@ -162,7 +162,6 @@ ${STYLE}
 BODY="
 <div id=\\\"formavid-credit\\\">
     <div style=\\\"clear: both;\\\">
-    <a href=\\\"https://formavid.org\\\">FormaVid</a> -
     Powered by <a href=\\\"https://formavid.org\\\">FormaVid Small Business Appliance</a>
     </div>
 </div>
