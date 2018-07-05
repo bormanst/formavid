@@ -208,7 +208,7 @@ sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/templates/def
 sed -i "s/<style>/<!-- <style>/" ${APP_DIR}/templates/default/header.tpl
 sed -i "s/<\/style>/<\/style> -->/" ${APP_DIR}/templates/default/header.tpl
 sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${APP_DIR}/templates/default/header.tpl
-sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/templates/default/header.tpl
+sed -i "/<body/r /etc/formavid/header.txt" ${APP_DIR}/templates/default/header.tpl
 sed -i "s/sedtoolname/Billing/g" ${APP_DIR}/templates/default/header.tpl
 
 # clean up

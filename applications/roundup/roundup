@@ -248,7 +248,7 @@ ln -sf ${HOME}/share/doc/roundup/html ${APP_DIR}/docs
 sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n:translate=\"\">local</a>);" ${APP_DIR}/html/page.html
 
 # apply theme header
-sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/html/page.html
+sed -i "/<body/r /etc/formavid/header.txt" ${APP_DIR}/html/page.html
 sed -i "s/sedtoolname/Support/g" ${APP_DIR}/html/page.html
 sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.html
 

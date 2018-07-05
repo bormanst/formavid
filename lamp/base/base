@@ -57,12 +57,20 @@ sed -i "s/sedlowername/${SITENAME}/g" ${APP_DIR}/*.php
 sed -i "s/sedsitename/${SITETITLE}/g" ${APP_DIR}/*.php
 sed -i "s/sedhostname/${APP_HOSTNAME}/g" ${APP_DIR}/*.php
 
-# tools: update header
-sed -i "s/sedsitename/${SITETITLE}/g" ${FORMAVID}/sites-template/header.txt
+# check default envars
+DEFAULT_HEADER=/etc/formavid/header.txt
+if [ ! -f "${DEFAULT_HEADER}" ]; then
+    # mkdir is graceful so use it
+    mkdir -p /etc/formavid
+    # create etc default_envars to avoid git update overwrite
+    cp -p ${FORMAVID}/sites-template/header.txt ${DEFAULT_HEADER}
+    # tools: update header
+    sed -i "s/sedsitename/${SITETITLE}/g" ${DEFAULT_HEADER}
+fi
 
 # tools: theme
 sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/*.php
-sed -i "/<body/r ${FORMAVID}/sites-template/header.txt" ${APP_DIR}/*.php
+sed -i "/<body/r ${DEFAULT_HEADER}" ${APP_DIR}/*.php
 sed -i "s/sedtoolname/Admin/g" ${APP_DIR}/*.php
 
 # stunnel conf
