@@ -52,35 +52,30 @@ mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
 CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
 sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
 
-# TODO: secure installation
+# secure installation
 
 # use mysql db
-# MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
-# QUERY="USE mysql;"
-# ${MYSQL_BATCH} --execute ${QUERY}
+MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
+QUERY="USE mysql;"
+${MYSQL_BATCH} --execute ${QUERY}
 
 # remove anonymous users
-# QUERY="DELETE FROM user WHERE User='';"
-# ${MYSQL_BATCH} --execute ${QUERY}
+QUERY="DELETE FROM user WHERE User='';"
+${MYSQL_BATCH} --execute ${QUERY}
 
 # remove remote root
-# QUERY="DELETE FROM user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-# ${MYSQL_BATCH} --execute ${QUERY}
+QUERY="DELETE FROM user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+${MYSQL_BATCH} --execute ${QUERY}
 
 # remove test database
-# QUERY="DROP DATABASE IF EXISTS test;"
-# ${MYSQL_BATCH} --execute ${QUERY}
-
-# QUERY="DELETE FROM db WHERE Db='test' OR Db='test\\_%';"
-# ${MYSQL_BATCH} --execute ${QUERY}
-
-# rename root to adminer
-# QUERY="RENAME USER 'root'@'localhost' TO 'adminer'@'localhost';"
-# ${MYSQL_BATCH} --execute ${QUERY}
+QUERY="DROP DATABASE IF EXISTS test;"
+${MYSQL_BATCH} --execute ${QUERY}
+QUERY="DELETE FROM db WHERE Db='test' OR Db='test\\_%';"
+${MYSQL_BATCH} --execute ${QUERY}
 
 # reload privilege
-# QUERY="FLUSH PRIVILEGES;"
-# ${MYSQL_BATCH} --execute ${QUERY}
+QUERY="FLUSH PRIVILEGES;"
+${MYSQL_BATCH} --execute ${QUERY}
 
 # restart service
 systemctl restart ${PACKAGE}
