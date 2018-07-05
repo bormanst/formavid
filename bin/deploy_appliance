@@ -59,13 +59,21 @@ echo "$( date ) Deployment started." >> ${LOG}
 CONF=/etc/apt/apt.conf
 if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
 
+# check default envars
+DEFAULT_ENVARS=/etc/formavid/default_envars
+if [ ! -f "${DEFAULT_ENVARS}" ]; then
+    # mkdir is graceful so use it
+    mkdir -p /etc/formavid
+    # create etc default_envars to avoid git update overwrite
+    cp -p ${FORMAVID}/bin/deploy/shell/default_envars ${DEFAULT_ENVARS}
+fi
+
 # load default envars
-. ${FORMAVID}/bin/deploy/shell/default_envars
+. ${DEFAULT_ENVARS}
 
 # get envars
 let ENVAR_REQ_LIST_SIZE=`echo "${ENVAR_REQ_LIST}" | awk -F" " '{print NF-1}'`+1
 if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; then
-    DEFAULT_ENVARS=${FORMAVID}/bin/deploy/shell/default_envars
     # set envars by args
     echo "$( date ) Using passed in envars." >> ${LOG}
     ARG=1
