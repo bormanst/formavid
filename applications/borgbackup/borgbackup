@@ -408,6 +408,9 @@ fi
 # verify the repository
 info "Verifying repository..."
 
+# Break lock in case
+borg break-lock ${MOUNT}
+
 borg check \\
     --info \\
     --repository-only \\
@@ -428,6 +431,9 @@ fi
 
 # verify main archives
 info "Verifying main archives..."
+
+# Break lock in case
+borg break-lock ${MOUNT}
 
 borg check \\
     --archives-only \\
