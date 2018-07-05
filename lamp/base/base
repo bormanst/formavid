@@ -165,8 +165,61 @@ while [ $COUNT -le 40 ]; do
     ((COUNT=$COUNT+1))
 done
 
-# enable unattended-upgrades
-sed -i 's|//Unattended-Upgrade::Mail "root";|Unattended-Upgrade::Mail "root";|' /etc/apt/apt.conf.d/50unattended-upgrades
+# set random early reboot when needed: 2 <= time < 5
+RANDOM_EARLY_TIME="0$((2 + RANDOM % 3)):$((RANDOM % 6))$((RANDOM % 10))"
+
+# config unattended-upgrades
+CONF=/etc/apt/apt.conf.d/50unattended-upgrades
+cat > ${CONF} <<EOF
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+Unattended-Upgrade::Mail "${APP_EMAIL}";
+
+// Automatically upgrade packages from these
+Unattended-Upgrade::Origins-Pattern {
+      "o=Debian,a=stable";
+      "o=Debian,a=stable-updates";
+      "o=Debian,a=proposed-updates";
+      "origin=Debian,codename=\${distro_codename},label=Debian-Security";
+};
+
+// You can specify your own packages to NOT automatically upgrade here
+Unattended-Upgrade::Package-Blacklist {
+//      "vim";
+//      "libc6";
+//      "libc6-dev";
+//      "libc6-i686";
+
+};
+
+Unattended-Upgrade::MailOnlyOnError "true";
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "${RANDOM_EARLY_TIME}";
+EOF
+
+# config unattended-upgrades
+CONF=/etc/apticron/apticron.conf
+cat > ${CONF} <<EOF
+EMAIL="${APP_EMAIL}"
+DIFF_ONLY="1"
+LISTCHANGES_PROFILE="apticron"
+SYSTEM="${APP_HOSTNAME}"
+NOTIFY_HOLDS="0"
+NOTIFY_NO_UPDATES="0"
+EOF
+
+# config unattended-upgrades
+CONF=/etc/apt/listchanges.conf
+cat > ${CONF} <<EOF
+[apt]
+frontend=pager
+email_address=${APP_EMAIL}
+confirm=true
+save_seen=/var/lib/apt/listchanges.db
+which=news
+EOF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
