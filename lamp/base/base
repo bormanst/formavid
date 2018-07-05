@@ -215,8 +215,8 @@ CONF=/etc/apt/listchanges.conf
 cat > ${CONF} <<EOF
 [apt]
 frontend=pager
-email_address=${APP_EMAIL}
 confirm=true
+email_address=${APP_EMAIL}
 save_seen=/var/lib/apt/listchanges.db
 which=news
 EOF
