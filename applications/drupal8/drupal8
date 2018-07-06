@@ -123,11 +123,11 @@ phpdismod xdebug
 
 # download latest drupal8 and install
 cd ${WWW_DIR}
-composer create-project --no-plugins --no-scripts drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
+composer create-project drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
 
 # download and install modules
 cd ${APP_DIR}
-composer require --no-plugins --no-scripts ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra
+composer require ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
