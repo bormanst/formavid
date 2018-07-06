@@ -15,8 +15,8 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # set specs
-DRUPAL_SPEC=^8.0
-DRUSH_SPEC=^8.0
+DRUPAL_SPEC=^8.5
+DRUSH_SPEC=^9.3
 
 # set dirs
 DRUPAL_DIR=${PACKAGE}
@@ -120,11 +120,11 @@ mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost
 
 # download latest drupal8 and install
 cd ${WWW_DIR}
-composer create-project drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
+composer create-project --no-plugins --no-scripts drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
 
 # download and install modules
 cd ${APP_DIR}
-composer require ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra
+composer require --no-plugins --no-scripts ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
