@@ -118,6 +118,9 @@ sed -i "s/modulesToEnable\ =\ \[\]/modulesToEnable\ =\ \[${ENABLE_MODULES}\]/" $
 # add drupal8 user to database
 mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
 
+# composer peformance issue
+phpdismod xdebug
+
 # download latest drupal8 and install
 cd ${WWW_DIR}
 composer create-project --no-plugins --no-scripts drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}
