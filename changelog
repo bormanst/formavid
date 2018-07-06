@@ -1,4 +1,4 @@
-formavid (15.0.0) stable; urgency=low
+formavid (15.0.0) beta; urgency=low
 
   * Refactored to be a collection of install and configuration scripts.
 
