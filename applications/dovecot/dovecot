@@ -14,6 +14,20 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
+# check dir
+APP_DIR=/usr/share/${PACKAGE}
+if [ -d "${APP_DIR}" ]; then
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} already exists."
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
 # dependencies check: postfix
 DEPENDS=postfix
 if ! (systemctl -q is-active ${DEPENDS}); then

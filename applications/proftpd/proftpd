@@ -14,10 +14,9 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# check exists
-# Note: check cssadmin in proftpd.conf
-PROFTPD_CONF=/etc/proftpd/proftpd.conf
-if grep -q "cssadmin" ${PROFTPD_CONF}; then
+# check dir
+APP_DIR=/usr/share/${PACKAGE}
+if [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} already exists."
