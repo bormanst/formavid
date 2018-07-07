@@ -16,7 +16,7 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # set specs
 DRUPAL_SPEC=^8.5
-DRUSH_SPEC=^9.3
+DRUSH_SPEC=^8.0
 
 # set dirs
 DRUPAL_DIR=${PACKAGE}
