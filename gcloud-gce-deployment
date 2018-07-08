@@ -339,6 +339,7 @@ echo ""
 echo "Please enter admin email for the appliance."
 read -p "Or press enter to select the default of [${APP_EMAIL}]:" OPTION
 if [[ ! -z "${OPTION// }" ]]; then APP_EMAIL=${OPTION}; fi
+echo ""
 echo "Admin email for the appliance set to ${APP_EMAIL}."
 
 # Solr: ask install.
@@ -391,7 +392,7 @@ done
 USER=${GCS_ACCOUNT%@*}
 
 # Commands to deploy.
-COMMANDS="sudo apt install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${PASSWORD}"
+COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${PASSWORD}"
 
 # Remote deploy.
 gcloud compute ssh ${USER}@${GCE_INSTANCE} --command="${COMMANDS}"
