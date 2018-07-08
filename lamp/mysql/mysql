@@ -52,6 +52,9 @@ mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
 CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
 sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
 
+# restart service
+systemctl restart ${PACKAGE}
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
