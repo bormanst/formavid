@@ -318,7 +318,7 @@ if [ -n "${APP_EMAIL}" ]; then
         ${MYSQL_BATCH} --execute ${QUERY}
 
         # restart service
-        systemctl restart ${PACKAGE}
+        systemctl restart mysql
     fi
 
     # initialize etckeeper
