@@ -176,6 +176,7 @@ WantedBy=multi-user.target graphical.target
 EOF
 
 # add security: encoded password is 'SolrRocks'
+mkdir -p ${SOLR_HOME}/data
 FILE=${SOLR_HOME}/data/security.json
 cat > ${FILE} <<EOF
 {
