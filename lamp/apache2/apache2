@@ -32,10 +32,6 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# remove default site
-a2dissite 000-default
-rm -rf /var/www/html
-
 # apply overlay
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
@@ -180,6 +176,10 @@ a2enmod substitute
 
 # tools: enable conf
 a2ensite zzz-admin.${SITENAME}.conf
+
+# remove default site
+a2dissite 000-default
+rm -rf /var/www/html
 
 # restart service
 systemctl restart ${PACKAGE}
