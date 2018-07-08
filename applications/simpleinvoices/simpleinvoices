@@ -131,7 +131,6 @@ sed -i "s|\`name\` varchar(255) NOT NULL,|\`name\` varchar(50) NOT NULL,|" ${APP
 mysql --user=root --password=${DB_PASS} ${DB_NAME} < ${APP_DIR}/databases/mysql/Full_Simple_Invoices.sql
 
 # set admin password and email
-export UPDATE_EMAIL=True
 ${FORMAVID}/bin/initialize/python/simpleinvoices.py
 
 # set nonce key: should be random and secret

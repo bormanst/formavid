@@ -32,4 +32,12 @@ done
 export APP_HOSTNAME=`echo "${DOMAIN,,}" | sed 's/www.//'`
 export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
 
+# prompt for update emails
+echo ""
+read -p "Change the admin email for Drupal and Simple Invoices (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) export UPDATE_EMAIL="True";;
+  * ) export UPDATE_EMAIL="False";;
+esac
+
 echo "$( date ) Exported user selected envars." >> ${LOG}

@@ -90,6 +90,7 @@ if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; the
     # finish assigning envars
     export APP_HOSTNAME=`echo ${DOMAIN,,} | sed 's/www.//'`
     export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
+    export UPDATE_EMAIL="True"
 else
     # set envars by input
     . ${FORMAVID}/bin/deploy/shell/set_envars
