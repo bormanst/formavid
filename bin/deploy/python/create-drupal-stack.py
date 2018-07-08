@@ -526,7 +526,8 @@ def main():
         system("drush -r %s -l http://%s pm-refresh" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'Please validate %s by viewing the drupal admin status report.'" % baseUri)
-        system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
+        if not os.path.exists("/var/www/admin/images/%s.svg" % sitename):
+            system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
         # log info
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
