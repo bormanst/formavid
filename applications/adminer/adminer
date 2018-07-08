@@ -16,7 +16,7 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check dir
 set ${ADMINER_PORT:=12322}
-if ( grep -qF "${ADMINER_PORT}" /etc/apache2/ports.conf );; then
+if (grep -qF "${ADMINER_PORT}" /etc/apache2/ports.conf); then
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} already exists."
