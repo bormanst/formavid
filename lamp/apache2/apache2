@@ -84,9 +84,6 @@ sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"sho
 sed -i "/Require ip/a\                Deny from all" ${CONF}
 sed -i "/Require ip/a\                Order deny,allow" ${CONF}
 
-# set toolsadmin apache password
-${FORMAVID}/bin/initialize/python/tools.py
-
 # tools: create conf
 APP_DIR=/var/www/admin
 APACHE_CONF=/etc/apache2/sites-available/zzz-admin.${SITENAME}.conf
@@ -174,15 +171,18 @@ EOF
 # enable modules
 a2enmod substitute
 
-# tools: enable conf
-a2ensite zzz-admin.${SITENAME}.conf
-
 # remove default site
 a2dissite 000-default
 rm -rf /var/www/html
 
+# tools: enable conf
+a2ensite zzz-admin.${SITENAME}.conf
+
 # restart service
 systemctl restart ${PACKAGE}
+
+# set toolsadmin apache password
+${FORMAVID}/bin/initialize/python/tools.py
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
