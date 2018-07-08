@@ -292,6 +292,35 @@ if [ -n "${APP_EMAIL}" ]; then
     # restart apache2
     if (systemctl -q is-active apache2); then systemctl restart apache2; fi
 
+    # secure mysql installation
+    if (systemctl -q is-active mysql); then
+        # use mysql db
+        MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
+        QUERY="USE mysql;"
+        ${MYSQL_BATCH} --execute ${QUERY}
+
+        # remove anonymous users
+        QUERY="DELETE FROM user WHERE User='';"
+        ${MYSQL_BATCH} --execute ${QUERY}
+
+        # remove remote root
+        QUERY="DELETE FROM user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        ${MYSQL_BATCH} --execute ${QUERY}
+
+        # remove test database
+        QUERY="DROP DATABASE IF EXISTS test;"
+        ${MYSQL_BATCH} --execute ${QUERY}
+        QUERY="DELETE FROM db WHERE Db='test' OR Db='test\\_%';"
+        ${MYSQL_BATCH} --execute ${QUERY}
+
+        # reload privilege
+        QUERY="FLUSH PRIVILEGES;"
+        ${MYSQL_BATCH} --execute ${QUERY}
+
+        # restart service
+        systemctl restart ${PACKAGE}
+    fi
+
     # initialize etckeeper
     ${FORMAVID}/bin/initialize/shell/init_etckeeper
 

@@ -15,8 +15,8 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check dir
-APP_DIR=/usr/share/${PACKAGE}
-if [ -d "${APP_DIR}" ]; then
+set ${ADMINER_PORT:=12322}
+if ( grep -qF "${ADMINER_PORT}" /etc/apache2/ports.conf );; then
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} already exists."
@@ -61,7 +61,6 @@ OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
 
 # add apache port
-set ${ADMINER_PORT:=12322}
 sed -i "/# vim:/iListen ${ADMINER_PORT}" /etc/apache2/ports.conf
 
 # append apache conf
