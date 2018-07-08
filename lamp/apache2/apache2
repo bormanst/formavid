@@ -77,7 +77,7 @@ sed -i "s|^\(\s*ServerSignature\s\+\).*$|\1Off|g" ${CONF}
 
 # update status.conf: in reverse order
 CONF=/etc/apache2/mods-available/status.conf
-sed -i "/Require ip/a\                Substitute 's|<body>|<body><header class=\"header\" id=\"header\" role=\"banner\"><div class=\"header__name-and-slogan\" id=\"name-and-slogan\"><h1 class=\"header__site-name\" id=\"site-name\"><a href=\"/\" title=\"Home\" rel=\"home\" class=\"header__logo\" id=\"logo\"><img src=\"/theme/logo.svg\" alt=\"Home\" class=\"header__logo-image\" /></a><a href=\"/\" title=\"Home\" class=\"header__site-link\" rel=\"home\"><span>${SITETITLE} Admin</span></a></h1></div></header>|i'" ${CONF}
+sed -i "/Require ip/a\                Substitute 's|<body>|<body><header class=\"header\" id=\"header\" role=\"banner\"><div class=\"header__name-and-slogan\" id=\"name-and-slogan\"><h1 class=\"header__site-name\" id=\"site-name\"><a href=\"/\" title=\"Home\" rel=\"home\" class=\"header__logo\" id=\"logo\"><img src=\"/theme/logo.svg\" alt=\"Home\" class=\"header__logo-image\" /></a><a href=\"/\" title=\"Home\" class=\"header__site-link\" rel=\"home\" style=\"font-family:Arial,Helvetica,sans-serif;text-decoration:none;font-size:23px\"><span>${SITETITLE} Admin</span></a></h1></div></header>|i'" ${CONF}
 sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"shortcut icon\" href=\"/theme/favicon.ico\" type=\"image/vnd.microsoft.icon\" /><style>@import url(\"/theme/css/layouts/responsive-sidebars.css?\");@import url(\"/theme/css/pages.css?\");@import url(\"/theme/css/styles.css?\");</style>|i'" ${CONF}
 sed -i "/Require ip/a\                Deny from all" ${CONF}
 sed -i "/Require ip/a\                Order deny,allow" ${CONF}
