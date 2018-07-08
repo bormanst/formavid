@@ -25,11 +25,14 @@ def main():
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
     password = os.environ.get("SIMPLEINVOICES_PASS")
+    update_email = os.environ.get("UPDATE_EMAIL")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
-    update_email = False
     username = "admin"
+
+    if not update_email: update_email = False
+    else update_email = True
 
     if not password:
         password = d.get_password(
