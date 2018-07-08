@@ -30,7 +30,7 @@ if [ "${GCS_PROJECT_ID}" == "None" ] && ( gcloud config list --format="text(core
     GCS_PROJECT_ID=`gcloud config list --format="text(core.project)" | sed "s/core.project: //"`
     if ( gcloud compute project-info describe --project ${GCS_PROJECT_ID} > /dev/null 2>&1 ); then
         GCS_BUCKET_REGION=`gcloud compute project-info describe --project ${GCS_PROJECT_ID} --format="value(commonInstanceMetadata.google-compute-default-region)"`
-        GCS_BUCKET_TYPE="nearline"
+        GCS_BUCKET_TYPE="regional"
         GCS_BUCKET="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"
     else
         GCS_PROJECT_ID="None"

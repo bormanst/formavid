@@ -19,7 +19,7 @@ documented and relatively easy to read and edit.
 Google GCE Debian 9 image:
 The gcloud-gce-deployment script is meant to be run from a local bash client
 using the google-cloud-sdk. It will prompt for information to create a template,
-a GCE instance using the template, a nearline storage bucket, and adds the
+a GCE instance using the template, a regional storage bucket, and adds the
 required firewall rules. After the environment is configured it will ask if the
 appliance should be deployed. Selecting deployment will install the FormaVid git
 repository onto the newly created instance and then run the deploy_appliance
@@ -31,7 +31,7 @@ can be changed after the installation, if desired. The standard install script
 may be used after creating an instance but all the instance configuartions will
 need to be done manually, i.e. firewall rules, etc. Once the installation is
 tested and confirmed, it may be wise to ensure that the compute instance and the
-nearline storage bucket are protected from accidental deletion. Please see:
+regional storage bucket are protected from accidental deletion. Please see:
 https://cloud.google.com/compute/docs/instances/preventing-accidental-vm-deletion
 and https://cloud.google.com/storage/docs/access-control/ for more information.
 Depending on use case, it may be useful to retain the external ip address:

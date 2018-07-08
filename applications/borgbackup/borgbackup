@@ -66,7 +66,7 @@ echo ${MESSSAGE} >> ${LOG}
 # note: billing must be enabled to create bucket
 if [ "${GCS_PROJECT_ID}" != "None" ]; then
     # set bucket type
-    BUCKET_TYPE="nearline"
+    BUCKET_TYPE="regional"
     if [ "${GCS_BUCKET_TYPE}" != "None" ]; then BUCKET_TYPE="${GCS_BUCKET_TYPE}"; fi
     # create bucket dependent on location
     GCS_BUCKET="${GCS_PROJECT_ID}-backup-${BUCKET_TYPE}"

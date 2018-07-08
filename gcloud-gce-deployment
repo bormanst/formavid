@@ -132,7 +132,7 @@ set ${GCS_FOLDER:="${GCS_PROJECT_ID}"}
 set ${GCS_NAME:="FormaVid Appliance"}
 set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
 set ${GCE_TEMPLATE:="f1-micro-template"}
-set ${GCS_BUCKET_TYPE:="nearline"}
+set ${GCS_BUCKET_TYPE:="regional"}
 set ${GCS_BUCKET:="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"}
 
 # Check create project.
@@ -145,7 +145,7 @@ fi
 echo ""
 echo ""
 echo ""
-echo "Billing needs to be enabled to create a nearline backup bucket."
+echo "Billing needs to be enabled to create a regional backup bucket."
 echo "Use the GCS user account ${GCS_ACCOUNT} for access."
 echo "Please enable billing for project at:"
 echo "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}"
@@ -238,7 +238,7 @@ GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
 if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
     echo "The storage bucket of ${GCS_BUCKET} already exists."
     echo "If the borgbackup directory exists, it needs to be deleted prior to appliance deployment."
-    echo "Billing needs to be enabled to create a nearline backup bucket."
+    echo "Billing needs to be enabled to create a regional backup bucket."
     echo "Use the GCS user account ${GCS_ACCOUNT} for access."
     echo ""
     read -p "Billing has been enabled (y/n)?" CHOICE
