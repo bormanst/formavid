@@ -4,7 +4,7 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-DEFAULT_ENVARS=${FORMAVID}/bin/deploy/shell/default_envars
+DEFAULT_ENVARS=/etc/formavid/default_envars
 
 # export user input
 export_user_input () {

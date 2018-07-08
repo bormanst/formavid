@@ -30,6 +30,6 @@ else
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
-    echo ${MESSSAGE} | tee -a ${LOG} ${FORMAVID}/bin/deploy/shell/default_envars
+    echo ${MESSSAGE} | tee -a ${LOG} ${DEFAULT_ENVARS}
 fi
 
