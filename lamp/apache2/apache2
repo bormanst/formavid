@@ -32,6 +32,10 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
+# remove default site
+a2dissite 000-default
+rm -rf /var/www/html
+
 # apply overlay
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
@@ -39,17 +43,6 @@ if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
 strip() {
     echo $1 | sed "s/\n//";
 }
-
-# configure apache
-a2enmod authn_dbm
-a2enmod cgi
-a2enmod rewrite
-a2enmod ssl
-a2enmod substitute
-
-# remove default site
-a2dissite 000-default
-rm -rf /var/www/html
 
 # get ssl cert
 PRIVATE=/etc/ssl/private
@@ -175,6 +168,13 @@ cat > /etc/apache2/mods-available/substitute.conf <<EOF
     Substitute "s|</body>|$(strip "$BODY")</body>|i"
 </Location>
 EOF
+
+# enable modules
+a2enmod authn_dbm
+a2enmod cgi
+a2enmod rewrite
+a2enmod ssl
+a2enmod substitute
 
 # tools: enable conf
 a2ensite zzz-admin.${SITENAME}.conf
