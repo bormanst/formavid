@@ -44,6 +44,12 @@ strip() {
     echo $1 | sed "s/\n//";
 }
 
+# enable modules
+a2enmod authn_dbm
+a2enmod cgi
+a2enmod rewrite
+a2enmod ssl
+
 # get ssl cert
 PRIVATE=/etc/ssl/private
 openssl dhparam -out ${PRIVATE}/dhparams.pem 2048 > /dev/null 2>&1
@@ -170,10 +176,6 @@ cat > /etc/apache2/mods-available/substitute.conf <<EOF
 EOF
 
 # enable modules
-a2enmod authn_dbm
-a2enmod cgi
-a2enmod rewrite
-a2enmod ssl
 a2enmod substitute
 
 # tools: enable conf
