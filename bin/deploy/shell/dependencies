@@ -34,6 +34,7 @@ if [ $(swapon -s | grep -ci "${SWAPFILE}") -eq 0 ];  then
 fi
 
 # required for all-apt-gets
+apt-get update
 apt-get install -y curl
 
 echo ""
