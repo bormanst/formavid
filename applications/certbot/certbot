@@ -37,9 +37,9 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# check cron job
-SCRIPT=/etc/cron.d/${PACKAGE}
-if [ -f "${SCRIPT}" ]; then
+# check app dir
+APP_DIR=/etc/letsencrypt/live/${APP_HOSTNAME}
+if [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} already exists."
@@ -71,9 +71,9 @@ sed -i '/^\s*SSLCertificateKeyFile/s/^/#\ /g' ${CONF}
 sed -i '/^\s*SSLCertificateFile/s/^/#\ /g' ${CONF}
 
 # add new pems
-sed -i '/SSLStrictSNIVHostCheck/a SSLCertificateChainFile /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem' ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a SSLCertificateKeyFile /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem' ${CONF}
-sed -i '/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem' ${CONF}
+sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateChainFile /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
+sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateKeyFile /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
+sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
 
 # restart apache
 systemctl restart apache2
