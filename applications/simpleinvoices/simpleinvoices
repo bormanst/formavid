@@ -130,9 +130,6 @@ sed -i "s|\`name\` varchar(255) NOT NULL,|\`name\` varchar(50) NOT NULL,|" ${APP
 # create database
 mysql --user=root --password=${DB_PASS} ${DB_NAME} < ${APP_DIR}/databases/mysql/Full_Simple_Invoices.sql
 
-# set admin password and email
-${FORMAVID}/bin/initialize/python/simpleinvoices.py
-
 # set nonce key: should be random and secret
 RANDOM_1=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''`
 RANDOM_2=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''`
@@ -214,6 +211,9 @@ sed -i "s/sedtoolname/Billing/g" ${APP_DIR}/templates/default/header.tpl
 # clean up
 touch ${APP_DIR}/tmp/cache/
 rm -rf ${APP_DIR}/tmp/cache/*
+
+# set admin password and email
+${FORMAVID}/bin/initialize/python/simpleinvoices.py
 
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
