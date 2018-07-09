@@ -32,7 +32,7 @@ def main():
     username = "admin"
 
     if not update_email: update_email = False
-    else update_email = True
+    else: update_email = True
 
     if not password:
         password = d.get_password(
