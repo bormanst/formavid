@@ -34,7 +34,7 @@ export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
 
 # prompt for update emails
 echo ""
-read -p "Change the admin email for Drupal and Simple Invoices (y/n)?" CHOICE
+read -p "Change the admin email for Drupal and Simple Invoices to ${APP_EMAIL} (y/n)?" CHOICE
 case "${CHOICE^^}" in
   Y|YES ) export UPDATE_EMAIL="True";;
   * ) export UPDATE_EMAIL="False";;

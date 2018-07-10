@@ -149,6 +149,8 @@ class Dialog:
 
             return email
 
+    def check_email_format(email): return email_re.match(email)
+
     def get_input(self, title, text, init=''):
         while 1:
             s = self.inputbox(title, text, init, "Apply", "")[1]

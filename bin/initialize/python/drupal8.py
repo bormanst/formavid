@@ -19,6 +19,7 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
+DEFAULT_HOSTNAME="examplesitename.com"
 
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
@@ -28,6 +29,7 @@ def main():
     # Get envars.
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
+    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("APP_PASS")
     update_email = os.environ.get("UPDATE_EMAIL")
 
@@ -36,33 +38,40 @@ def main():
     drupaldir = "/var/www/drupal8"
     username = "admin"
 
-    if not update_email: update_email = False
-    else: update_email = True
+    # Set hostname.
+    if not hostname: hostname = DEFAULT_HOSTNAME
 
+    # Check password.
     if not password:
         password = d.get_password(
             "Drupal admin and cssadmin password",
             "Please enter password for Drupal admin and cssadmin accounts.")
 
+    # Check dbpass.
     if not dbpass:
         dbpass = d.get_password(
             "MySQL 'root' password",
             "Please enter new password for the MySQL 'root' account.")
 
-    if not email:
-        # Check need update email.
-        update_email = not d.yesno(
-            "Change email",
-            "Do you wish to change the drupal admin email?",
-            "No",
-            "Yes")
+    # Check update_email.
+    if not update_email and not email:
+        update_email = d.yesno(
+            "Drupal admin Email",
+            "Change the admin email for Drupal site(s)?",
+            "Yes",
+            "No")
         if update_email:
             # Get email.
             email = d.get_email(
                 "Drupal admin Email",
-                "Please enter email address for the Drupal admin account.")
+                "Please enter email address for Drupal admin account(s)."
+                "%s@%s" (username, hostname))
+    # if email do update
+    elif email and check_email_format(email): update_email = True
+    # no email no update
+    else: update_email = False
 
-    # Drupal - check change admin/password.
+    # Init db connection.
     con = ""
     try:
         pwd.getpwnam('admin')
@@ -105,7 +114,7 @@ def main():
         if con:
             con.close()
 
-    # Drupal - check change cssadmin/password with toggle to create base site.
+    # Check change cssadmin/password with toggle to create base site.
     try:
         # Check cssadmin exists with exception if not.
         pwd.getpwnam('cssadmin')

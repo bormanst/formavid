@@ -18,12 +18,14 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
+DEFAULT_HOSTNAME="examplesitename.com"
 
 def main():
     # Get envars.
     apachepass = os.environ.get("TOOLS_PASS")
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
+    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("SIMPLEINVOICES_PASS")
     update_email = os.environ.get("UPDATE_EMAIL")
 
@@ -31,40 +33,49 @@ def main():
     d = Dialog(DEFAULT_DIALOG_HEADER)
     username = "admin"
 
-    if not update_email: update_email = False
-    else: update_email = True
+    # Set hostname.
+    if not hostname: hostname = DEFAULT_HOSTNAME
 
+    # Check password.
     if not password:
         password = d.get_password(
             "Simple Invoices admin Password",
             "Enter password for the Simple Invoices apache site access and admin account.")
 
+    # Check dbpass.
     if not dbpass:
         dbpass = d.get_password(
             "MySQL 'root' Password",
             "Please enter new password for the MySQL 'root' account.")
 
+    # Check apachepass.
     if not apachepass:
         apachepass = d.get_password(
             "Apache access password",
             "Please enter password for Apache access to Simple Invoices.")
 
-    if not email:
-        # Check need update email.
-        update_email = not d.yesno(
-            "Change email",
-            "Do you wish to change the Simple Invoices admin email?",
-            "No",
-            "Yes")
-        # Check update email.
+    # Check update_email.
+    if not update_email and not email:
+        update_email = d.yesno(
+            "Simple Invoices admin Email",
+            "Change the admin email for Simple Invoices?",
+            "Yes",
+            "No")
         if update_email:
             # Get email.
             email = d.get_email(
                 "Simple Invoices admin Email",
-                "Enter email address for the Simple Invoices admin account.")
+                "Enter email address for the Simple Invoices admin account.",
+                "%s@%s" (username, hostname))
+    # if email do update
+    elif email and check_email_format(email): update_email = True
+    # no email no update
+    else: update_email = False
 
+    # Set hashpass.
     hashpass = hashlib.md5(password).hexdigest()
 
+    # Init db connection.
     con = ""
     try:
         # Get db conection.
