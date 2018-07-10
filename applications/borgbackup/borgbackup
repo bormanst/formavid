@@ -141,8 +141,8 @@ ionice -c2 -n7 -p\$\$
 # set log dir
 BORG_LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
 
-RUN_DAILIES=False
-if [ "$( date +%H )" == "00" ]; then RUN_DAILIES=True; fi
+RUN_DAILIES="False"
+if [ "\$( date +%H )" == "00" ]; then RUN_DAILIES="True"; fi
 
 # set GCS_BUCKET
 GCS_BUCKET=${GCS_BUCKET}
@@ -305,7 +305,7 @@ else
     info "Pruning repository finished with no exceptions."
 fi
 
-if [ "${RUN_DAILIES}" == "True" ]; then
+if [ "\${RUN_DAILIES}" == "True" ]; then
     # Break lock in case
     borg break-lock ${MOUNT}
 
