@@ -87,8 +87,9 @@ if [[ ! -z "${ENVAR_REQ_LIST// }" ]] && [ ${#} -eq ${ENVAR_REQ_LIST_SIZE} ]; the
         # args++
         let ARG=ARG+1
     done
-    # finish assigning envars
+    # update dependent envars
     export APP_HOSTNAME=`echo ${DOMAIN,,} | sed 's/www.//'`
+    export APP_EMAIL="admin@${APP_HOSTNAME}"
     export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
     export UPDATE_EMAIL="True"
 else
