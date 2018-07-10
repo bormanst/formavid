@@ -68,7 +68,8 @@ formavid (15.0.0) beta; urgency=low
     apache2         2.4.25
     borgbackup      1.0.9
     dovecot         2.2.27
-    drupal          8.5.5 (upstream archive)
+    drupal          ^8.5 (upstream archive)
+    drush           ^8.0 (upstream archive)
     fail2ban        0.9.6
     mariadb         10.1.26
     php             7.0.27
