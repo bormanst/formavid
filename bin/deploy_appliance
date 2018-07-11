@@ -55,6 +55,13 @@ export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 TIME_START=$( date +%s )
 echo "$( date ) Deployment started." >> ${LOG}
 
+# already run
+ALREADY_RUN="False"
+
+# check dir
+APP_DIR=/var/www/admin
+if [ -d "${APP_DIR}" ]; then ALREADY_RUN="True"; fi
+
 # configure apt for queued access
 CONF=/etc/apt/apt.conf
 if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
@@ -281,16 +288,19 @@ if [ -n "${APP_EMAIL}" ]; then
     # wait for processes completed
     wait
 
-    # clean up mod_php5 references in webroot
-    echo ""
-    MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in /var/www for security..."
-    echo "#############################################"
-    echo "#"
-    echo "# ${MESSSAGE}"
-    echo "#"
-    echo "#############################################"
-    echo ${MESSSAGE} >> ${LOG}
-    find /var/www -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+    # run once post install
+    if [ "${ALREADY_RUN}" = "True" ]; then
+        # clean up mod_php5 references in webroot
+        echo ""
+        MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in /var/www for security..."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+        find /var/www -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+    fi
 
     # restart services
     echo ""
@@ -301,9 +311,6 @@ if [ -n "${APP_EMAIL}" ]; then
     echo "#"
     echo "#############################################"
     echo ${MESSSAGE} >> ${LOG}
-    # restart mysql
-    if (systemctl -q is-active mysql); then systemctl restart mysql; fi
-
     # restart stunnel4
     if (systemctl -q is-active stunnel4); then systemctl restart stunnel4; fi
 
@@ -316,7 +323,7 @@ if [ -n "${APP_EMAIL}" ]; then
     # restart apache2
     if (systemctl -q is-active apache2); then systemctl restart apache2; fi
 
-    # secure mysql installation
+    # secure/restart mysql
     if (systemctl -q is-active mysql); then
         # secure mysql
         echo ""
@@ -352,11 +359,35 @@ if [ -n "${APP_EMAIL}" ]; then
 
         # restart service
         systemctl restart mysql
+    else
+        # no service
+        echo ""
+        MESSSAGE="$( date ) Failed to secure mysql. Service was not active."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
     fi
 
-    # initialize etckeeper
-    if [ ! -f "/etc/.etckeeper" ]; then ${FORMAVID}/bin/initialize/shell/init_etckeeper; fi
+    # check etckeeper
+    if [ ! -f "/etc/.etckeeper" ]; then
+        # initialize etckeeper
+        ${FORMAVID}/bin/initialize/shell/init_etckeeper
+    else
+        # let cron update
+        echo ""
+        MESSSAGE="$( date ) etckeeper is already initialized. Cron job will pick up changes."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+    fi
 
+    # finished
     echo ""
     MESSSAGE="$( date ) Install and configuration completed."
     echo "#############################################"
