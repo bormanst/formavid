@@ -333,7 +333,7 @@ if [ -n "${APP_EMAIL}" ]; then
     # restart apache2
     if (systemctl -q is-active apache2); then systemctl restart apache2; fi
 
-    # secure/restart mysql
+    # secure mysql installation
     if (systemctl -q is-active mysql); then
         # secure mysql
         echo ""
