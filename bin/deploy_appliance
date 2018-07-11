@@ -283,7 +283,7 @@ if [ -n "${APP_EMAIL}" ]; then
 
     # clean up mod_php5 references in webroot
     echo ""
-    MESSSAGE="$( date ) Replacing mod_php7 with mod_php5 in /var/www for security..."
+    MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in /var/www for security..."
     echo "#############################################"
     echo "#"
     echo "# ${MESSSAGE}"
