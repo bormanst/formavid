@@ -326,7 +326,7 @@ if [ -n "${APP_EMAIL}" ]; then
     fi
 
     # initialize etckeeper
-    ${FORMAVID}/bin/initialize/shell/init_etckeeper
+    if [ ! -f "/etc/.etckeeper" ]; then ${FORMAVID}/bin/initialize/shell/init_etckeeper; fi
 
     echo ""
     MESSSAGE="$( date ) Install and configuration completed."
