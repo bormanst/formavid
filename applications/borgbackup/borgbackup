@@ -201,7 +201,7 @@ else
 fi
 
 # Break lock in case
-borg break-lock ${MOUNT}
+borg break-lock ${MOUNT} && sleep 10
 
 info "Starting main backup..."
 
@@ -282,7 +282,7 @@ rm -rf \${DUMP_DIR}/*
 info "Temp database backups dir \${DUMP_DIR} has been cleaned."
 
 # Break lock in case
-borg break-lock ${MOUNT}
+borg break-lock ${MOUNT} && sleep 10
 
 info "Pruning repository..."
 
@@ -315,7 +315,7 @@ fi
 
 if [ "\${RUN_DAILIES}" = "00" ]; then
     # Break lock in case
-    borg break-lock ${MOUNT}
+    borg break-lock ${MOUNT} && sleep 10
 
     info "Starting logs backup..."
 
@@ -346,7 +346,7 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
     fi
 
     # Break lock in case
-    borg break-lock ${MOUNT}
+    borg break-lock ${MOUNT} && sleep 10
 
     # only need 7 days of logs
     info "Pruning logs..."
@@ -370,7 +370,7 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
     fi
 
     # Break lock in case
-    borg break-lock ${MOUNT}
+    borg break-lock ${MOUNT} && sleep 10
 
     # verify the repository
     info "Verifying repository..."
@@ -394,7 +394,7 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
     fi
 
     # Break lock in case
-    borg break-lock ${MOUNT}
+    borg break-lock ${MOUNT} && sleep 10
 
     # verify main archives
     info "Verifying main archives..."
@@ -420,7 +420,7 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
 fi
 
 # Break lock in case
-borg break-lock ${MOUNT}
+borg break-lock ${MOUNT} && sleep 10
 
 # unmount google fuse
 info "Unmounting gcsfuse mount..."
