@@ -380,7 +380,7 @@ if [ -n "${APP_EMAIL}" ]; then
     fi
 
     # check etckeeper
-    if [ ! -f "/etc/.etckeeper" ]; then
+    if [ ! "${ALREADY_RUN}" = "True" ]; then
         # initialize etckeeper
         ${FORMAVID}/bin/initialize/shell/init_etckeeper
     else
