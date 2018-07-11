@@ -282,7 +282,27 @@ if [ -n "${APP_EMAIL}" ]; then
     wait
 
     # clean up mod_php5 references in webroot
+    echo ""
+    MESSSAGE="$( date ) Replacing mod_php7 with mod_php5 in /var/www for security..."
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
     find /var/www -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+
+    # restart services
+    echo ""
+    MESSSAGE="$( date ) Restarting services..."
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
+    # restart mysql
+    if (systemctl -q is-active mysql); then systemctl restart mysql; fi
 
     # restart stunnel4
     if (systemctl -q is-active stunnel4); then systemctl restart stunnel4; fi
@@ -298,6 +318,15 @@ if [ -n "${APP_EMAIL}" ]; then
 
     # secure mysql installation
     if (systemctl -q is-active mysql); then
+        # secure mysql
+        echo ""
+        MESSSAGE="$( date ) Securing mysql..."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
         # use mysql db
         MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
         QUERY="USE mysql;"
