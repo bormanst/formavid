@@ -34,9 +34,10 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 # check cron job
 SCRIPT=/etc/cron.hourly/${PACKAGE}
 if [ -f "${SCRIPT}" ]; then
+    MESSSAGE="The cron job ${SCRIPT} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script for further details."
@@ -48,19 +49,16 @@ fi
 # set BACKUP_DIR on GCS_BUCKET
 BACKUP_DIR=${PACKAGE}
 if ( gsutil -q stat gs://${GCS_BUCKET}/${BACKUP_DIR}/ ); then
+    MESSSAGE="Required ${GCS_BUCKET}/${BACKUP_DIR} is already active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! Command gsutil -q stat ${GCS_BUCKET}/${BACKUP_DIR} already exists."
     echo "WARNING! Check console to ensure the directory ${BACKUP_DIR} is empty/removed."
     echo "WARNING! The bucket ${GCS_BUCKET} returns a positive result - no need to modify."
     echo ""
     echo ""
     exit 0
 fi
-
-# log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
 
 # check create bucket based on project id
 # note: billing must be enabled to create bucket
@@ -85,14 +83,19 @@ fi
 
 # check bucket exists
 if ( ! gsutil -q ls -b gs://${GCS_BUCKET} ); then
+    MESSSAGE="Required bucket ${GCS_BUCKET} not available. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! Command gsutil -q ls -b ${GCS_BUCKET} fails."
     echo "WARNING! Check console to ensure the bucket ${GCS_BUCKET} exists."
     echo ""
     echo ""
     exit 0
 fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
 
 # create log files
 PACKAGE_LOG_DIR=/var/log/${PACKAGE}
@@ -100,7 +103,13 @@ mkdir -p ${PACKAGE_LOG_DIR}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # set fuse mount point
 MOUNT=/mnt/${PACKAGE}

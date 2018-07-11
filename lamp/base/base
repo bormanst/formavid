@@ -17,9 +17,10 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 # check dir
 APP_DIR=/var/www/admin
 if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script for further details."
@@ -34,7 +35,13 @@ echo ${MESSSAGE} >> ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # create admin
 if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then

@@ -29,9 +29,10 @@ if [ "${SOLR_INSTALL}" != "True" ]; then exit 0; fi
 # check dir
 APP_DIR=/usr/local/solr
 if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script in applications/${PACKAGE} for further details."
@@ -92,7 +93,13 @@ ${SRC}/${INSTALL_SCRIPT} ${TGZ} -i /usr/local -d ${SOLR_HOME} -p ${SOLR_PORT} -s
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # change log location
 mkdir ${SOLR_LOG}

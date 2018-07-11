@@ -20,9 +20,10 @@ TRACKER=support
 # check dir
 APP_DIR=/var/www/${TRACKER}
 if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script in applications/${PACKAGE} for further details."
@@ -34,9 +35,10 @@ fi
 # dependencies check: apache2
 DEPENDS=apache2
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -47,9 +49,10 @@ fi
 DEPENDS=mysql
 systemctl start ${DEPENDS} && sleep 10
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -218,7 +221,13 @@ sed -i "1,/^${OPTION} = root/s/^${OPTION} = root/${OPTION} = ${DB_USER}/" ${CONF
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # create etc dir
 ETC=/etc/${PACKAGE}/${TRACKER}

@@ -14,17 +14,14 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
-
 # check exists
 # Note: check inetd_ssl=1 in miniserv.conf
 CONF=/etc/webmin/miniserv.conf
 if grep -q "inetd_ssl=1" ${CONF}; then
+    MESSSAGE="The ${CONF} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script in applications/${PACKAGE} for further details."
@@ -33,9 +30,19 @@ if grep -q "inetd_ssl=1" ${CONF}; then
     exit 0
 fi
 
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # update miniserv
 sed -i "/^ssl=/ s|=.*|=|" ${CONF}

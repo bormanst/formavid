@@ -25,6 +25,8 @@ APP_DIR=${WWW_DIR}/${DRUPAL_DIR}
 
 # check dir
 if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} already exists."
@@ -39,9 +41,10 @@ fi
 # dependencies check: apache2
 DEPENDS=apache2
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -51,9 +54,10 @@ fi
 # dependencies check: mysql
 DEPENDS=mysql
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -63,9 +67,10 @@ fi
 # dependencies check: php
 DEPENDS=php
 if ! (hash php); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -131,7 +136,13 @@ composer require ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-ex
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # add drush symlinks
 ln -sf ${APP_DIR}/vendor/drush/drush/drush /usr/local/bin/drush

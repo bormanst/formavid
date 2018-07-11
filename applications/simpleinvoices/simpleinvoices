@@ -17,9 +17,10 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 APP_DIR=/var/www/${PACKAGE}
 # check dir
 if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script in applications/${PACKAGE} for further details."
@@ -31,9 +32,10 @@ fi
 # dependencies check: mysql
 DEPENDS=mysql
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -43,9 +45,10 @@ fi
 # dependencies check: apache2
 DEPENDS=apache2
 if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -55,9 +58,10 @@ fi
 # dependencies check: php
 DEPENDS=php
 if ! (hash php); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -67,9 +71,10 @@ fi
 # dependencies check: git
 DEPENDS=git
 if ! hash ${DEPENDS} 2>/dev/null; then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
@@ -118,7 +123,13 @@ rm -f /tmp/cookie
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # enable authentication and set default creds
 sed -i "s|^authentication.enabled.*|authentication.enabled = true|" ${CONF}

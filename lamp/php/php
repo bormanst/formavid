@@ -18,6 +18,8 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 # Note: xdebug.max_nesting_level set below so using as a trigger
 if [[ $(php -r "echo ini_get('memory_limit');") == "256M" ]] \
     && [[ $(php -r "echo ini_get('xdebug.max_nesting_level');") == "256" ]]; then
+    MESSSAGE="The memory_limit and max_nesting_level already set. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
@@ -53,7 +55,13 @@ setini() {
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then cp -rf ${OVERLAY_DIR}/* /; fi
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # use these defaults
 set ${PHP_MEMORY_LIMIT:=256M}           # php.ini default: 128MB
