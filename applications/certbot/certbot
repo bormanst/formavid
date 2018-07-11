@@ -10,6 +10,9 @@ PACKAGE=certbot
 if [ "${CERTBOT_INSTALL}" != "True" ]; then
     MESSSAGE="default_envars:CERTBOT_INSTALL not set to 'True'. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    exit 0
 fi
 
 # check install
@@ -28,7 +31,6 @@ if ! (systemctl -q is-active ${DEPENDS}); then
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} depends on the ${DEPENDS} service."
     echo "WARNING! Please ensure that ${DEPENDS} is active."
     echo ""
     echo ""
