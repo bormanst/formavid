@@ -289,7 +289,7 @@ if [ -n "${APP_EMAIL}" ]; then
     wait
 
     # run once post install
-    if [ "${ALREADY_RUN}" = "True" ]; then
+    if [ ! "${ALREADY_RUN}" = "True" ]; then
         # clean up mod_php5 references in webroot
         echo ""
         MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in /var/www for security..."
