@@ -345,27 +345,25 @@ if [ -n "${APP_EMAIL}" ]; then
         echo "#############################################"
         echo ${MESSSAGE} >> ${LOG}
         # use mysql db
-        MYSQL_BATCH="mysql --user=root --password=${DB_PASS} --batch"
-        QUERY="USE mysql;"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        MYSQL_BATCH="mysql -uroot -p${DB_PASS} mysql -B -e"
 
         # remove anonymous users
         QUERY="DELETE FROM user WHERE User='';"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        ${MYSQL_BATCH} "${QUERY}"
 
         # remove remote root
         QUERY="DELETE FROM user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        ${MYSQL_BATCH} "${QUERY}"
 
         # remove test database
         QUERY="DROP DATABASE IF EXISTS test;"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        ${MYSQL_BATCH} "${QUERY}"
         QUERY="DELETE FROM db WHERE Db='test' OR Db='test\\_%';"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        ${MYSQL_BATCH} "${QUERY}"
 
         # reload privilege
         QUERY="FLUSH PRIVILEGES;"
-        ${MYSQL_BATCH} --execute ${QUERY}
+        ${MYSQL_BATCH} "${QUERY}"
 
         # restart service
         systemctl restart mysql
