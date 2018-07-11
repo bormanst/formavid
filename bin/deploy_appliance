@@ -300,6 +300,16 @@ if [ -n "${APP_EMAIL}" ]; then
         echo "#############################################"
         echo ${MESSSAGE} >> ${LOG}
         find /var/www -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+    else
+        # skipping
+        echo ""
+        MESSSAGE="$( date ) Skipped run once post install scripts."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
     fi
 
     # restart services
