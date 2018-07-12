@@ -1,0 +1,72 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=create_drupal_stack
+
+# set default FORMAVID
+export FORMAVID=/usr/local/formavid
+
+# check FORMAVID
+if [ ! -d "${FORMAVID}" ]; then
+    # dir should exist: this script is supposed to be located in formavid/bin
+    export FORMAVID=$(find /usr/local -name "formavid")
+    if [ -z "${FORMAVID}" ]; then
+        echo ""
+        echo ""
+        echo "WARNING! ${PACKAGE} depends on formavid's location being in /usr/local."
+        echo "WARNING! Please ensure that formavid is located in /usr/local."
+        echo "WARNING! OR"
+        echo "WARNING! Modify formavid's default location formavid/bin/${PACKAGE}."
+        echo ""
+        echo ""
+        exit 0
+    fi
+fi
+
+# confirm creation
+echo ""
+echo ""
+echo "WARNING! You are about to create a new drupal site stack."
+echo "WARNING! This script needs root permissions."
+echo "WARNING! Make sure you have mysql root:password and drupal admin:password too."
+echo "WARNING! Confirm there is enough resources for an additional site."
+echo ""
+echo "WARNING! The appliance will automatically restart the affected services!"
+echo "WARNING! This includes apache2, postfix confs, and possibly solr!"
+echo ""
+read -p "Continue with stack creation (y/n)?" CHOICE
+case "${CHOICE^^}" in
+    Y|YES ) :;;
+    * ) exit 0;;
+esac
+
+# set log dir
+FORMAVID_LOGS=/var/log/formavid
+
+# check log dir exists
+if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
+
+# export log
+export LOG=${FORMAVID_LOGS}/deploy_appliance.log
+
+MESSSAGE="$( date ) Starting site stack creation..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# get default envars
+DEFAULT_ENVARS=/etc/formavid/default_envars
+if [ -f "${DEFAULT_ENVARS}" ]; then . /etc/formavid/default_envars; fi
+
+# update envars
+${FORMAVID}/bin/deploy/shell/set_envars
+
+# create site stack
+${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+
+# reboot appliance
+MESSSAGE="$( date ) Site stack creation completed."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0

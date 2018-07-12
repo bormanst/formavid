@@ -80,45 +80,6 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# select drupal modules to install
-DRUPAL_MODULE_LIST="\
-    drupal/advagg \
-    drupal/advanced_help \
-    drupal/background_image \
-    drupal/backup_migrate \
-    drupal/captcha \
-    drupal/components \
-    drupal/ctools \
-    drupal/devel \
-    drupal/features \
-    drupal/field_group \
-    drupal/fivestar \
-    drupal/honeypot \
-    drupal/image_style_quality \
-    drupal/imageapi_optimize \
-    drupal/imagemagick \
-    drupal/imce \
-    drupal/inline_entity_form \
-    drupal/module_filter \
-    drupal/panels \
-    drupal/pathauto \
-    drupal/recaptcha \
-    drupal/rules \
-    drupal/search_api_solr \
-    drupal/search_api_solr_defaults \
-    drupal/tagadelic \
-    drupal/views_bulk_operations \
-    drupal/zen
-"
-
-# set modules to enable in stack creation script
-ENABLE_MODULES="'"$(\
-    echo ${DRUPAL_MODULE_LIST} | \
-    sed -e "s/\sdrupal\/zen//g" | \
-    sed -e "s/\s/,'/g" | sed -e "s/,/',/g"  | \
-    sed -e "s/drupal\///g")"'"
-sed -i "s/modulesToEnable\ =\ \[\]/modulesToEnable\ =\ \[${ENABLE_MODULES}\]/" ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
-
 # add drupal8 user to database
 mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
 

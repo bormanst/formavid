@@ -44,4 +44,41 @@ export GCS_BUCKET=${GCS_BUCKET}
 export CERTBOT_INSTALL="False" # default: False
 export SECURE_CIPHER_LIST="ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256"
 
-echo "$( date ) Exported default envars." >> ${LOG}
+# select drupal modules to install
+export DRUPAL_MODULE_LIST="\
+    drupal/advagg \
+    drupal/advanced_help \
+    drupal/background_image \
+    drupal/backup_migrate \
+    drupal/captcha \
+    drupal/components \
+    drupal/ctools \
+    drupal/devel \
+    drupal/features \
+    drupal/field_group \
+    drupal/fivestar \
+    drupal/honeypot \
+    drupal/image_style_quality \
+    drupal/imageapi_optimize \
+    drupal/imagemagick \
+    drupal/imce \
+    drupal/inline_entity_form \
+    drupal/module_filter \
+    drupal/panels \
+    drupal/pathauto \
+    drupal/recaptcha \
+    drupal/rules \
+    drupal/search_api_solr \
+    drupal/search_api_solr_defaults \
+    drupal/tagadelic \
+    drupal/views_bulk_operations \
+    drupal/zen
+"
+
+# set modules to enable in stack creation script
+ENABLE_MODULES="'"$(\
+    echo ${DRUPAL_MODULE_LIST} | \
+    sed -e "s/\sdrupal\/zen//g" | \
+    sed -e "s/\s/,'/g" | sed -e "s/,/',/g"  | \
+    sed -e "s/drupal\///g")"'"
+sed -i "s/modulesToEnable\ =\ \[\]/modulesToEnable\ =\ \[${ENABLE_MODULES}\]/" ${FORMAVID}/bin/deploy/python/create-drupal-stack.py

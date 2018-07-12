@@ -4,7 +4,36 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-DEFAULT_ENVARS=/etc/formavid/default_envars
+# check default_envars
+if [ -z "${LOG}" ]; then
+    # create log files
+    FORMAVID_LOGS=/var/log/formavid
+    if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
+    # export log
+    export LOG=${FORMAVID_LOGS}/deploy_appliance.log
+fi
+
+# check default_envars
+if [ -z "${DEFAULT_ENVARS}" ]; then
+    # set etc dir
+    ETC_DIR=/etc/formavid
+    # set default_envars
+    DEFAULT_ENVARS=${ETC_DIR}/default_envars
+    # check default_envars
+    if [ ! -f "${DEFAULT_ENVARS}" ]; then
+        # check config dir exists
+        if [ ! -d "${ETC_DIR}" ]; then mkdir -p ${ETC_DIR}; fi
+        # create file
+        touch ${DEFAULT_ENVARS}
+        # dir should exist: this script is supposed to be located in formavid/bin/deploy/shell
+        FORMAVID=$(find /usr/local -name "formavid")
+        if [ ! -z "${FORMAVID// }" ]; then
+            # create etc default_envars to avoid git update overwrite
+            cp -fp ${FORMAVID}/bin/deploy/shell/default_envars ${DEFAULT_ENVARS}
+        fi
+    fi
+    . ${DEFAULT_ENVARS}
+fi
 
 # export user input
 export_user_input () {
