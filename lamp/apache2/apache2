@@ -160,8 +160,12 @@ ${STYLE}
 "
 BODY="
 <div id=\\\"formavid-credit\\\">
-    <div style=\\\"clear: both;\\\">
-    Powered by <a href=\\\"https://formavid.org\\\">FormaVid Small Business Appliance</a>
+    <div style=\\\"clear:both;\\\">
+        <div id=\\\"si_footer\\\">
+            <div class=\\\"si_wrap\\\">
+                Powered by <a href=\\\"https://formavid.org\\\">FormaVid Small Business Appliance</a>
+            </div>
+        </div>
     </div>
 </div>
 "
