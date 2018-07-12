@@ -534,21 +534,25 @@ def main():
     # Check formavid logo.
     if not sitename.lower() == "formavidorg":
         # Admin Tools - use first "base" site logo.
-        if not os.path.exists("/var/www/admin/images/logo.svg"):
+        logo = "/var/www/admin/images/logo.svg"
+        if not os.path.exists(logo):
             # Symlink logo to admin pages.
-            system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/logo.svg" % (drupaldir,sitename))
+            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
         # Billing - use first "base" site logo.
-        if not os.path.exists("/var/www/simpleinvoices/images/logo.svg"):
+        logo = "/var/www/simpleinvoices/images/logo.svg"
+        if not os.path.exists(logo):
             # Symlink logo to simpleinvoices.
-            system("ln -s %s/themes/%s/logo.svg /var/www/simpleinvoices/images/logo.svg" % (drupaldir,sitename))
+            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
         # Support - use first "base" site logo.
-        if not os.path.exists("/var/www/support/html/images/logo.svg"):
+        logo = "/var/www/support/html/images/logo.svg"
+        if not os.path.exists(logo):
             # Symlink logo to support.
-            system("ln -s %s/themes/%s/logo.svg /var/www/support/html/images/logo.svg" % (drupaldir,sitename))
-        # Support - use first "base" site logo.
-        if not os.path.exists("/var/www/support/html/images/favicon.ico"):
-            # Symlink logo to support.
-            system("ln -s %s/themes/%s/favicon.ico /var/www/support/html/images/favicon.ico" % (drupaldir,sitename))
+            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
+        # Support - use first "base" site ico.
+        logo = "/var/www/support/html/images/favicon.ico"
+        if not os.path.exists(logo):
+            # Symlink ico to support.
+            system("ln -s %s/themes/%s/favicon.ico %s" % (drupaldir,sitename, logo))
 
     # Postfix - add virtual addresses.
     system("echo ''")
