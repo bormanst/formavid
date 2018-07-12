@@ -531,25 +531,24 @@ def main():
         # log info
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
-    # Admin Tools - use first "base" site logo.
-    if not os.path.exists("/var/www/admin/images/logo.svg") and not sitename.lower() == "formavidorg":
-        # Symlink logo to admin pages.
-        system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/logo.svg" % (drupaldir,sitename))
-
-    # Billing - use first "base" site logo.
-    if not os.path.exists("/var/www/simpleinvoices/images/logo.svg") and not sitename.lower() == "formavidorg":
-        # Symlink logo to simpleinvoices.
-        system("ln -s %s/themes/%s/logo.svg /var/www/simpleinvoices/images/logo.svg" % (drupaldir,sitename))
-
-    # Support - use first "base" site logo.
-    if not os.path.exists("/var/www/support/html/images/logo.svg") and not sitename.lower() == "formavidorg":
-        # Symlink logo to support.
-        system("ln -s %s/themes/%s/logo.svg /var/www/support/html/images/logo.svg" % (drupaldir,sitename))
-
-    # Support - use first "base" site logo.
-    if not os.path.exists("/var/www/support/html/images/favicon.ico") and not sitename.lower() == "formavidorg":
-        # Symlink logo to support.
-        system("ln -s %s/themes/%s/favicon.ico /var/www/support/html/images/favicon.ico" % (drupaldir,sitename))
+    # Check formavid logo.
+    if not sitename.lower() == "formavidorg":
+        # Admin Tools - use first "base" site logo.
+        if not os.path.exists("/var/www/admin/images/logo.svg"):
+            # Symlink logo to admin pages.
+            system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/logo.svg" % (drupaldir,sitename))
+        # Billing - use first "base" site logo.
+        if not os.path.exists("/var/www/simpleinvoices/images/logo.svg"):
+            # Symlink logo to simpleinvoices.
+            system("ln -s %s/themes/%s/logo.svg /var/www/simpleinvoices/images/logo.svg" % (drupaldir,sitename))
+        # Support - use first "base" site logo.
+        if not os.path.exists("/var/www/support/html/images/logo.svg"):
+            # Symlink logo to support.
+            system("ln -s %s/themes/%s/logo.svg /var/www/support/html/images/logo.svg" % (drupaldir,sitename))
+        # Support - use first "base" site logo.
+        if not os.path.exists("/var/www/support/html/images/favicon.ico"):
+            # Symlink logo to support.
+            system("ln -s %s/themes/%s/favicon.ico /var/www/support/html/images/favicon.ico" % (drupaldir,sitename))
 
     # Postfix - add virtual addresses.
     system("echo ''")
