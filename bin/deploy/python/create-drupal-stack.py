@@ -393,9 +393,15 @@ def main():
         # Sites - set additional database properties.
         for sitetype in siteTypes:
             # Allow perms for drush.
-            cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal8@localhost WITH GRANT OPTION;" % (sitename,sitetype))
+            cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal8@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;" % (sitename,sitetype))
             # log info
             logging.info('Allow perms for drush db access on %s_%s.*.' % (sitename,sitetype))
+        # Restart mysql.
+        system("echo ''")
+        system("echo 'Restarting mysql service...'")
+        system("echo ''")
+        system("systemctl restart mysql")
+        system("echo ''")
 
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
