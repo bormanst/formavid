@@ -52,6 +52,7 @@ if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 # export log
 export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 
+# start
 MESSSAGE="$( date ) Starting site stack creation..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
@@ -65,7 +66,7 @@ ${FORMAVID}/bin/deploy/shell/set_envars
 # create site stack
 ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
 
-# reboot appliance
+# completed
 MESSSAGE="$( date ) Site stack creation completed."
 echo ${MESSSAGE} | tee -a ${LOG}
 
