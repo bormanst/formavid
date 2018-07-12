@@ -546,6 +546,11 @@ def main():
         # Symlink logo to support.
         system("ln -s %s/themes/%s/logo.svg /var/www/support/html/images/logo.svg" % (drupaldir,sitename))
 
+    # Support - use first "base" site logo.
+    if not os.path.exists("/var/www/support/html/images/favicon.ico") and not sitename.lower() == "formavidorg":
+        # Symlink logo to support.
+        system("ln -s %s/themes/%s/favicon.ico /var/www/support/html/images/favicon.ico" % (drupaldir,sitename))
+
     # Postfix - add virtual addresses.
     system("echo ''")
     system("echo ''")
