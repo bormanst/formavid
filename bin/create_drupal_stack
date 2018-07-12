@@ -61,7 +61,7 @@ DEFAULT_ENVARS=/etc/formavid/default_envars
 if [ -f "${DEFAULT_ENVARS}" ]; then . /etc/formavid/default_envars; fi
 
 # update envars
-${FORMAVID}/bin/deploy/shell/set_envars
+. ${FORMAVID}/bin/deploy/shell/set_envars
 
 # create site stack
 ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
