@@ -66,7 +66,7 @@ def set_solr_configs(solrconfigpath, solrserverid, solrservername, solrcorename,
 
 DEFAULT_DIALOG_HEADER = "Formavid - Drupal site build script"
 DEFAULT_DOMAIN = "www.examplesitename.com"
-DEFAULT_LOG = "/var/log/formavid/create-druapl-stack.log"
+DEFAULT_LOG = "/var/log/formavid/create-drupal-stack.log"
 DEFAULT_TITLE = "Example Site Name"
 
 SOLR_TEXT = """Solr search can be used as a replacement for core content search and boasts both extra features and better performance. Low memory systems may wish to use the default search to avoid the overhead associated with a Java virtual machine."""
