@@ -46,7 +46,7 @@ fi
 
 # create log files
 FORMAVID_LOGS=/var/log/formavid
-mkdir -p ${FORMAVID_LOGS}
+if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 
 # export log
 export LOG=${FORMAVID_LOGS}/deploy_appliance.log
