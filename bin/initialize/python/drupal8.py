@@ -67,7 +67,7 @@ def main():
                 "Please enter email address for Drupal admin account(s).",
                 "%s@%s" % (username, hostname))
     # if email do update
-    elif email and check_email_format(email): update_email = True
+    elif email: update_email = True
     # no email no update
     else: update_email = False
 
