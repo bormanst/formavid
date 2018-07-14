@@ -139,7 +139,7 @@ npm install -g gulp-cli
 # background safe: depends on gulp-cli
 cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes
 cd ${APP_DIR}/themes
-npm install --unsafe-perm
+su - cssadmin -c "npm install --unsafe-perm"
 
 # set cssadmin perms
 chown -R cssadmin:cssadmin ${APP_DIR}/themes
