@@ -64,8 +64,8 @@ def main():
             # Get email.
             email = d.get_email(
                 "Drupal admin Email",
-                "Please enter email address for Drupal admin account(s)."
-                "%s@%s" (username, hostname))
+                "Please enter email address for Drupal admin account(s).",
+                "%s@%s" % (username, hostname))
     # if email do update
     elif email and check_email_format(email): update_email = True
     # no email no update

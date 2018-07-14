@@ -66,7 +66,7 @@ def main():
             email = d.get_email(
                 "Simple Invoices admin Email",
                 "Enter email address for the Simple Invoices admin account.",
-                "%s@%s" (username, hostname))
+                "%s@%s" % (username, hostname))
     # if email do update
     elif email and check_email_format(email): update_email = True
     # no email no update
