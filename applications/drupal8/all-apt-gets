@@ -31,7 +31,7 @@ else
     # add node.js source
     curl -sL https://deb.nodesource.com/setup_9.x | bash -
     # install dependencies
-    export APTGETS="checkinstall composer libjs-jquery-colorbox libssl-dev nodejs php-curl php-gd php-getid3 php-gmp php-readline php-ssh2 php-twig php-xml python-yaml"
+    export APTGETS="checkinstall composer libjs-jquery-colorbox libpng-dev libssl-dev nodejs php-curl php-gd php-getid3 php-gmp php-readline php-ssh2 php-twig php-xml python-yaml"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

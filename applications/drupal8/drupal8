@@ -137,13 +137,9 @@ npm install -g gulp-cli
 
 # preload node_modules for themes
 # background safe: depends on gulp-cli
-mkdir -p ${APP_DIR}/themes/temp
-cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes/temp
-cd ${APP_DIR}/themes/temp
+cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes
+cd ${APP_DIR}/themes
 npm install --unsafe-perm
-mv -f node_modules ${APP_DIR}/themes
-cd ${APP_DIR}
-rm -rf ${APP_DIR}/themes/temp
 
 # set cssadmin perms
 chown -R cssadmin:cssadmin ${APP_DIR}/themes
