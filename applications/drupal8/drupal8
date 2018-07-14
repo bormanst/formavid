@@ -135,14 +135,15 @@ ln -s /usr/local/bin/npm /usr/bin/npm
 # install gulp-cli
 npm install -g gulp-cli
 
-# preload node_modules for themes
-# background safe: depends on gulp-cli
+# copy custom package.json
 cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes
-cd ${APP_DIR}/themes
-su - cssadmin -c "npm install --unsafe-perm"
 
 # set cssadmin perms
 chown -R cssadmin:cssadmin ${APP_DIR}/themes
+
+# preload node_modules for themes
+# background safe: depends on gulp-cli
+su - cssadmin -c "cd ${APP_DIR}/themes && npm install --unsafe-perm"
 
 # insert "www.example.com" as default trusted_host (inithook will adjust)
 NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.com\$',\n\);\n"
