@@ -14,10 +14,10 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# check dir
-APP_DIR=/usr/share/${PACKAGE}
-if [ -d "${APP_DIR}" ]; then
-    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+# check conf
+CONF=/etc/${PACKAGE}/${PACKAGE}.conf
+if [ $(grep -c 'cssadmin' ${CONF}) -gt 0 ];  then
+    MESSSAGE="File ${CONF} already modified. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
@@ -46,6 +46,13 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
     echo ""
 fi
+
+# set cssadmin dir
+cat >> ${CONF} <<EOF
+<Global>
+  DefaultRoot /var/www/drupal8/themes cssadmin
+</Global>
+EOF
 
 # restart service
 systemctl restart ${PACKAGE}
