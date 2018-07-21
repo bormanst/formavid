@@ -431,7 +431,7 @@ exit \${global_exit}
 EOF
 
 # make executable root only
-chmod 0700 ${FILE}
+chmod 0755 ${FILE}
 
 # create borg gcs mount script
 FILE=/usr/bin/borg-mount-gcs-archive
