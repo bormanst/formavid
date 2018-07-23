@@ -1,0 +1,302 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=gcloud-snapshot
+
+# check install
+if [ "${GCS_PROJECT_ID}" == "None" ]; then
+    MESSSAGE="default_envars: GCS_PROJECT_ID is set to 'None'. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "${PACKAGE^} will need to be manually configured."
+    echo "The script was specifically designed for gcloud deployment."
+    echo "Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log check
+MESSSAGE="Check packages: ${PACKAGE}"
+echo ${MESSSAGE} >> ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check dir
+APP_DIR=/usr/local/${PACKAGE}
+if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE}..."
+echo ${MESSSAGE} >> ${LOG}
+
+# create app dir
+mkdir -p ${APP_DIR}
+
+# create log files
+PACKAGE_LOG_DIR=/var/log/${PACKAGE}
+mkdir -p ${PACKAGE_LOG_DIR}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# create cron daily job
+# modified https://github.com/jacksegal/google-compute-snapshot/blob/master/gcloud-snapshot.sh
+FILE=${APP_DIR}/${PACKAGE}
+cat > ${FILE} <<EOF
+#!/bin/bash
+
+# set PATH
+export PATH=\$PATH:/usr/local/bin/:/usr/bin
+
+# set log
+export LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
+
+# set days to keep
+OLDER_THAN=7
+
+getInstanceName()
+{
+    # get the name for this vm
+    local instance_name="\$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")"
+
+    # strip out the instance name from the fullly qualified domain name the google returns
+    echo -e "\${instance_name%%.*}"
+}
+
+getInstanceId()
+{
+    echo -e "\$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/id" -H "Metadata-Flavor: Google")"
+}
+
+getInstanceZone()
+{
+    local instance_zone="\$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/zone" -H "Metadata-Flavor: Google")"
+
+    # strip instance zone out of response
+    echo -e "\${instance_zone##*/}"
+}
+
+# input: INSTANCE_NAME
+getDeviceList()
+{
+    echo -e "\$(gcloud compute disks list --filter "users~instances/\$1\\\$ \$LABEL_CLAUSE" --format='value(name)')"
+}
+
+createSnapshotName()
+{
+    # create snapshot name
+    local name="gcs-\$1-\$2-\$3"
+
+    # google compute snapshot name cannot be longer than 62 characters
+    local name_max_len=62
+
+    # check if snapshot name is longer than max length
+    if [ \${#name} -ge \${name_max_len} ]; then
+
+        # work out how many characters we require - prefix + device id + timestamp
+        local req_chars="gcs--\$2-\$3"
+
+        # work out how many characters that leaves us for the device name
+        local device_name_len=\`expr \${name_max_len} - \${#req_chars}\`
+
+        # shorten the device name
+        local device_name=\${1:0:device_name_len}
+
+        # create new (acceptable) snapshot name
+        name="gcs-\${device_name}-\$2-\$3";
+
+    fi
+
+    echo -e \${name}
+}
+
+# input: DEVICE_NAME, SNAPSHOT_NAME, INSTANCE_ZONE
+createSnapshot()
+{
+    echo -e "\$(gcloud compute disks snapshot \$1 --snapshot-names \$2 --zone \$3 2>> \${LOG})"
+}
+
+# input: SNAPSHOT_REGEX
+getSnapshots()
+{
+    # create empty array
+    SNAPSHOTS=()
+
+    # get list of snapshots from gcloud for this device
+    local gcloud_response="\$(gcloud compute snapshots list --filter="name~'"\$1"'" --uri)"
+
+    # loop through and get snapshot name from URI
+    while read line
+    do
+        # grab snapshot name from full URI
+        snapshot="\${line##*/}"
+
+        # add snapshot to global array
+        SNAPSHOTS+=(\${snapshot})
+
+    done <<< "\$(echo -e "\$gcloud_response")"
+}
+
+# input: SNAPSHOT_NAME
+getSnapshotCreatedDate()
+{
+    local snapshot_datetime="\$(gcloud compute snapshots describe \$1 | grep "creationTimestamp" | cut -d " " -f 2 | tr -d \')"
+
+    #  format date
+    echo -e "\$(date -d \${snapshot_datetime%?????} +%Y%m%d)"
+}
+
+# input: OLDER_THAN
+getSnapshotDeletionDate()
+{
+    echo -e "\$(date -d "-\$1 days" +"%Y%m%d")"
+}
+
+# input: DELETION_DATE, SNAPSHOT_CREATED_DATE
+checkSnapshotDeletion()
+{
+    if [ \$1 -ge \$2 ]
+
+        then
+            echo -e "1"
+        else
+            echo -e "2"
+
+    fi
+}
+
+# input: SNAPSHOT_NAME
+deleteSnapshot()
+{
+    echo -e "\$(gcloud compute snapshots delete \$1 -q 2>> \${LOG})"
+}
+
+logTime()
+{
+    local datetime="\$(date +"%Y-%m-%d %T")"
+    echo -e "\$datetime: \$1" | tee -a \${LOG}
+}
+
+createSnapshotWrapper()
+{
+    # log time
+    logTime "Start of createSnapshotWrapper"
+
+    # get date time
+    DATE_TIME="\$(date "+%s")"
+
+    # get the instance name
+    INSTANCE_NAME=\$(getInstanceName)
+
+    # get the device id
+    INSTANCE_ID=\$(getInstanceId)
+
+    # get the instance zone
+    INSTANCE_ZONE=\$(getInstanceZone)
+
+    # get a list of all the devices
+    DEVICE_LIST=\$(getDeviceList \${INSTANCE_NAME})
+
+    # create the snapshots
+    echo "\${DEVICE_LIST}" | while read DEVICE_NAME
+    do
+        # create snapshot name
+        SNAPSHOT_NAME=\$(createSnapshotName \${DEVICE_NAME} \${INSTANCE_ID} \${DATE_TIME})
+
+        # create the snapshot
+        OUTPUT_SNAPSHOT_CREATION=\$(createSnapshot \${DEVICE_NAME} \${SNAPSHOT_NAME} \${INSTANCE_ZONE})
+    done
+}
+
+deleteSnapshotsWrapper()
+{
+    # log time
+    logTime "Start of deleteSnapshotsWrapper"
+
+    # get the deletion date for snapshots
+    DELETION_DATE=\$(getSnapshotDeletionDate "\${OLDER_THAN}")
+
+    # get list of snapshots for regex - saved in global array
+    getSnapshots "gcs-.*\${INSTANCE_ID}-.*"
+
+    # loop through snapshots
+    for snapshot in "\${SNAPSHOTS[@]}"
+    do
+        # get created date for snapshot
+        SNAPSHOT_CREATED_DATE=\$(getSnapshotCreatedDate \${snapshot})
+
+        # check if snapshot needs to be deleted
+        DELETION_CHECK=\$(checkSnapshotDeletion \${DELETION_DATE} \${SNAPSHOT_CREATED_DATE})
+
+        # delete snapshot
+        if [ "\${DELETION_CHECK}" -eq "1" ]; then
+            OUTPUT_SNAPSHOT_DELETION=\$(deleteSnapshot \${snapshot})
+        fi
+
+    done
+}
+
+# log time
+logTime "Start of Script"
+
+# create snapshot
+createSnapshotWrapper
+
+# delete snapshots older than 'x' days
+deleteSnapshotsWrapper
+
+# log time
+logTime "End of Script"
+EOF
+
+# make executable root only
+chmod 0755 ${FILE}
+
+# add to daily cron
+ln -sf ${FILE} /etc/cron.daily/${PACKAGE}
+
+# logrotate file for solr
+FILE=/etc/logrotate.d/${PACKAGE}
+cat > ${FILE} <<EOF
+# Logrotate file for ${PACKAGE}
+
+/var/log/${PACKAGE}/*.log {
+        compress
+    delaycompress
+        daily
+        missingok
+        rotate 7
+        notifempty
+}
+EOF
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} >> ${LOG}
+
+exit 0
