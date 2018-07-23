@@ -264,6 +264,9 @@ deleteSnapshotsWrapper()
 # log time
 logTime "Start of Script"
 
+# delete moot file system blocks
+fstrim /
+
 # create snapshot
 createSnapshotWrapper
 
