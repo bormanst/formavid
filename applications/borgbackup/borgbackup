@@ -31,16 +31,16 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# check cron job
-SCRIPT=/etc/cron.hourly/${PACKAGE}
-if [ -f "${SCRIPT}" ]; then
-    MESSSAGE="The cron job ${SCRIPT} already exists. Skipping configuration for ${PACKAGE}."
+# check dir
+APP_DIR=/usr/local/${PACKAGE}
+if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
-    echo "WARNING! Please review script for further details."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
     echo ""
     echo ""
     exit 0
@@ -97,6 +97,9 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
+# create app dir
+mkdir -p ${APP_DIR}
+
 # create log files
 PACKAGE_LOG_DIR=/var/log/${PACKAGE}
 mkdir -p ${PACKAGE_LOG_DIR}
@@ -139,8 +142,8 @@ BORG_PASSPHRASE="${BORGBACKUP_PASS}" borg init --info --encryption=repokey ${MOU
 # unmount fuse
 fusermount -u -z ${MOUNT}
 
-# create cron hourly main job
-FILE=/etc/cron.hourly/${PACKAGE}
+# create cron job
+FILE=${APP_DIR}/${PACKAGE}
 cat > ${FILE} <<EOF
 #!/bin/sh
 # limit resource impact
@@ -433,6 +436,9 @@ EOF
 # make executable root only
 chmod 0755 ${FILE}
 
+# add to daily cron
+ln -sf ${FILE} /etc/cron.hourly/${PACKAGE}
+
 # create borg gcs mount script
 FILE=/usr/bin/borg-mount-gcs-archive
 cat > ${FILE} <<EOF
@@ -518,12 +524,12 @@ EOF
 # make executable root only
 chmod 0700 ${FILE}
 
-# logrotate file for solr
-FILE=/etc/logrotate.d/borgbackup
+# logrotate file
+FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
-# Logrotate file for borgbackup
+# Logrotate file for ${PACKAGE}
 
-/var/log/borgbackup/*.log {
+/var/log/${PACKAGE}/*.log {
         compress
     delaycompress
         daily
@@ -532,6 +538,9 @@ cat > ${FILE} <<EOF
         notifempty
 }
 EOF
+
+# add to daily cron
+ln -sf ${FILE} /etc/logrotate.d/${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
