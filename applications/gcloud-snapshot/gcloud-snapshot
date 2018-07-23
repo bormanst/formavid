@@ -280,8 +280,8 @@ chmod 0755 ${FILE}
 # add to daily cron
 ln -sf ${FILE} /etc/cron.daily/${PACKAGE}
 
-# logrotate file for solr
-FILE=/etc/logrotate.d/${PACKAGE}
+# logrotate file
+FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
 
@@ -294,6 +294,9 @@ cat > ${FILE} <<EOF
         notifempty
 }
 EOF
+
+# add to logrotate
+ln -sf ${FILE} /etc/logrotate.d/${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
