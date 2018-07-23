@@ -539,7 +539,7 @@ cat > ${FILE} <<EOF
 }
 EOF
 
-# add to daily cron
+# add to logrotate
 ln -sf ${FILE} /etc/logrotate.d/${PACKAGE}
 
 # log completed
