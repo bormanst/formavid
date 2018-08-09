@@ -4,7 +4,7 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-PACKAGE=gcloud-snapshot
+PACKAGE=gcsnapshot
 
 # log check
 MESSSAGE="Check packages: ${PACKAGE}"
