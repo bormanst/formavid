@@ -13,7 +13,7 @@ echo ${MESSSAGE} >> ${LOG}
 # check packages
 PKG_CHECK=${PACKAGE^^}
 # check dir
-APP_DIR=/var/www/admin
+APP_DIR=/usr/local/${PACKAGE}
 if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""
