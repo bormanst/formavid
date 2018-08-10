@@ -53,7 +53,11 @@ export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 
 # begin deployment
 TIME_START=$( date +%s )
+echo "" >> ${LOG}
+echo "$( date ) -------------------" >> ${LOG}
 echo "$( date ) Deployment started." >> ${LOG}
+echo "$( date ) -------------------" >> ${LOG}
+echo "" >> ${LOG}
 
 # already run
 ALREADY_RUN="False"
