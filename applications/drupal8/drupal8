@@ -90,10 +90,16 @@ phpdismod xdebug
 chown admin:adm ${WWW_DIR}
 
 # download latest drupal8 and install
-su - admin -c "composer create-project -d ${WWW_DIR} drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}"
+COMMAND="composer create-project -d ${WWW_DIR} drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}"
+su - admin -c "${COMMAND}"
 
 # download and install modules
-su - admin -c "cd ${APP_DIR} && composer require ${DRUPAL_MODULE_LIST} drush/drush:${DRUSH_SPEC} drush/config-extra"
+COMMAND="composer require -d ${APP_DIR} ${DRUPAL_MODULE_LIST}"
+su - admin -c "${COMMAND}"
+
+# download and install drush
+COMMAND="composer require -d ${APP_DIR} drush/drush:${DRUSH_SPEC} drush/config-extra"
+su - admin -c "${COMMAND}"
 
 # restore apache2 perms
 chown www-data:www-data ${WWW_DIR}
