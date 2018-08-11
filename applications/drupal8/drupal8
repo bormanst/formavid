@@ -86,9 +86,6 @@ mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost
 # composer peformance issue
 phpdismod xdebug
 
-# temp perms for install
-chown admin:adm ${WWW_DIR}
-
 # download latest drupal8 and install
 COMMAND="composer create-project -d ${WWW_DIR} drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}"
 su - admin -c "${COMMAND}"
@@ -100,9 +97,6 @@ su - admin -c "${COMMAND}"
 # download and install drush
 COMMAND="composer require -d ${APP_DIR} drush/drush:${DRUSH_SPEC} drush/config-extra"
 su - admin -c "${COMMAND}"
-
-# restore apache2 perms
-chown www-data:www-data ${WWW_DIR}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay

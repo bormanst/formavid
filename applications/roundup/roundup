@@ -72,6 +72,9 @@ if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
     useradd -U -m -r -s /bin/bash ${DB_USER}
 fi
 
+# temp www-data perm
+usermod -aG www-data ${DB_USER}
+
 # set mysql vars
 BATCH_EX="--batch --execute"
 ROOT_CREDS="--user=root --password=${DB_PASS}"
@@ -93,9 +96,6 @@ else
     echo ""
     exit 0
 fi
-
-# temp perms for install
-chown ${DB_USER}:${DB_USER} /var/www
 
 # check pip install
 HOME="/home/${DB_USER}/.local"
@@ -265,8 +265,8 @@ sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.ht
 # create images dir: logo symlinked in create-drupal-stack.py
 mkdir -p ${APP_DIR}/html/images
 
-# restore apache2 perms
-chown www-data:www-data /var/www
+# remove www-data perms
+gpasswd -d ${DB_USER} www-data
 
 # give apache2 access
 chown -R www-data:www-data ${APP_DIR}

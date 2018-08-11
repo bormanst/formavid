@@ -47,7 +47,11 @@ fi
 if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
     useradd -g adm -m -s /bin/bash admin
     echo admin:${APP_PASS} | chpasswd
+    # give root perms
     usermod -aG sudo admin
+    # give perms to /var/www
+    usermod -aG www-data admin
+    chmod 0775 /var/www
 fi
 
 # create cssadmin user
