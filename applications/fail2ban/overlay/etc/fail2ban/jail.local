@@ -18,17 +18,17 @@ action    = %(action_mwl)s
 enabled   = true
 maxretry  = 3
 
-[ssh-ddos]
-enabled   = true
-maxretry  = 3
+# [ssh-ddos]
+# enabled   = true
+# maxretry  = 3
 
 [dropbear]
 enabled   = true
 maxretry  = 3
 
-[selinux-ssh]
-enabled   = true
-maxretry  = 3
+# [selinux-ssh]
+# enabled   = true
+# maxretry  = 3
 
 
 #
