@@ -72,9 +72,6 @@ if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
     useradd -U -m -r -s /bin/bash ${DB_USER}
 fi
 
-# temp www-data perm
-usermod -aG www-data ${DB_USER}
-
 # set mysql vars
 BATCH_EX="--batch --execute"
 ROOT_CREDS="--user=root --password=${DB_PASS}"
@@ -264,9 +261,6 @@ sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.ht
 
 # create images dir: logo symlinked in create-drupal-stack.py
 mkdir -p ${APP_DIR}/html/images
-
-# remove www-data perms
-gpasswd -d ${DB_USER} www-data
 
 # give apache2 access
 chown -R www-data:www-data ${APP_DIR}
