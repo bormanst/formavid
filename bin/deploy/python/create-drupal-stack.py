@@ -539,26 +539,34 @@ def main():
 
     # Check formavid logo.
     if not sitename.lower() == "formavidorg":
+        # set theme
+        lnTheme = "ln -s %s/themes/%s" % (drupaldir,sitename)
         # Admin Tools - use first "base" site logo.
-        logo = "/var/www/admin/images/logo.svg"
-        if not os.path.exists(logo):
+        lnFile = "logo.svg"
+        pathDir = "/var/www/admin/images"
+        pathFile = ''.join([pathDir,'/',lnFile])
+        if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink logo to admin pages.
-            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
+            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
         # Billing - use first "base" site logo.
-        logo = "/var/www/simpleinvoices/images/logo.svg"
-        if not os.path.exists(logo):
+        pathDir = "/var/www/simpleinvoices/images"
+        pathFile = ''.join([pathDir,'/',lnFile])
+        if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink logo to simpleinvoices.
-            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
+            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
         # Support - use first "base" site logo.
-        logo = "/var/www/support/html/images/logo.svg"
-        if not os.path.exists(logo):
+        pathDir = "/var/www/support/html/images"
+        pathFile = ''.join([pathDir,'/',lnFile])
+        if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink logo to support.
-            system("ln -s %s/themes/%s/logo.svg %s" % (drupaldir,sitename, logo))
+            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
         # Support - use first "base" site ico.
-        logo = "/var/www/support/html/images/favicon.ico"
-        if not os.path.exists(logo):
+        lnFile = "favicon.ico"
+        pathDir = "/var/www/support/html/images"
+        pathFile = ''.join([pathDir,'/',lnFile])
+        if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink ico to support.
-            system("ln -s %s/themes/%s/favicon.ico %s" % (drupaldir,sitename, logo))
+            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
 
     # Postfix - add virtual addresses.
     system("echo ''")
