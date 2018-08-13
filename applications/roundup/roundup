@@ -262,8 +262,8 @@ sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.ht
 # create images dir: logo symlinked in create-drupal-stack.py
 mkdir -p ${APP_DIR}/html/images
 
-# give apache2 access
-chown -R www-data:www-data ${APP_DIR}
+# give apache2 db access
+chown -R www-data:www-data ${APP_DIR}/db
 
 # apache2: create conf
 CONF=${ETC}/apache.conf
