@@ -548,25 +548,6 @@ def main():
         if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink logo to admin pages.
             system("%s/%s %s" % (lnTheme,lnFile,pathFile))
-        # Billing - use first "base" site logo.
-        pathDir = "/var/www/simpleinvoices/images"
-        pathFile = ''.join([pathDir,'/',lnFile])
-        if os.path.exists(pathDir) and not os.path.exists(pathFile):
-            # Symlink logo to simpleinvoices.
-            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
-        # Support - use first "base" site logo.
-        pathDir = "/var/www/support/html/images"
-        pathFile = ''.join([pathDir,'/',lnFile])
-        if os.path.exists(pathDir) and not os.path.exists(pathFile):
-            # Symlink logo to support.
-            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
-        # Support - use first "base" site ico.
-        lnFile = "favicon.ico"
-        pathDir = "/var/www/support/html/images"
-        pathFile = ''.join([pathDir,'/',lnFile])
-        if os.path.exists(pathDir) and not os.path.exists(pathFile):
-            # Symlink ico to support.
-            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
 
     # Postfix - add virtual addresses.
     system("echo ''")

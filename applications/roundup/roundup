@@ -251,13 +251,16 @@ done
 # create local documentation
 mkdir -p ${APP_DIR}/docs
 ln -sf ${HOME}/share/doc/roundup/html ${APP_DIR}/docs
-sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n:translate=\"\">local</a>);" ${APP_DIR}/html/page.html
+FILE=${APP_DIR}/html/page.html
+sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n:translate=\"\">local</a>);" ${FILE}
 
 # apply theme header
-sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/images\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${APP_DIR}/html/page.html
-sed -i "/<body/r /etc/formavid/header.txt" ${APP_DIR}/html/page.html
-sed -i "s/sedtoolname/Support/g" ${APP_DIR}/html/page.html
-sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${APP_DIR}/html/page.html
+sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/images\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${FILE}
+sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"/support/theme/css/header.css\" \/>" ${FILE}
+sed -i "/<body/r /etc/formavid/header.txt" ${FILE}
+sed -i "s/sedtoolname/Support/g" ${FILE}
+ssed -i "s/sedbrsize/48px/g" ${FILE}
+sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${FILE}
 
 # create images dir: logo symlinked in create-drupal-stack.py
 mkdir -p ${APP_DIR}/html/images
@@ -278,6 +281,7 @@ cat > ${CONF} <<EOF
     RedirectMatch ^/$ /${TRACKER}/
     PythonOptimize On
     Alias /${TRACKER}/docs ${APP_DIR}/docs/html
+    Alias /${TRACKER}/theme/css /var/www/drupal8/themes/${SITENAME}/components/asset-builds/css
     Alias /${TRACKER}/theme /var/www/drupal8/themes/${SITENAME}
     AliasMatch ^/${TRACKER}/@@file/(.*) ${APP_DIR}/html/\$1
     AliasMatch ^/${TRACKER}/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1

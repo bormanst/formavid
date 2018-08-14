@@ -73,6 +73,7 @@ if [ ! -f "${DEFAULT_HEADER}" ]; then
     # create etc default_envars to avoid git update overwrite
     cp -p ${FORMAVID}/sites-template/header.txt ${DEFAULT_HEADER}
     # tools: update header
+    sed -i "s/sedlowername/${SITENAME}/g" ${DEFAULT_HEADER}
     sed -i "s/sedsitename/${SITETITLE}/g" ${DEFAULT_HEADER}
 fi
 
@@ -80,6 +81,7 @@ fi
 sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/*.php
 sed -i "/<body/r ${DEFAULT_HEADER}" ${APP_DIR}/*.php
 sed -i "s/sedtoolname/Admin/g" ${APP_DIR}/*.php
+sed -i "s/sedbrsize/57px/g" ${APP_DIR}/*.php
 
 # stunnel conf
 CONF=/etc/stunnel/stunnel.conf

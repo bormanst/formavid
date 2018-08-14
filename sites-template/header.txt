@@ -1,8 +1,10 @@
-<header class="header" id="header" role="banner">
-<div class="header__name-and-slogan" id="name-and-slogan">
-  <h1 class="header__site-name" id="site-name">
-    <a href="/" title="Home" rel="home" class="header__logo" id="logo"><img src="/images/logo.svg" alt="Home" class="header__logo-image" /></a>
-    <a href="/" title="Home" class="header__site-link" rel="home" style="font-family:Arial,Helvetica,sans-serif;text-decoration:none;font-size:23px"><span>sedsitename sedtoolname</span></a>
-  </h1>
+<header class="header" role="banner">
+<div id="block-sedlowername-branding" class="block block-system block-system-branding-block">
+    <a href="/" title="Home" rel="home" class="site-logo">
+      <img src="theme/logo.svg" alt="Home" />
+    </a>
+    <div class="site-name">
+      <a href="/" title="Home" rel="home">sedsitename sedtoolname</a><br style="line-height: sedbrsize;" />
+    </div>
 </div>
 </header>

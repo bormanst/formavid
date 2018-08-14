@@ -173,6 +173,7 @@ cat > ${CONF} <<EOF
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
+    Alias /theme/css /var/www/drupal8/themes/${SITENAME}/components/asset-builds/css
     Alias /theme /var/www/drupal8/themes/${SITENAME}
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
@@ -210,14 +211,15 @@ a2ensite ${PACKAGE}
 sed -i "/127.0.1.1/s/$/ billing.${APP_HOSTNAME}/" /etc/hosts
 
 # apply theme.
-sed -i "/<title/d" ${APP_DIR}/templates/default/header.tpl
-sed -i "/favicon.ico/d" ${APP_DIR}/templates/default/header.tpl
-sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/templates/default/header.tpl
-sed -i "s/<style>/<!-- <style>/" ${APP_DIR}/templates/default/header.tpl
-sed -i "s/<\/style>/<\/style> -->/" ${APP_DIR}/templates/default/header.tpl
-sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${APP_DIR}/templates/default/header.tpl
-sed -i "/<body/r /etc/formavid/header.txt" ${APP_DIR}/templates/default/header.tpl
-sed -i "s/sedtoolname/Billing/g" ${APP_DIR}/templates/default/header.tpl
+FILE=${APP_DIR}/templates/default/header.tpl
+sed -i "/<title/d" ${FILE}
+sed -i "/favicon.ico/d" ${FILE}
+sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${FILE}
+sed -i '/base.css/d' ${FILE}
+sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${FILE}
+sed -i "/<body/r /etc/formavid/header.txt" ${FILE}
+sed -i "s/sedtoolname/Billing/g" ${FILE}
+sed -i "s/sedbrsize/50px/g" ${FILE}
 
 # clean up
 touch ${APP_DIR}/tmp/cache/
