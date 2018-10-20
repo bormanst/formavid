@@ -136,7 +136,7 @@ if [[ ${OLD_VER} != ${NEW_VER} ]]; then
     # backup composer.json
     MESSSAGE="$( date ) Copying composer.json to composer.json.old ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    cp -f ${JSON} ${DRUPAL}/composer.json.old
+    cp -f ${JSON} /var/www/admin/utils/composer.json.old
     # update composer.json
     MESSSAGE="$( date ) Updating composer.json to new core version..."
     echo ${MESSSAGE} | tee -a ${LOG}
