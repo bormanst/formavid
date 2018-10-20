@@ -1,0 +1,226 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=composer_d8up
+
+# set default drupal location
+export DRUPAL=/var/www/drupal8
+
+# check DRUPAL
+if [ ! -d "${DRUPAL}" ]; then
+    # notify dir should exist: this script is supposed to be located in ${DRUPAL}
+    printf "\n\nWARNING! ${PACKAGE} depends on drupal's location being in ${DRUPAL}."
+    printf "\nWARNING! Please ensure that drupal is located in ${DRUPAL}."
+    printf "\nWARNING! OR"
+    printf "\nWARNING! Modify drupal's default location in ${PACKAGE}.\n\n"
+    exit 0
+fi
+
+# check composer format
+JSON=${DRUPAL}/composer.json
+if [ `grep -c '"replace": {' ${JSON}` != 0  ]; then
+    # notify format
+    printf "\n\nWARNING! The default ${JSON} is not compatible with this script."
+    printf "\nWARNING! A one-time manual edit of ${JSON} is required."
+    printf "\n\n\nWARNING! This script depends on drupal/core being a requirement."
+    printf "\nWARNING! Please modify ${JSON} by adding drupal/core to the \"require\": {"
+    printf "\nWARNING! section AND removing the corresponding \"replace\": { section."
+    printf "\nWARNING! Then run this script or modify accordingly.\n\n"
+    exit 0
+fi
+
+# notify update
+printf "\n\nWARNING! You are about to update your drupal installation using composer."
+printf "\nWARNING! This includes core, dependent modules, and possibly symphony modules."
+printf "\nWARNING! It will affect all drupal sites located in the default directory."
+printf "\nWARNING! It is wise to perform a backup prior to updating via composer."
+printf "\nWARNING! Keep a copy of the compsoser.json file in the default directory."
+printf "\n\nWARNING! This will automatically update dbs and clear caches!"
+printf "\nWARNING! Save any work prior to running this script."
+printf "\nWARNING! Please notify other users if applicable."
+printf "\n\nNote: Some updates may be blocked by unmet installs and/or dependecies."
+printf "\nNote: File composer.json may have to be manually modified to resolve issues."
+printf "\nNote: Please see /var/log/formavid/update_drupal.log for relevant messages.\n\n"
+
+# verify update
+read -p "Continue with composer update to drupal 8 directory (y/n)?" CHOICE
+case "${CHOICE^^}" in
+    Y|YES ) :;;
+    * ) exit 0;;
+esac
+
+# export log
+LOG=${FORMAVID_LOGS}/update_drupal.log
+
+# touch in case
+touch ${LOG}
+
+# set log perms
+chown admin:adm ${LOG}
+chmod 0644 ${LOG}
+
+# start updates
+MESSSAGE="$( date ) ----------------------------"
+echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE="$( date ) Starting drupal 8 updates..."
+echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE="$( date ) ----------------------------"
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# Prepare for the hogs.
+MESSSAGE="$( date ) Set php.ini memory_limit = -1"
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# Get current php memory_limit.
+MEMSTORE=`php -i | grep memory_limit | awk 'NF>1{print $NF}'`
+
+# Don't leave memory_limit in open state.
+if [[ -z "${MEMSTORE}" ]] || [[ ${MEMSTORE} == "-1" ]]; then MEMSTORE="256MB"; fi
+
+# Set php memory_limit = -1.
+sed -i "/^memory_limit *=/ s|= *[^ ]\+|= -1|g" /etc/php/7.0/cli/php.ini
+
+# Get version to update to.
+OLD_VER=`drush -r ${DRUPAL} --fields=drupal-version status | sed -e "s/.*\s\s//g" | xargs`
+echo ""
+
+# Notify of format.
+printf "\n\nEntering a new core version of x.x.x will backup and then update composer.json."
+printf "\nUpdates are then applied using the new composer.json file."
+printf "\nKeeping the existing version will attempt to only apply other updates.\n\n"
+
+# Get version.
+read -p "Please enter new drupal core version or press enter to keep ${OLD_VER}:" NEW_VER
+
+# clean input
+NEW_VER=${NEW_VER} | xargs
+
+# check input or default
+if [[ -z "${NEW_VER}" ]] || [[ $( echo "${NEW_VER}" | awk -F"." '{print NF-1}' ) != 2 ]]; then NEW_VER=${OLD_VER}; fi
+
+# set log dir
+FORMAVID_LOGS=/var/log/formavid
+
+# check log dir exists
+if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
+
+# put sites in maintenance mode
+MESSSAGE="$( date ) Putting drupal sites into maintenance mode..."
+echo ${MESSSAGE} | tee -a ${LOG}
+ENABLE_LIST=""
+PARENT_DIR=${DRUPAL}/sites
+for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
+    # get site name
+    SITE_NAME=${CHILD_DIR##*/}
+    # get drush base ex
+    DRUSH_EXECUTE="drush -r ${DRUPAL} -l http://${SITE_NAME}"
+    # check site status
+    if [ "`${DRUSH_EXECUTE} sget system.maintenance_mode`" != "1" ]; then
+        # add to enable list
+        ENABLE_LIST=${ENABLE_LIST}${SITE_NAME}" "
+        # disable site
+        MESSSAGE="$( date ) Putting drupal site ${SITE_NAME} into maintenance mode..."
+        echo ${MESSSAGE} | tee -a ${LOG}
+        ${DRUSH_EXECUTE} sset -y system.maintenance_mode 1 | tee -a ${LOG}
+    fi
+done
+
+# check update core
+if [[ ${OLD_VER} != ${NEW_VER} ]]; then
+    # drupal core update via composer
+    MESSSAGE="$( date ) Updating core from ${OLD_VER} to ${NEW_VER}..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    # backup composer.json
+    MESSSAGE="$( date ) Copying composer.json to composer.json.old ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    cp -f ${JSON} ${DRUPAL}/composer.json.old
+    # update composer.json
+    MESSSAGE="$( date ) Updating composer.json to new core version..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    sed -i "s/\"drupal\/core\":.*/\"drupal\/core\": \"~${NEW_VER}\"\,/" ${JSON}
+else
+    # drupal core update via composer
+    MESSSAGE="$( date ) Core unchanged: checking update other components..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+fi
+
+# composer clear cache
+MESSSAGE="$( date ) Clearing composer caches..."
+echo ${MESSSAGE} | tee -a ${LOG}
+su - admin -c "composer clear-cache -d ${DRUPAL} 2>&1 | tee -a ${LOG}"
+
+# check drupal dependencies
+MESSSAGE="$( date ) Check outdated drupal components..."
+echo ${MESSSAGE} | tee -a ${LOG}
+su - admin -c "composer outdated -d ${DRUPAL} drupal/* 2>&1 | tee -a ${LOG}"
+
+# set HAS_UPDATES
+HAS_UPDATES=false
+
+# check symfony dependencies
+if [ $(composer prohibits -d ${DRUPAL} drupal/core:${NEW_VER} 2>&1 | grep -c "There is no installed package depending on") != 1 ]; then
+    # update symfony dependencies
+    MESSSAGE="$( date ) Updating drupal and symfony dependencies..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    su - admin -c "composer update -d ${DRUPAL} drupal/* symfony/* --with-dependencies 2>&1 | tee -a ${LOG}"
+    HAS_UPDATES=true
+else
+    # update drupal dependencies
+    MESSSAGE="$( date ) Updating drupal..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    # check no updates
+    if [ $(su - admin -c "composer update -d ${DRUPAL} drupal/* --with-dependencies 2>&1 | tee -a ${LOG} | grep -c 'Nothing to install or update'") != 1 ]; then HAS_UPDATES=true; fi
+fi
+
+# check HAS_UPDATES
+if ${HAS_UPDATES}; then
+    # update sites
+    MESSSAGE="$( date ) Updating drupal sites..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    PARENT_DIR=${DRUPAL}/sites
+    for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
+        SITE_NAME=${CHILD_DIR##*/}
+        # get site name
+        DRUSH_EXECUTE="drush -r ${DRUPAL} -l http://${SITE_NAME}"
+        # update dbs
+        MESSSAGE="$( date ) Updating database for ${SITE_NAME} ..."
+        echo ${MESSSAGE} | tee -a ${LOG}
+        ${DRUSH_EXECUTE} updatedb -y | tee -a ${LOG}
+        # clear caches
+        MESSSAGE="$( date ) Rebuilding caches for ${SITE_NAME} ..."
+        echo ${MESSSAGE} | tee -a ${LOG}
+        ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
+    done
+fi
+
+# enable selected sites
+MESSSAGE="$( date ) Returning drupal sites to live mode..."
+echo ${MESSSAGE} | tee -a ${LOG}
+for SITE_NAME in ${ENABLE_LIST}; do
+    # get drush base ex
+    DRUSH_EXECUTE="drush -r ${DRUPAL} -l http://${SITE_NAME}"
+    # enable site
+    MESSSAGE="$( date ) Returning drupal site ${SITE_NAME} to live mode..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    ${DRUSH_EXECUTE} sset -y system.maintenance_mode 0 | tee -a ${LOG}
+done
+
+# reset php.ini memory_limit
+MESSSAGE="$( date ) Set php.ini memory_limit = ${MEMSTORE}"
+echo ${MESSSAGE} | tee -a ${LOG}
+sed -i "/^memory_limit *=/ s|= *[^ ]\+|= ${MEMSTORE}|g" /etc/php/7.0/cli/php.ini
+
+# finished update
+MESSSAGE="$( date ) ----------------------------"
+echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE="$( date ) Finished drupal 8 updates."
+echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE="$( date ) ----------------------------"
+echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE=""
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0
