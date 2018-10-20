@@ -174,7 +174,7 @@ EOF
 
 # Loop through all sites in drupal.
 # Drupal sites, by custom scripted design, will have a "." in their directory name.
-CRON_DRUPAL=/etc/cron.hourly/drupal8
+CRON_DRUPAL=/etc/cron.daily/drupal8
 cat > ${CRON_DRUPAL} <<EOF
 #!/bin/bash -e
 # Trigger drush cron
