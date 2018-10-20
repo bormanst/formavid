@@ -25,7 +25,7 @@ SWAPFILE=/swapfile
 if [ $(swapon -s | grep -ci "${SWAPFILE}") -eq 0 ];  then
     # add permanent swap:
     echo "$( date ) Adding permanent swap." >> ${LOG}
-    fallocate -l 1G ${SWAPFILE}
+    fallocate -l 2G ${SWAPFILE}
     chmod 600 ${SWAPFILE}
     mkswap ${SWAPFILE}
     swapon ${SWAPFILE}
