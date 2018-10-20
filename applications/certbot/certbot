@@ -103,7 +103,7 @@ FILE=/etc/logrotate.d/letsencrypt
 cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
 
-/var/log/letsencrypt/*.log {
+/var/log/letsencrypt/letsencrypt.* {
         rotate 7
         compress
         delaycompress
