@@ -95,6 +95,24 @@ for f in /etc/php/?.?/cli/conf.d/20-xdebug.ini; do
     echo "xdebug.max_nesting_level=256" >> $f
 done
 
+# append xdebug settings to apache2/php.init
+apache2_ini=/etc/php/7.0/apache2/php.ini
+cat >> ${apache2_ini} <<EOF
+; x-debug settings:
+;zend_extension=/usr/lib/php/20151012/xdebug.so
+;xdebug.remote_enable=1
+;xdebug.remote_host=127.0.0.1
+;xdebug.remote_port=9000
+;xdebug.remote_handler=dbgp
+;xdebug.remote_mode=req
+;xdebug.remote_autostart=false
+;xdebug.idekey=xdebug-atom
+;xdebug.remote_log=/var/log/apache2/xdebug.log
+;xdebug.collect_assignments=1
+;xdebug.collect_return=1
+;xdebug.collect_vars=1
+EOF
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
