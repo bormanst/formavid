@@ -1,0 +1,69 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=xdebugen
+
+# set php.ini location
+export PHP=/etc/php/7.0/apache2
+
+# check PHP
+if [ ! -d "${PHP}" ]; then
+    # notify dir should exist: this script is supposed to be located in ${PHP}
+    printf "\n\nWARNING! ${PACKAGE} depends on apache2 php.ini location in ${PHP}."
+    printf "\nWARNING! Please ensure that apache2 php.ini is located in ${PHP}.\n\n"
+    exit 0
+fi
+
+# notify change
+printf "\n\nWARNING! This script must be run with sudo privileges."
+printf "\n\nWARNING! You are about to enable xdebug in your apache2 php.ini."
+printf "\nWARNING! This script will attempt to disable opcache too."
+printf "\nWARNING! This will affect the performance of ALL php realated apache sites."
+printf "\nWARNING! It should be disabled with xdebugdis when debugging is completed."
+printf "\n\nNote: The xdebug values can be manually modified if desired."
+printf "\nNote: The addition of xdebug parameters will require modifying this"
+printf "\nNote: script along with the corresponding part of the xdebugdis script."
+printf "\n\nWARNING! This will automatically restart apache2 to apply changes!"
+printf "\nWARNING! Save any work prior to running this script."
+printf "\nWARNING! Please notify other users if applicable.\n\n"
+
+# verify update
+read -p "Continue with enabling xdebug (y/n)?" CHOICE
+case "${CHOICE^^}" in
+    Y|YES ) :;;
+    * ) exit 0;;
+esac
+
+# set php.ini file
+FILE=${PHP}/php.ini
+
+# disable opcache which is known to cause xdebug issues
+sed -i "/^;opcache.enable=/s/;//g" ${FILE}
+sed -i "/^;opcache.enable_cli=/s/;//g" ${FILE}
+
+# enable xdebug parameters
+sed -i "/^;zend_extension=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_enable=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_host=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_port=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_handler=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_mode=/s/;//g" ${FILE}
+sed -i "/^;xdebug.remote_autostart=/s/;//g" ${FILE}
+sed -i "/^;xdebug.idekey=/s/;//g" ${FILE}
+
+# notify of changes
+printf "\n\nThe xdebug related parameters have been enabled."
+printf "\n\nRestarting apache2..."
+
+# restart apache
+systemctl restart apache2
+
+# notify completed
+printf "\n\nXdebugging should now be available for your apache php sites.\n\n"
+printf "\nPlease confirm by viewing phpinfo() if there are any issues."
+printf "\nVerify xdebug settings and that opcache is disabled.\n\n"
+
+exit 0
