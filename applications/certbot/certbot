@@ -98,6 +98,21 @@ systemctl restart stunnel4
 # restart apache
 systemctl restart apache2
 
+# logrotate file for letsencrypt
+FILE=/etc/logrotate.d/letsencrypt
+cat > ${FILE} <<EOF
+# Logrotate file for letsencrypt
+
+/var/log/letsencrypt/*.log {
+        rotate 7
+        compress
+        delaycompress
+        ifempty
+        missingok
+        daily
+}
+EOF
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
