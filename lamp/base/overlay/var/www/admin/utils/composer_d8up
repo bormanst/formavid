@@ -7,7 +7,7 @@
 PACKAGE=composer_d8up
 
 # set default drupal location
-export DRUPAL=/var/www/drupal8
+export DRUPAL=/var/www/drupal8/prod
 
 # check DRUPAL
 if [ ! -d "${DRUPAL}" ]; then
@@ -78,13 +78,14 @@ echo ${MESSSAGE} | tee -a ${LOG}
 MEMSTORE=`php -i | grep memory_limit | awk 'NF>1{print $NF}'`
 
 # Don't leave memory_limit in open state.
-if [[ -z "${MEMSTORE}" ]] || [[ ${MEMSTORE} == "-1" ]]; then MEMSTORE="256MB"; fi
+# if [[ -z "${MEMSTORE}" ]] || [[ ${MEMSTORE} == "-1" ]]; then MEMSTORE="256MB"; fi
+if [[ -z "${MEMSTORE}" ]]; then MEMSTORE="-1"; fi
 
 # Set php memory_limit = -1.
 sed -i "/^memory_limit *=/ s|= *[^ ]\+|= -1|g" /etc/php/7.0/cli/php.ini
 
 # Get version to update to.
-OLD_VER=`drush -r ${DRUPAL} --fields=drupal-version status | sed -e "s/.*\s\s//g" | xargs`
+OLD_VER=`drush -r ${DRUPAL} --fields=drupal-version status | sed -e "s/Drupal\sversion\s:\s//g" | xargs`
 echo ""
 
 # Notify of format.
@@ -111,7 +112,7 @@ if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 MESSSAGE="$( date ) Putting drupal sites into maintenance mode..."
 echo ${MESSSAGE} | tee -a ${LOG}
 ENABLE_LIST=""
-PARENT_DIR=${DRUPAL}/sites
+PARENT_DIR=${DRUPAL}/web/sites
 for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
     # get site name
     SITE_NAME=${CHILD_DIR##*/}
@@ -125,6 +126,10 @@ for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort
         MESSSAGE="$( date ) Putting drupal site ${SITE_NAME} into maintenance mode..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} sset -y system.maintenance_mode 1 | tee -a ${LOG}
+        # clear caches
+        MESSSAGE="$( date ) Rebuilding caches for ${SITE_NAME} ..."
+        echo ${MESSSAGE} | tee -a ${LOG}
+        ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
     fi
 done
 
@@ -136,7 +141,7 @@ if [[ ${OLD_VER} != ${NEW_VER} ]]; then
     # backup composer.json
     MESSSAGE="$( date ) Copying composer.json to composer.json.old ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    cp -f ${JSON} /var/www/admin/utils/composer.json.old
+    cp -f ${JSON} composer.json.old
     # update composer.json
     MESSSAGE="$( date ) Updating composer.json to new core version..."
     echo ${MESSSAGE} | tee -a ${LOG}
@@ -180,7 +185,6 @@ if ${HAS_UPDATES}; then
     # update sites
     MESSSAGE="$( date ) Updating drupal sites..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    PARENT_DIR=${DRUPAL}/sites
     for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
         SITE_NAME=${CHILD_DIR##*/}
         # get site name
@@ -206,6 +210,10 @@ for SITE_NAME in ${ENABLE_LIST}; do
     MESSSAGE="$( date ) Returning drupal site ${SITE_NAME} to live mode..."
     echo ${MESSSAGE} | tee -a ${LOG}
     ${DRUSH_EXECUTE} sset -y system.maintenance_mode 0 | tee -a ${LOG}
+    # clear caches
+    MESSSAGE="$( date ) Rebuilding caches for ${SITE_NAME} ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
 done
 
 # reset php.ini memory_limit
