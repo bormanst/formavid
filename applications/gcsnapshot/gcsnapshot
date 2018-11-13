@@ -288,13 +288,13 @@ FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
 
-/var/log/${PACKAGE}/*.log {
+/var/log/gcloud-snapshot/*.log /var/log/gcloud-snapshot/*.log.* {
         compress
-    delaycompress
+        delaycompress
         daily
         missingok
         rotate 7
-        notifempty
+        ifempty
 }
 EOF
 
