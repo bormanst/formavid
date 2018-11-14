@@ -172,22 +172,28 @@ def main():
     # log info
     logging.info('Solr removals complete.')
 
+    # TODO: Add option to specify subdir
+    drupalsubdir = "prod"
+
+    # Sites - drupal loaction.
+    drupaldir = "/".join(["/var/www/drupal8",drupalsubdir,"web"])
+
     # Drupal - remove stack sites.
     system("echo ''")
     system("echo 'Removing drupal stack sites for %s...'" % hostname)
     system("echo ''")
-    system("touch /var/www/drupal8/sites/poll.%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/poll.%s" % hostname)
-    system("touch /var/www/drupal8/sites/forum.%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/forum.%s" % hostname)
-    system("touch /var/www/drupal8/sites/book.%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/book.%s" % hostname)
-    system("touch /var/www/drupal8/sites/blog.%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/blog.%s" % hostname)
-    system("touch /var/www/drupal8/sites/aggregator.%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/aggregator.%s" % hostname)
-    system("touch /var/www/drupal8/sites/%s" % hostname)
-    system("rm -rf /var/www/drupal8/sites/%s" % hostname)
+    system("touch %s/sites/poll.%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/poll.%s" % (drupaldir, hostname))
+    system("touch %s/sites/forum.%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/forum.%s" % (drupaldir, hostname))
+    system("touch %s/sites/book.%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/book.%s" % (drupaldir, hostname))
+    system("touch %s/sites/blog.%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/blog.%s" % (drupaldir, hostname))
+    system("touch %s/sites/aggregator.%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/aggregator.%s" % (drupaldir, hostname))
+    system("touch %s/sites/%s" % (drupaldir, hostname))
+    system("rm -rf %s/sites/%s" % (drupaldir, hostname))
     # log info
     logging.info('Drupal directory removals complete.')
 
@@ -205,8 +211,8 @@ def main():
     system("echo ''")
     system("echo 'Removing drupal theme for %s...'" % hostname)
     system("echo ''")
-    system("touch /var/www/drupal8/themes/%s" % sitename)
-    system("rm -rf /var/www/drupal8/themes/%s" % sitename)
+    system("touch %s/themes/%s" % (drupaldir, sitename))
+    system("rm -rf %s/themes/%s" % (drupaldir, sitename))
     # log info
     logging.info('Removed drupal theme for %s.' % hostname)
 
@@ -235,6 +241,10 @@ def main():
     finally:
         if con:
             con.close()
+
+    # Apache - remove stack conf.
+    system("systemctl restart apache2")
+    logging.info('Restarted apache2 after removals completed.')
 
     # Finished removing stack.
     system("echo ''")

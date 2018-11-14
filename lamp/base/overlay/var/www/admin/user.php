@@ -65,8 +65,8 @@
     <ul>
       <li>Initial password same as entered for Drupal7/Solr admin during appliance install.</li>
       <li>Theme design privileges.</li>
-      <li>Access and permissions to /var/www/drupal8/themes directory.</li>
-      <li>ProFTPD account mapped to /var/www/drupal8/themes directory.</li>
+      <li>Access and permissions to /var/www/drupal8/prod/web/themes directory.</li>
+      <li>ProFTPD account mapped to /var/www/drupal8/prod/web/themes directory.</li>
       <li>Access drupal site themes via ftp://admin.HOSTNAME using cssadmin:password account.</li>
       <li>Gulp.</li>
       <li>Shell-In-A-Box.</li>
@@ -100,8 +100,8 @@
       <li>Access drupal site themes via ftp://admin.HOSTNAME using cssadmin:password account.</li>
       <li>Initial password same as entered for Drupal8/Solr admin during appliance install.</li>
       <li>Theme design privileges.</li>
-      <li>Access and permissions to /var/www/drupal8/themes directory.</li>
-      <li>ProFTPD account mapped to /var/www/drupal8/themes directory.</li>
+      <li>Access and permissions to /var/www/drupal8/prod/web/themes directory.</li>
+      <li>ProFTPD account mapped to /var/www/drupal8/prod/web/themes directory.</li>
     </ul>
   </ul>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3></div><br>

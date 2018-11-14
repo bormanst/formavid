@@ -102,8 +102,8 @@ cat > ${APACHE_CONF} <<EOF
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    Alias /theme/css /var/www/drupal8/themes/${SITENAME}/components/asset-builds/css
-    Alias /theme /var/www/drupal8/themes/${SITENAME}
+    Alias /theme/css /var/www/drupal8/prod/web/themes/${SITENAME}/components/asset-builds/css
+    Alias /theme /var/www/drupal8/prod/web/themes/${SITENAME}
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
         Order deny,allow

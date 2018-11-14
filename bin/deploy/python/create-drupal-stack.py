@@ -282,8 +282,11 @@ def main():
     system("echo 'Creating default site for %s - this takes a while...'" % hostname)
     system("echo ''")
 
+    # TODO: Add option to specify subdir
+    drupalsubdir = "prod"
+
     # Sites - drupal loaction.
-    drupaldir = "/var/www/drupal8"
+    drupaldir = "/".join(["/var/www/drupal8",drupalsubdir])
 
     # Sites - templates location.
     templates = formavid
@@ -312,7 +315,7 @@ def main():
         solrdata = "/var/lib/solr/data"
         system("mv %s/%s %s" % (templates,sitename,solrdata))
         # Solr - copy drupal solr conf.
-        apachesolr = "/".join([drupaldir,"modules/contrib/search_api_solr/solr-conf/7.x"])
+        apachesolr = "/".join([drupaldir,"web/modules/contrib/search_api_solr/solr-conf/7.x"])
         for sitetype in siteTypes:
             system("cp -r %s %s/%s/%s/conf" % (apachesolr,solrdata,sitename,sitetype))
         # Solr - ensure owner.
@@ -340,6 +343,9 @@ def main():
     # Apache - replace sitehostname in confs.
     system("find %s/sites-staging -name \"*.conf\" -exec sed -i \"s/sitehostname/%s/g\" '{}' \\;" % (templates,hostname))
 
+    # Apache - replace drupalsubdir in confs.
+    system("find %s/sites-staging -name \"*.conf\" -exec sed -i \"s/drupalsubdir/%s/g\" '{}' \\;" % (templates,drupalsubdir))
+
     # Apache - add sites available.
     system("cp -f %s/sites-staging/sitehostname.conf /etc/apache2/sites-available/%s.conf" % (templates,hostname))
 
@@ -359,9 +365,10 @@ def main():
         system("echo ''")
         system("echo 'Creating %s drupal site...'" % baseUri)
         system("echo ''")
-        system("cp -f %s/sites/default/stack.settings.php %s/sites/default/settings.php" % (drupaldir,drupaldir))
-        system("chown www-data:www-data %s/sites/default/settings.php" % drupaldir)
-        system("drush -r %s -q site-install standard -y --account-name=admin --account-pass=%s --db-su=root --db-su-pw=%s --db-url=mysql://admin:%s@localhost/%s_%s --site-name=\"%s%s\" --account-mail=admin@%s --site-mail=admin@%s --sites-subdir=%s" % (drupaldir,password,dbpass,password,sitename,sitetype,sitetitle,sitetypetitle,hostname,hostname,baseUri))
+        system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\" --no-interaction" % (drupaldir,baseUri,baseUri,baseUri))
+        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\" % (drupaldir,baseUri,sitetitle,sitetypetitle,dbpass,sitetitle,hostname,hostname,password))
+        system("chmod 0777 %s/web/sites/%s/files" % (drupaldir,baseUri))
+        system("chmod 0444 %s/web/sites/%s/settings.php" % (drupaldir,baseUri))
         # Sites - set trusted_host_patterns.
         esc_baseUri = baseUri.replace(".","\\\\\.")
         new_lines="\$settings['trusted_host_patterns'] = array\(\\n\\t'^" + esc_baseUri + "\$',\\n\);\\n"
@@ -369,10 +376,6 @@ def main():
         # Sites - set private file path.
         system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'sites\/%s\/files\/private';/g\" %s/sites/%s/settings.php" % (hostname,drupaldir,hostname))
         # Sites - update settings.
-        system("chown root:www-data %s/sites/%s/settings.php" % (drupaldir,baseUri))
-        system("chmod 640 %s/sites/%s/settings.php" % (drupaldir,baseUri))
-        system("chown -R www-data:www-data %s/sites/%s/files" % (drupaldir,baseUri))
-        system("chmod 777 %s/sites/%s/files" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'The drupal site %s has been created.'" % baseUri)
         system("echo ''")
@@ -380,9 +383,6 @@ def main():
         logging.info('The drupal site %s has been created.' % baseUri)
 
     # Sites - clean up.
-    system("cp -f %s/sites/default/stack.settings.php %s/sites/default/settings.php" % (drupaldir,drupaldir))
-    system("chown root:www-data %s/sites/default/settings.php" % drupaldir)
-    system("chmod 640 %s/sites/default/settings.php" % drupaldir)
     system("rm -rf %s/sites-staging" % templates)
 
     try:

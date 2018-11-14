@@ -15,8 +15,8 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # set specs
-DRUPAL_SPEC=^8.5
-DRUSH_SPEC=^8.0
+DRUPAL_SPEC=^8.6
+DRUSH_SPEC=^9.0
 
 # set dirs
 DRUPAL_DIR=${PACKAGE}
@@ -87,15 +87,43 @@ mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost
 phpdismod xdebug
 
 # download latest drupal8 and install
-COMMAND="composer create-project -d ${WWW_DIR} drupal/drupal:${DRUPAL_SPEC} ${DRUPAL_DIR}"
+
+# make drupal dir
+COMMAND="mkdir -p ${APP_DIR}"
+su - admin -c "${COMMAND}"
+
+# change to drupal dir
+COMMAND="cd ${APP_DIR}"
+su - admin -c "${COMMAND}"
+
+# load composer console in drupal root
+COMMAND="composer require -d ${APP_DIR} drupal/console:~1.0 --prefer-dist --optimize-autoloader"
+su - admin -c "${COMMAND}"
+
+# console-extend-plugin causes install issues - automatically recreated later
+COMMAND="rm -rf ${APP_DIR}/vendor/drupal/console-extend-plugin"
+su - admin -c "${COMMAND}"
+
+# drupal project subdir
+PROJECT="prod"
+PROJECT_DIR=${APP_DIR}/${PROJECT}
+COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --prefer-dist --no-progress --no-interaction"
+su - admin -c "${COMMAND}"
+
+# update console
+COMMAND="composer update -d ${APP_DIR} drupal/console --with-dependencies"
+su - admin -c "${COMMAND}"
+
+# init drupal project console
+COMMAND="drupal init --destination=${PROJECT_DIR}/console/ -q"
+su - admin -c "${COMMAND}"
+
+# copy chain files required for drupal project
+COMMAND="cp ${PROJECT_DIR}/vendor/drupal/console-core/dist/chain/* ${PROJECT_DIR}/console/chain"
 su - admin -c "${COMMAND}"
 
 # download and install modules
-COMMAND="composer require -d ${APP_DIR} ${DRUPAL_MODULE_LIST}"
-su - admin -c "${COMMAND}"
-
-# download and install drush
-COMMAND="composer require -d ${APP_DIR} drush/drush:${DRUSH_SPEC} drush/config-extra"
+COMMAND="composer require -d ${PROJECT_DIR} ${DRUPAL_MODULE_LIST}"
 su - admin -c "${COMMAND}"
 
 # apply overlay
@@ -109,8 +137,8 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # add drush symlinks
-ln -sf ${APP_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
-ln -sf ${APP_DIR}/vendor/drush/drush/drush.complete.sh /etc/bash_completion.d/drush
+ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
+ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush.complete.sh /etc/bash_completion.d/drush
 
 # add drush configs
 mkdir -p /etc/drush
@@ -119,11 +147,6 @@ cat > /etc/drush/drushrc.php <<EOF
 // by default use the drupal root directory
 \$options['r'] = '${APP_DIR}';
 EOF
-
-# update settings
-CONF=${APP_DIR}/sites/default/settings.php
-cp ${APP_DIR}/sites/default/default.settings.php ${CONF}
-chown www-data:www-data ${CONF}
 
 # update nodejs to latest
 npm cache clean -f
@@ -140,14 +163,19 @@ ln -s /usr/local/bin/npm /usr/bin/npm
 npm install -g gulp-cli
 
 # copy custom package.json
-cp -fp ${FORMAVID}/gulp/package.json ${APP_DIR}/themes
+cp -fp ${FORMAVID}/gulp/package.json ${PROJECT_DIR}/web/themes
 
 # set cssadmin perms
-chown -R cssadmin:cssadmin ${APP_DIR}/themes
+chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 
 # preload node_modules for themes
 # background safe: depends on gulp-cli
-su - cssadmin -c "cd ${APP_DIR}/themes && npm install --unsafe-perm"
+su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
+
+# update settings
+CONF=${PROJECT_DIR}/web/sites/default/settings.php
+cp ${PROJECT_DIR}/web/sites/default/default.settings.php ${CONF}
+chown www-data:www-data ${CONF}
 
 # insert "www.example.com" as default trusted_host (inithook will adjust)
 NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.com\$',\n\);\n"
@@ -186,7 +214,7 @@ cat > ${CRON_DRUPAL} <<EOF
 sites=()
 while read -r -d ''; do
     sites+=("\$REPLY")
-done < <(cd ${APP_DIR}/sites/; find *.* -maxdepth 0 -type d -print0)
+done < <(cd ${PROJECT_DIR}/web/sites/; find *.* -maxdepth 0 -type d -print0)
 # Run cron on the sites.
 len=\${#sites[*]}
 for((i=0; i<\$len; i++)); do
@@ -197,22 +225,6 @@ chmod +x ${CRON_DRUPAL}
 
 # configure apache
 a2enmod rewrite
-
-# make copy of settings.php
-cp ${APP_DIR}/sites/default/settings.php ${APP_DIR}/sites/default/stack.settings.php
-
-# redirect default install.php to base site.
-INSTALL_DRUPAL=/var/www/drupal8/install.php
-rm -f ${INSTALL_DRUPAL}
-cat > ${INSTALL_DRUPAL} <<EOF
-<?php
-/* Redirect browser */
-header("Location: http://${APP_HOSTNAME}");
-
-/* Make sure that code below does not get executed when we redirect. */
-exit;
-?>
-EOF
 
 # create base site
 ${FORMAVID}/bin/deploy/python/create-drupal-stack.py

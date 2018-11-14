@@ -50,11 +50,16 @@ if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
     usermod -aG sudo admin
 fi
 
+# drupal project subdir
+PROJECT="prod"
+DRUPAL_DIR="/var/www/drupal8"
+PROJECT_DIR=${DRUPAL_DIR}/${PROJECT}
+
 # create cssadmin user
 if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then
     useradd -U -m -s /bin/bash cssadmin
     echo cssadmin:${APP_PASS} | chpasswd
-    echo "cd /var/www/drupal8/themes" >> /home/cssadmin/.bashrc
+    echo "cd ${PROJECT_DIR}/web/themes" >> /home/cssadmin/.bashrc
 fi
 
 # tools: add hosts entry
@@ -244,4 +249,3 @@ MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
 
 exit 0
-

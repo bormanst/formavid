@@ -20,7 +20,7 @@
     <li><b>Images:</b> /var/www/admin/images</li>
     <li><b>Security (apache2 authn_dbm):</b> /usr/local/apache2/passwd/admintools/passwords.dbm</li>
     <li><b>Apache configuration:</b> /etc/apache2/sites-available/zzz-admin.sedhostname.conf</li>
-    <li><b>CSS (symlinked):</b> /var/www/drupal8/themes/sedlowername</li>
+    <li><b>CSS (symlinked):</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
   </ul>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools Page Apache Passwords</h3></div><br>
   <ul>

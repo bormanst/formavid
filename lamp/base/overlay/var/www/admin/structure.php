@@ -39,7 +39,7 @@
     <li><b>Users:</b> htdbm -bc /usr/local/apache2/passwd/admintools/passwords.dbm username password</li>
     <li><b>php Pages:</b> /var/www/admin</li>
     <li><b>Images:</b> /var/www/admin/images</li>
-    <li><b>Header CSS (symlinked):</b> /var/www/drupal8/themes/sedlowername</li>
+    <li><b>Header CSS (symlinked):</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
   </ul>
 </div>
 <div>
@@ -65,7 +65,7 @@
     <li><b>Location:</b> /var/www/drupal8</li>
     <li><b>System admin:</b> admin</li>
     <li><b>CSS admin:</b> cssadmin</li>
-    <li><b>CSS themes:</b> /var/www/drupal8/themes</li>
+    <li><b>CSS themes:</b> /var/www/drupal8/prod/web/themes</li>
     <li>Site stacks created using <a href="/drupal.php" title="instructions and script">instructions and script</a>.</li>
     <li>Permanent apache url redirects used to isolate sub sites.</li>
     <li><b>Apache configuration:</b> /etc/apache2/sites-available/HOSTNAME.conf</li>
@@ -110,7 +110,7 @@
     <li><b>Data location:</b> /var/www/support</li>
     <li><b>Tracker configuration:</b> symlink /etc/roundup/tracker-config.ini /var/www/support/config.ini</li>
     <li><b>Apache configuration:</b> symlink /etc/roundup/apache.conf /etc/apache2/sites-available/support.sedhostname.conf</li>
-    <li><b>Header CSS:</b> /var/www/drupal8/themes/sedlowername</li>
+    <li><b>Header CSS:</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
   </ul>
 </div>
 <div>
@@ -122,7 +122,7 @@
     <li><b>Security:</b> protected by apache2 authn_dbm</li>
     <li><b>Users:</b> htdbm -bc /usr/local/apache2/passwd/simpleinvoices/passwords.dbm username password</li>
     <li><b>Logs:</b> /var/log/apache2</li>
-    <li><b>Header CSS:</b> /var/www/drupal8/themes/sedlowername</li>
+    <li><b>Header CSS:</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
   </ul>
 </div>
 <div>

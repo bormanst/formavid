@@ -66,12 +66,17 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
+# drupal project subdir
+PROJECT="prod"
+DRUPAL_DIR="/var/www/drupal8"
+WEB_ROOT=${DRUPAL_DIR}/${PROJECT}/web
+
 # get cert
 # can add more domains
-# certbot certonly --webroot -w /var/www/drupal8 -d ${APP_HOSTNAME} -d DOMAIN-2 ... -d DOMAIN-N
+# certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -d DOMAIN-2 ... -d DOMAIN-N
 # can add more webroots
-# certbot certonly --webroot -w /var/www/drupal8 -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
-certbot certonly --webroot -w /var/www/drupal8 -d ${APP_HOSTNAME}
+# certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
+certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME}
 
 # update ssl.conf
 CONF=/etc/apache2/mods-available/ssl.conf

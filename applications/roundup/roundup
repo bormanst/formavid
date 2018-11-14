@@ -268,6 +268,11 @@ mkdir -p ${APP_DIR}/html/images
 # give apache2 db access
 chown -R www-data:www-data ${APP_DIR}/db
 
+# drupal theme dir
+PROJECT="prod"
+DRUPAL_DIR="/var/www/drupal8"
+THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes/${SITENAME}
+
 # apache2: create conf
 CONF=${ETC}/apache.conf
 cat > ${CONF} <<EOF
@@ -281,8 +286,8 @@ cat > ${CONF} <<EOF
     RedirectMatch ^/$ /${TRACKER}/
     PythonOptimize On
     Alias /${TRACKER}/docs ${APP_DIR}/docs/html
-    Alias /${TRACKER}/theme/css /var/www/drupal8/themes/${SITENAME}/components/asset-builds/css
-    Alias /${TRACKER}/theme /var/www/drupal8/themes/${SITENAME}
+    Alias /${TRACKER}/theme/css ${THEME_DIR}/components/asset-builds/css
+    Alias /${TRACKER}/theme ${THEME_DIR}
     AliasMatch ^/${TRACKER}/@@file/(.*) ${APP_DIR}/html/\$1
     AliasMatch ^/${TRACKER}/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}

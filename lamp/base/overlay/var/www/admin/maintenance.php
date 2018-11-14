@@ -42,7 +42,7 @@
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal8</h3></div><br>
   <ul>
     <li>Check status report for the main site for each stack.</li>
-    <li>Update according to report until report is clear. Use drush commnds as needed: <a href="/drupal.php" title="Drupal Info"><span>Drupal Info</span></a>.</li>
+    <li>Update according to report until report is clear. Use composer commands as needed: <a href="/drupal.php" title="Drupal Info"><span>Drupal Info</span></a>.</li>
     <li>Ensure sites not left in "design compile" mode.</li>
     <li>Ensure database is set to be optimized in cron.</li>
     <li>Ensure backups are functional.</li>

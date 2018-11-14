@@ -47,10 +47,15 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
+# drupal theme dir
+PROJECT="prod"
+DRUPAL_DIR="/var/www/drupal8"
+THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes
+
 # set cssadmin dir
 cat >> ${CONF} <<EOF
 <Global>
-  DefaultRoot /var/www/drupal8/themes cssadmin
+  DefaultRoot ${THEME_DIR} cssadmin
 </Global>
 EOF
 
