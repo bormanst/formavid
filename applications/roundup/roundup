@@ -259,7 +259,7 @@ sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/images\/favi
 sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"/support/theme/css/header.css\" \/>" ${FILE}
 sed -i "/<body/r /etc/formavid/header.txt" ${FILE}
 sed -i "s/sedtoolname/Support/g" ${FILE}
-ssed -i "s/sedbrsize/48px/g" ${FILE}
+sed -i "s/sedbrsize/48px/g" ${FILE}
 sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${FILE}
 
 # create images dir: logo symlinked in create-drupal-stack.py
