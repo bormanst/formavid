@@ -86,11 +86,15 @@ mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost
 # composer peformance issue
 phpdismod xdebug
 
+#
 # download latest drupal8 and install
+#
 
 # make drupal dir
-COMMAND="mkdir -p ${APP_DIR}"
-su - admin -c "${COMMAND}"
+mkdir -p ${APP_DIR}
+
+# set admin owner
+chown admin:adm ${APP_DIR}
 
 # change to drupal dir
 COMMAND="cd ${APP_DIR}"
