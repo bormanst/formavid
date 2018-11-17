@@ -148,13 +148,13 @@ OPTION=user
 sed -i "1,/^${OPTION} = ${DB_USER}/s/^${OPTION} = ${DB_USER}/${OPTION} = root/" ${CONF}
 
 # check docker exists
-if ! ( hash ${HACK} ); then
-    # docker: get docker
-    curl -sSL https://get.${HACK}.com/ | sh
-else
+if hash ${HACK}; then
     # docker: start docker
     systemctl enable ${HACK}
     systemctl start ${HACK}
+else
+    # docker: get docker
+    curl -sSL https://get.${HACK}.com/ | sh
 fi
 
 # docker: check container is active
