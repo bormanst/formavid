@@ -115,8 +115,13 @@ COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.
 su - admin -c "${COMMAND}"
 
 # update console
-COMMAND="composer update -d ${APP_DIR} drupal/console --with-dependencies"
+COMMAND="composer update -d ${APP_DIR} drupal/console --prefer-dist --with-dependencies --optimize-autoloader"
 su - admin -c "${COMMAND}"
+
+# enable drupal console within subdirs
+curl https://drupalconsole.com/installer -L -o drupal.phar
+mv drupal.phar /usr/local/bin/drupal
+chmod +x /usr/local/bin/drupal
 
 # init drupal project console
 COMMAND="drupal init --destination=${PROJECT_DIR}/console/ -q"
@@ -127,7 +132,7 @@ COMMAND="cp ${PROJECT_DIR}/vendor/drupal/console-core/dist/chain/* ${PROJECT_DIR
 su - admin -c "${COMMAND}"
 
 # download and install modules
-COMMAND="composer require -d ${PROJECT_DIR} ${DRUPAL_MODULE_LIST}"
+COMMAND="composer require -d ${PROJECT_DIR} ${DRUPAL_MODULE_LIST} --prefer-dist --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # apply overlay
