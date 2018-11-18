@@ -62,6 +62,10 @@ sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
 # restart service
 systemctl restart ${PACKAGE}
 
+# add admin user to database
+mysql --user=root --password=${DB_PASS} --execute "CREATE USER admin@localhost IDENTIFIED BY '${APP_PASS}';"
+mysql --user=root --password=${DB_PASS} --execute "GRANT ALL PRIVILEGES ON *.* TO admin@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}
