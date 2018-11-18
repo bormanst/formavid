@@ -371,7 +371,7 @@ def main():
         system("echo 'Creating %s drupal site...'" % baseUri)
         system("echo ''")
         system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\" --no-interaction" % (drupaldir,baseUri,baseUri,baseUri))
-        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\" % (drupaldir,baseUri,sitename,sitetype,dbpass,sitetitle,hostname,hostname,password))
+        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\" % (drupaldir,baseUri,sitename,sitetype,password,sitetitle,hostname,hostname,password))
         system("chmod 0777 %s/web/sites/%s/files" % (drupaldir,baseUri))
         system("chmod 0444 %s/web/sites/%s/settings.php" % (drupaldir,baseUri))
         # Sites - set trusted_host_patterns.
