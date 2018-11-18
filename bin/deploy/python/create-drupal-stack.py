@@ -352,8 +352,9 @@ def main():
     # Apache - enable added sites.
     system("cp -sf /etc/apache2/sites-available/%s.conf /etc/apache2/sites-enabled/." % hostname)
 
-    # Set temp owner for sites/themes.
+    # Set root owner for sites/themes.
     system("chown root:root %s/web/sites" % drupaldir)
+    system("chown root:root %s/web/sites/sites.php" % drupaldir)
     system("chown root:root %s/web/themes" % drupaldir)
 
     # Create drupal sites.
@@ -530,7 +531,7 @@ def main():
         system("echo \"%s\" >  %s/web/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
         system("chmod 0760 %s/web/sites/%s/files/private" % (drupaldir,baseUri))
         system("chmod 0444 %s/web/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
-        system("chown -R admin:adm %s/web/sites/%s/files" % (drupaldir,baseUri))
+        system("chown -R admin:adm %s/web/sites/%s" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/css" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/js" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/php" % (drupaldir,baseUri))
@@ -548,8 +549,9 @@ def main():
         # log info
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
-    # Reset owner for sites/themes.
+    # Set admin owner for sites/themes.
     system("chown admin:adm %s/web/sites" % drupaldir)
+    system("chown admin:adm %s/web/sites/sites.php" % drupaldir)
     system("chown cssadmin:cssadmin %s/web/themes" % drupaldir)
 
     # Check formavid logo.
