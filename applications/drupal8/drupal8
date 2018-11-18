@@ -180,7 +180,6 @@ su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
 # update settings
 CONF=${PROJECT_DIR}/web/sites/default/settings.php
 cp ${PROJECT_DIR}/web/sites/default/default.settings.php ${CONF}
-chown www-data:www-data ${CONF}
 
 # insert "www.example.com" as default trusted_host (inithook will adjust)
 NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.com\$',\n\);\n"

@@ -352,6 +352,10 @@ def main():
     # Apache - enable added sites.
     system("cp -sf /etc/apache2/sites-available/%s.conf /etc/apache2/sites-enabled/." % hostname)
 
+    # Set temp owner for sites/themes.
+    system("chown root:root %s/web/sites" % drupaldir)
+    system("chown root:root %s/web/themes" % drupaldir)
+
     # Create drupal sites.
     os.chdir(drupaldir)
     for sitetype in siteTypes:
@@ -366,15 +370,15 @@ def main():
         system("echo 'Creating %s drupal site...'" % baseUri)
         system("echo ''")
         system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\" --no-interaction" % (drupaldir,baseUri,baseUri,baseUri))
-        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\" % (drupaldir,baseUri,sitetitle,sitetypetitle,dbpass,sitetitle,hostname,hostname,password))
+        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\" % (drupaldir,baseUri,sitename,sitetype,dbpass,sitetitle,hostname,hostname,password))
         system("chmod 0777 %s/web/sites/%s/files" % (drupaldir,baseUri))
         system("chmod 0444 %s/web/sites/%s/settings.php" % (drupaldir,baseUri))
         # Sites - set trusted_host_patterns.
         esc_baseUri = baseUri.replace(".","\\\\\.")
         new_lines="\$settings['trusted_host_patterns'] = array\(\\n\\t'^" + esc_baseUri + "\$',\\n\);\\n"
-        system("sed -i \"/trusted_host_patterns/,/\*\//{n;s|^$|%s|}\" %s/sites/%s/settings.php" % (new_lines,drupaldir,hostname))
+        system("sed -i \"/trusted_host_patterns/,/\*\//{n;s|^$|%s|}\" %s/web/sites/%s/settings.php" % (new_lines,drupaldir,hostname))
         # Sites - set private file path.
-        system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'sites\/%s\/files\/private';/g\" %s/sites/%s/settings.php" % (hostname,drupaldir,hostname))
+        system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'web\/sites\/%s\/files\/private';/g\" %s/web/sites/%s/settings.php" % (hostname,drupaldir,hostname))
         # Sites - update settings.
         system("echo ''")
         system("echo 'The drupal site %s has been created.'" % baseUri)
@@ -435,10 +439,21 @@ def main():
     system("echo 'Creating custom theme for %s based on zen theme...'" % sitetitle)
     system("echo ''")
 
+    # Enable zen sub-theme.
+    system("drush -r %s -l http://%s theme:enable -y zen" % (drupaldir,hostname))
+
     # Create site theme from zen sub-theme.
-    system("drush -r %s -l http://%s en -y zen" % (drupaldir,hostname))
-    system("drush -r %s -l http://%s zen \"%s\"" % (drupaldir,hostname,sitename))
+    system("cp -fpr %s/prod/web/themes/contrib/zen/STARTERKIT %s/prod/web/themes" % (drupaldir,drupaldir))
+    system("mv %s/prod/web/themes/STARTERKIT %s/prod/web/themes/%s" % (drupaldir,drupaldir,sitename))
+    system("shopt -s globstar")
+    system("export REMDIR=`echo $PWD`")
+    system("cd %s/prod/web/themes/%s" % (drupaldir,sitename))
+    system("rename 's/STARTERKIT/%s/' **" % sitename)
+    system("cd $REMDIR")
+    system("find %s/prod/web/themes/%s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (drupaldir,sitename,sitename))
+
     # Add theme to module list.
+    # TODO: need to use theme:enable method here too???
     modulesToEnable.append(sitename)
     system("echo ''")
     system("echo 'Theme for %s is ready for modification.'" % sitetitle)
@@ -447,16 +462,17 @@ def main():
     # Set local gulp for SASS.
     system("echo ''")
     system("echo 'Setting up local Gulp for %s theme...'" % sitetitle)
-    system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
-    system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("echo \"%s\" >>  %s/themes/%s/gulpfile.js" % (GULP_WATCH_SCSS_SCRIPT,drupaldir,sitename))
+    system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
+    system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/web/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
+    system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
+    system("echo \"%s\" >>  %s/web/themes/%s/gulpfile.js" % (GULP_WATCH_SCSS_SCRIPT,drupaldir,sitename))
     system("echo 'Gulp ready to run locally within theme directory.'")
 
     # Drupal - set site theme permissions.
-    system("chmod -R 0644 %s/themes/%s/logo.svg" % (drupaldir,sitename))
-    system("chown -R cssadmin:cssadmin %s/themes/%s" % (drupaldir,sitename))
-    system("chmod -R 775 %s/themes/%s" % (drupaldir,sitename))
+    system("chmod -R 0644 %s/web/themes/%s/logo.svg" % (drupaldir,sitename))
+    system("chown -R cssadmin:cssadmin %s/web/themes/%s" % (drupaldir,sitename))
+    system("chmod -R 775 %s/web/themes/%s" % (drupaldir,sitename))
+    system("chown -R www-data:www-data %s/web/themes/%s/styleguide" % (drupaldir,sitename))
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
@@ -509,21 +525,16 @@ def main():
         system("echo 'Rebuilding %s drupal content permissions...'" % baseUri)
         system("drush -r %s -l http://%s php-eval 'node_access_rebuild();'" % (drupaldir,baseUri))
         system("echo ''")
-        system("echo 'Setting permissions for %s drupal files directory...'" % baseUri)
-        system("mkdir -p %s/sites/%s/files/css/optimized" % (drupaldir,baseUri))
-        system("mkdir -p %s/sites/%s/files/js/optimized" % (drupaldir,baseUri))
-        system("chown -R www-data:www-data %s/sites/%s/files" % (drupaldir,baseUri))
-        system("mkdir %s/sites/%s/files/private" % (drupaldir,baseUri))
-        system("echo \"%s\" >  %s/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
-        system("chown -R www-data:www-data %s/sites/%s/files" % (drupaldir,baseUri))
-        system("chmod -R 0764 %s/sites/%s/files" % (drupaldir,baseUri))
-        system("chmod 0760 %s/sites/%s/files" % (drupaldir,baseUri))
-        system("chmod 0760 %s/sites/%s/files/private" % (drupaldir,baseUri))
-        system("chown root:root %s/sites/%s/files/.htaccess" % (drupaldir,baseUri))
-        system("chown root:root %s/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
-        system("chmod 0644 %s/sites/%s/files/.htaccess" % (drupaldir,baseUri))
-        system("chmod 0644 %s/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
-        system("echo 'Permissions set for drupal site %s files directory.'" % baseUri)
+        system("echo 'Finishing setup of drupal files directory for %s...'" % baseUri)
+        system("mkdir %s/web/sites/%s/files/private" % (drupaldir,baseUri))
+        system("echo \"%s\" >  %s/web/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
+        system("chmod 0760 %s/web/sites/%s/files/private" % (drupaldir,baseUri))
+        system("chmod 0444 %s/web/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
+        system("chown -R admin:adm %s/web/sites/%s/files" % (drupaldir,baseUri))
+        system("chown -R www-data:www-data %s/web/sites/%s/files/css" % (drupaldir,baseUri))
+        system("chown -R www-data:www-data %s/web/sites/%s/files/js" % (drupaldir,baseUri))
+        system("chown -R www-data:www-data %s/web/sites/%s/files/php" % (drupaldir,baseUri))
+        system("echo 'Completed setup of drupal site %s files directory.'" % baseUri)
         system("echo ''")
         system("echo 'Running initial cron job for drupal site %s...'" % baseUri)
         system("drush -r %s -l http://%s cron" % (drupaldir,baseUri))
@@ -533,14 +544,18 @@ def main():
         system("echo ''")
         system("echo 'Please validate %s by viewing the drupal admin status report.'" % baseUri)
         if not os.path.exists("/var/www/admin/images/%s.svg" % sitename):
-            system("ln -s %s/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
+            system("ln -s %s/web/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
         # log info
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
+    # Reset owner for sites/themes.
+    system("chown admin:adm %s/web/sites" % drupaldir)
+    system("chown cssadmin:cssadmin %s/web/themes" % drupaldir)
+
     # Check formavid logo.
-    if not sitename.lower() == "formavidorg":
+    if not sitename == "formavidorg":
         # set theme
-        lnTheme = "ln -s %s/themes/%s" % (drupaldir,sitename)
+        lnTheme = "ln -s %s/web/themes/%s" % (drupaldir,sitename)
         # Admin Tools - use first "base" site logo.
         lnFile = "logo.svg"
         pathDir = "/var/www/admin/images"
