@@ -14,10 +14,6 @@ echo ${MESSSAGE} >> ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# set specs
-DRUPAL_SPEC=^8.6
-DRUSH_SPEC=^9.0
-
 # set dirs
 DRUPAL_DIR=${PACKAGE}
 WWW_DIR=/var/www
