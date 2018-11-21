@@ -82,36 +82,55 @@ mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost
 # composer peformance issue
 phpdismod xdebug
 
-#
-# download latest drupal8 and install
-#
-
 # make drupal dir
 mkdir -p ${APP_DIR}
 
 # set admin owner
 chown admin:adm ${APP_DIR}
 
+# apply composer files
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${APP_DIR}/composer.* ${APP_DIR}
+    chown admin:adm ${APP_DIR}/composer.*
+    MESSSAGE="Applied composer files for ${APP_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
 # change to drupal dir
 COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
 
 # load composer console in drupal root
-COMMAND="composer require -d ${APP_DIR} drupal/console:~1.0 --prefer-dist --optimize-autoloader"
-su - admin -c "${COMMAND}"
-
-# console-extend-plugin causes install issues - automatically recreated later
-COMMAND="rm -rf ${APP_DIR}/vendor/drupal/console-extend-plugin"
+COMMAND="composer install -d ${APP_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # drupal project subdir
 PROJECT="prod"
 PROJECT_DIR=${APP_DIR}/${PROJECT}
-COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --prefer-dist --no-progress --no-interaction"
+
+# create project template with --no-install
+COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --prefer-dist --no-install --no-progress --no-interaction"
 su - admin -c "${COMMAND}"
 
-# update console
-COMMAND="composer update -d ${APP_DIR} drupal/console --prefer-dist --with-dependencies --optimize-autoloader"
+# apply composer files
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/composer.* ${PROJECT_DIR}
+    chown admin:adm ${PROJECT_DIR}/composer.*
+    MESSSAGE="Applied composer files for ${PROJECT_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# change to project subdir
+COMMAND="cd ${PROJECT_DIR}"
+su - admin -c "${COMMAND}"
+
+# download and install
+COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # enable drupal console within subdirs
@@ -127,19 +146,9 @@ su - admin -c "${COMMAND}"
 COMMAND="cp ${PROJECT_DIR}/vendor/drupal/console-core/dist/chain/* ${PROJECT_DIR}/console/chain"
 su - admin -c "${COMMAND}"
 
-# download and install modules
-COMMAND="composer require -d ${PROJECT_DIR} ${DRUPAL_MODULE_LIST} --prefer-dist --optimize-autoloader"
+# change to drupal dir
+COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
-
-# apply overlay
-OVERLAY_DIR=$1/overlay
-if [ -d "${OVERLAY_DIR}" ]; then
-    cp -rf ${OVERLAY_DIR}/* /
-    MESSSAGE="Applied overlay for ${PACKAGE}."
-    echo ${MESSSAGE} | tee -a ${LOG}
-    echo ""
-    echo ""
-fi
 
 # add drush symlinks
 ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
@@ -168,7 +177,13 @@ ln -s /usr/local/bin/npm /usr/bin/npm
 npm install -g gulp-cli
 
 # copy custom package.json
-cp -fp ${FORMAVID}/gulp/package.json ${PROJECT_DIR}/web/themes
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/web/themes/package.json ${PROJECT_DIR}/web/themes
+    MESSSAGE="Applied gulp package.json for ${PROJECT_DIR}/web/themes."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # set cssadmin perms
 chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes

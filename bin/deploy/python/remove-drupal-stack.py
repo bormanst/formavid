@@ -26,6 +26,7 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "Formavid - Drupal site removal script"
+DEFAULT_DOMAIN = "example.com"
 DEFAULT_LOG = "/var/log/formavid/remove-druapl-stack.log"
 
 def usage(s=None):
@@ -158,19 +159,20 @@ def main():
     logging.info('Postfix removals complete.')
 
     # Solr - remove cores.
-    system("echo ''")
-    system("echo 'Removing solr cores for %s...'" % hostname)
-    system("echo ''")
     solrdata = "/var/lib/solr/data"
-    system("touch %s/%s" % (solrdata, sitename))
-    system("rm -rf %s/%s" % (solrdata, sitename))
-    # Check solr service running.
-    out = system("systemctl is-active solr")
-    if out.strip().lower() == 'active':
-        # Restart to apply changes.
-        system("systemctl restart solr")
-    # log info
-    logging.info('Solr removals complete.')
+    if os.path.exists(solrdata):
+        system("echo ''")
+        system("echo 'Removing solr cores for %s...'" % hostname)
+        system("echo ''")
+        system("touch %s/%s" % (solrdata, sitename))
+        system("rm -rf %s/%s" % (solrdata, sitename))
+        # Check solr service running.
+        out = system("systemctl is-active solr")
+        if out.strip().lower() == 'active':
+            # Restart to apply changes.
+            system("systemctl restart solr")
+        # log info
+        logging.info('Solr removals complete.')
 
     # TODO: Add option to specify subdir
     drupalsubdir = "prod"
@@ -224,12 +226,13 @@ def main():
         system("echo ''")
         system("echo 'Removing mysql databases for %s...'" % hostname)
         system("echo ''")
-        cur.execute("DROP DATABASE IF EXISTS %s_aggregator;" % sitename)
-        cur.execute("DROP DATABASE IF EXISTS %s_article;" % sitename)
-        cur.execute("DROP DATABASE IF EXISTS %s_blog;" % sitename)
-        cur.execute("DROP DATABASE IF EXISTS %s_book;" % sitename)
-        cur.execute("DROP DATABASE IF EXISTS %s_forum;" % sitename)
-        cur.execute("DROP DATABASE IF EXISTS %s_poll;" % sitename)
+        siteprefix = sitename.replace(".", "")
+        cur.execute("DROP DATABASE IF EXISTS %s_aggregator;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_article;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_blog;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_book;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_forum;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_poll;" % siteprefix)
         cur.execute("FLUSH PRIVILEGES;")
         # log info
         logging.info('Removed mysql databases for %s.' % hostname)
