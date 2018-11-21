@@ -181,23 +181,25 @@ def main():
     drupaldir = "/".join(["/var/www/drupal8",drupalsubdir,"web"])
 
     # Drupal - remove stack sites.
-    system("echo ''")
-    system("echo 'Removing drupal stack sites for %s...'" % hostname)
-    system("echo ''")
-    system("touch %s/sites/poll.%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/poll.%s" % (drupaldir, hostname))
-    system("touch %s/sites/forum.%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/forum.%s" % (drupaldir, hostname))
-    system("touch %s/sites/book.%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/book.%s" % (drupaldir, hostname))
-    system("touch %s/sites/blog.%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/blog.%s" % (drupaldir, hostname))
-    system("touch %s/sites/aggregator.%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/aggregator.%s" % (drupaldir, hostname))
-    system("touch %s/sites/%s" % (drupaldir, hostname))
-    system("rm -rf %s/sites/%s" % (drupaldir, hostname))
-    # log info
-    logging.info('Drupal directory removals complete.')
+    sites = "/".join([drupaldir,"sites"])
+    if os.path.exists(sites):
+        system("echo ''")
+        system("echo 'Removing drupal stack sites for %s...'" % hostname)
+        system("echo ''")
+        system("touch %s/poll.%s" % (sites, hostname))
+        system("rm -rf %s/poll.%s" % (sites, hostname))
+        system("touch %s/forum.%s" % (sites, hostname))
+        system("rm -rf %s/forum.%s" % (sites, hostname))
+        system("touch %s/book.%s" % (sites, hostname))
+        system("rm -rf %s/book.%s" % (sites, hostname))
+        system("touch %s/blog.%s" % (sites, hostname))
+        system("rm -rf %s/blog.%s" % (sites, hostname))
+        system("touch %s/aggregator.%s" % (sites, hostname))
+        system("rm -rf %s/aggregator.%s" % (sites, hostname))
+        system("touch %s/%s" % (sites, hostname))
+        system("rm -rf %s/%s" % (sites, hostname))
+        # log info
+        logging.info('Drupal directory removals complete.')
 
     # Drupal - remove tools logo symlink.
     system("echo ''")
@@ -210,13 +212,15 @@ def main():
         logging.info('Removed logo symlink for %s from tools...' % hostname)
 
     # Drupal - remove stack site theme.
-    system("echo ''")
-    system("echo 'Removing drupal theme for %s...'" % hostname)
-    system("echo ''")
-    system("touch %s/themes/%s" % (drupaldir, sitename))
-    system("rm -rf %s/themes/%s" % (drupaldir, sitename))
-    # log info
-    logging.info('Removed drupal theme for %s.' % hostname)
+    themes = "/".join([drupaldir,"themes"])
+    if os.path.exists(themes):
+        system("echo ''")
+        system("echo 'Removing drupal theme for %s...'" % hostname)
+        system("echo ''")
+        system("touch %s/%s" % (themes, sitename))
+        system("rm -rf %s/%s" % (themes, sitename))
+        # log info
+        logging.info('Removed drupal theme for %s.' % hostname)
 
     try:
         # Get db cursor.
