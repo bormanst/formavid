@@ -384,7 +384,7 @@ def main():
         new_lines="\$settings['trusted_host_patterns'] = array\(\\n\\t'^" + esc_baseUri + "\$',\\n\);\\n"
         system("sed -i \"/trusted_host_patterns/,/\*\//{n;s|^$|%s|}\" %s/web/sites/%s/settings.php" % (new_lines,drupaldir,hostname))
         # Sites - set private file path.
-        system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'web\/sites\/%s\/files\/private';/g\" %s/web/sites/%s/settings.php" % (hostname,drupaldir,hostname))
+        system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'sites\/%s\/files\/private';/g\" %s/web/sites/%s/settings.php" % (hostname,drupaldir,hostname))
         # Sites - update settings.
         system("echo ''")
         system("echo 'The drupal site %s has been created.'" % baseUri)
