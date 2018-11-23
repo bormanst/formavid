@@ -303,18 +303,19 @@ if [ -n "${APP_EMAIL}" ]; then
     if [ ! "${ALREADY_RUN}" = "True" ]; then
         # clean up mod_php5 references in ${WEB_ROOT}
         echo ""
-        MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in ${WEB_ROOT} for security..."
+        # MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in ${WEB_ROOT} for security..."
+        MESSSAGE="$( date ) No run-once post install scripts were specified."
         echo "#############################################"
         echo "#"
         echo "# ${MESSSAGE}"
         echo "#"
         echo "#############################################"
         echo ${MESSSAGE} >> ${LOG}
-        find ${WEB_ROOT} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+        # find ${WEB_ROOT} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
     else
         # skipping
         echo ""
-        MESSSAGE="$( date ) Skipped run once post install scripts."
+        MESSSAGE="$( date ) Skipped run-once post install scripts."
         echo "#############################################"
         echo "#"
         echo "# ${MESSSAGE}"
