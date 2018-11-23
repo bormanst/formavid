@@ -84,7 +84,7 @@ def main():
     hostname = get_hostname(domain)
 
     # Get sitename.
-    sitename = hostname.replace(get_tld(hostname) + ".", "")
+    sitename = get_sitename(domain)
 
     # Verify not initial base site.
     apache_conf = ".".join([hostname,'conf'])
@@ -205,7 +205,7 @@ def main():
     system("echo ''")
     system("echo 'Remove logo symlink for %s from tools...'" % hostname)
     system("echo ''")
-    if not sitename.lower() == "formavid":
+    if not sitename == "formavidorg":
         system("touch /var/www/admin/images/%s.svg" % sitename)
         system("rm -f /var/www/admin/images/%s.svg" % sitename)
         # log info
@@ -230,13 +230,12 @@ def main():
         system("echo ''")
         system("echo 'Removing mysql databases for %s...'" % hostname)
         system("echo ''")
-        siteprefix = sitename.replace(".", "")
-        cur.execute("DROP DATABASE IF EXISTS %s_aggregator;" % siteprefix)
-        cur.execute("DROP DATABASE IF EXISTS %s_article;" % siteprefix)
-        cur.execute("DROP DATABASE IF EXISTS %s_blog;" % siteprefix)
-        cur.execute("DROP DATABASE IF EXISTS %s_book;" % siteprefix)
-        cur.execute("DROP DATABASE IF EXISTS %s_forum;" % siteprefix)
-        cur.execute("DROP DATABASE IF EXISTS %s_poll;" % siteprefix)
+        cur.execute("DROP DATABASE IF EXISTS %s_aggregator;" % sitename)
+        cur.execute("DROP DATABASE IF EXISTS %s_article;" % sitename)
+        cur.execute("DROP DATABASE IF EXISTS %s_blog;" % sitename)
+        cur.execute("DROP DATABASE IF EXISTS %s_book;" % sitename)
+        cur.execute("DROP DATABASE IF EXISTS %s_forum;" % sitename)
+        cur.execute("DROP DATABASE IF EXISTS %s_poll;" % sitename)
         cur.execute("FLUSH PRIVILEGES;")
         # log info
         logging.info('Removed mysql databases for %s.' % hostname)
