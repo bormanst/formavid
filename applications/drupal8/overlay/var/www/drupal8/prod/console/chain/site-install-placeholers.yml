@@ -1,0 +1,26 @@
+command:
+  name: site:install:inline
+  description: 'Install site using inline placeholders'
+vars:
+  db_type: mysql
+  db_host: 127.0.0.1
+  db_name: drupal
+  db_port: 3306
+commands:
+  # Install Drupal
+  - command: site:install
+    options:
+      langcode: '{{langcode}}'
+      db-type: '{{db_type}}'
+      db-host: '{{db_host}}'
+      db-name: '{{db_name}}'
+      db-user: '{{db_user}}'
+      db-pass: '{{db_pass}}'
+      db-port: '{{db_port}}'
+      site-name: '{{site_name}}'
+      site-mail: '{{site_mail}}'
+      account-name: '{{account_name}}'
+      account-mail: '{{account_mail}}'
+      account-pass: '{{account_pass}}'
+    arguments:
+      profile: '{{profile}}'

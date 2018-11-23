@@ -116,10 +116,10 @@ def main():
     except getopt.GetoptError, e:
         usage(e)
 
-    # log setup
+    # Log setup.
     logging.basicConfig(filename=DEFAULT_LOG,level=logging.INFO)
 
-    # log start
+    # Log start.
     logging.info('Start time: %s' % datetime.datetime.now())
 
     # Get envars.
@@ -131,15 +131,15 @@ def main():
     sitetitle = os.environ.get("SITETITLE")
     solr = os.environ.get("SOLR_INSTALL")
 
-    # check for dbpass
+    # Check for dbpass.
     isdbpass = "DbpasswordEnvar"
     if not dbpass or dbpass == "None": isdbpass = "No-DbpasswordEnvar"
 
-    # check for password
+    # Check for password.
     ispassword = "PasswordEnvar"
     if not password or password == "None": ispassword = "No-PasswordEnvar"
 
-    # log envars
+    # Log envars.
     logging.info('Incoming envars: [isdbpass]:[domain]:[email]:[formavid]:[ispassword]:[sitetitle]:[solr]')
     logging.info('Incoming envars: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, ispassword, sitetitle, solr))
 
@@ -149,10 +149,6 @@ def main():
     # List of solr related modules.
     solrModules = ['search_api_solr', 'search_api_solr_defaults']
     logging.info('Drupal solr related modules: %s' % solrModules)
-
-    # List of modules to disable.
-    # modulesToDisable = ['search', 'search_api_solr_defaults']
-    # logging.info('Drupal modules to disable: %s' % modulesToDisable)
 
     # List of modules to enable: initially populated by applications/1000-drupal8/drupal8drupal8 script.
     modulesToEnable = ['advagg','advanced_help','background_image','backup_migrate','captcha','components','ctools','devel','features','field_group','fivestar','honeypot','image_style_quality','imageapi_optimize','imagemagick','imce','inline_entity_form','module_filter','panels','pathauto','recaptcha','rules','search_api_solr','search_api_solr_defaults','tagadelic','views_bulk_operations']
@@ -192,7 +188,7 @@ def main():
             "Enter additional domain for Drupal8.",
             DEFAULT_DOMAIN)
 
-    # Preen domain.
+    # Format domain.
     domain = format_domain(domain)
 
     # Get hostname.
@@ -243,25 +239,9 @@ def main():
             system("echo ''")
             system("echo 'Exiting Drupal site build script with no action taken.'")
             system("echo ''")
-            # log issue
+            # Log info.
             logging.info('You selected Solr search but the solr service is not available!!!')
             quit()
-        # Ensure solr related modules in enable list.
-        # for module in solrModules:
-            # if module not in modulesToEnable:
-                # modulesToEnable.append(module)
-                # system("echo ''")
-                # system("echo ''")
-                # system("echo 'The solr related module %s has been appended to the list of modules to enable.'" % module)
-                # system("echo 'Drush should automatically download %s if it is not locally available.'" % module)
-                # system("echo 'Ensure that the module %s is syncd with composer.json to prevent updating issues.'" % module)
-    # else:
-        # Remove solr related modules from enable list.
-        # for module in solrModules:
-            # if module in modulesToEnable:
-                # modulesToEnable.remove(module)
-        # Update modules to disable list.
-        # modulesToDisable = []
 
     if not dbpass or dbpass == "None":
         dbpass = d.get_password(
@@ -273,11 +253,11 @@ def main():
             "Warning - verify resources exist for additional site.",
             "Please enter password for the Drupal8 admin account.")
 
-    # log vars
+    # Log vars.
     logging.info('Vars used to create stack: [isdbpass]:[domain]:[email]:[formavid]:[hostname]:[ispassword]:[sitename]:[sitetitle]:[installSolr]')
     logging.info('Vars used to create stack: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, hostname, ispassword, sitename, sitetitle, installSolr))
 
-    # log create start
+    # Log create start.
     logging.info('Starting stack creation: %s' % datetime.datetime.now())
 
     # Start default site setup.
@@ -330,7 +310,7 @@ def main():
         system("echo ''")
         system("echo 'Solr search core data configuration is complete.'")
         system("echo ''")
-        # log info
+        # Log info.
         logging.info('Solr search core data configuration is complete.')
 
     # Hosts - update.
@@ -339,7 +319,7 @@ def main():
         if sitetype != 'article':
             sitetypemod = sitetype + '.'
         system("sed -i '/127.0.0.1/s/$/ %s%s/' /etc/hosts" % (sitetypemod,hostname))
-        # log info
+        # Log info.
         logging.info('/etc/hosts configuration is complete.')
 
     # Sites - prepare templates.
@@ -358,8 +338,6 @@ def main():
     system("cp -sf /etc/apache2/sites-available/%s.conf /etc/apache2/sites-enabled/." % hostname)
 
     # Set root owner for sites/themes.
-    # system("chown root:root %s/web/sites" % drupaldir)
-    # system("chown root:root %s/web/sites/sites.php" % drupaldir)
     system("chown root:root %s/web/themes" % drupaldir)
 
     # Create drupal sites.
@@ -389,7 +367,7 @@ def main():
         system("echo ''")
         system("echo 'The drupal site %s has been created.'" % baseUri)
         system("echo ''")
-        # log info
+        # Log info.
         logging.info('The drupal site %s has been created.' % baseUri)
 
     # Sites - clean up.
@@ -404,7 +382,7 @@ def main():
         for sitetype in siteTypes:
             # Allow perms for drush.
             cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal8@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;" % (sitename,sitetype))
-            # log info
+            # Log info.
             logging.info('Allow perms for drush db access on %s_%s.*.' % (sitename,sitetype))
         # Restart mysql.
         system("echo ''")
@@ -436,7 +414,6 @@ def main():
         baseUri = sitetypemod + hostname
         system("echo ''")
         system("echo 'Rebuilding %s drupal caches...'" % baseUri)
-        # system("drush -r %s -l http://%s cache-rebuild" % (drupaldir,baseUri))
         system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
         system("echo 'Site %s can now be modified.'" % baseUri)
 
@@ -446,27 +423,17 @@ def main():
     system("echo 'Creating custom theme for %s based on zen theme...'" % sitetitle)
     system("echo ''")
 
-    # Enable zen sub-theme.
-    # TODO: need to use theme:enable method here too???
+    # Enable zen theme.
     system("drush -r %s -l http://%s theme:enable -y zen" % (drupaldir,hostname))
 
-    # Create site theme from zen sub-theme.
+    # Create site sub-theme from zen theme.
     system("cp -fpr %s/web/themes/contrib/zen/STARTERKIT %s/web/themes" % (drupaldir,drupaldir))
     system("mv %s/web/themes/STARTERKIT %s/web/themes/%s" % (drupaldir,drupaldir,sitename))
-    # system("export REMDIR=`echo $PWD`")
-    # system("cd %s/web/themes/%s" % (drupaldir,sitename))
-    # Rename ** requires bash globstar on.
-    # system("shopt -s globstar && rename 's/STARTERKIT/%s/' ** && shopt -u globstar" % sitename)
     system("find %s/web/themes/%s -iname \"*STARTERKIT*\" -exec rename 's/STARTERKIT/%s/' {} \;" % (drupaldir,sitename,sitename))
     system("find %s/web/themes/%s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (drupaldir,sitename,sitename))
     system("find %s/web/themes/%s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (drupaldir,sitename,sitetitle))
-    # system("cd $REMDIR")
-
-    # Add theme to module list.
-    # TODO: need to use theme:enable method here too???
-    # modulesToEnable.append(sitename)
     system("echo ''")
-    system("echo 'Theme for %s is ready for modification.'" % sitetitle)
+    system("echo 'Theme %s is ready for modification.'" % sitename)
     system("echo ''")
 
     # Set local gulp for SASS.
@@ -515,68 +482,59 @@ def main():
                     # Update solr defaults yaml settings.
                     set_solr_configs(solrconfigpath,solrserverid,solrservername,solrcorename,password,formavid)
                     # Enable module.
-                    # system("drush -r %s -l http://%s pm-enable -y %s" % (drupaldir,baseUri,module))
-                    # system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\" --no-interaction" % (drupaldir,baseUri,baseUri,baseUri))
                     system("drupal --root=%s --uri=\"http://%s\" module:install %s --no-interaction" % (drupaldir,baseUri,module))
                     # Restore solr defaults yaml files.
                     system("mv -f %s/search_api.server.default_solr_server.bak %s/search_api.server.default_solr_server.yml" % (solrconfigpath,solrconfigpath))
                     system("mv -f %s/search_api.index.default_solr_index.bak %s/search_api.index.default_solr_index.yml" % (solrconfigpath,solrconfigpath))
                 else:
                     # Enable module.
-                    # system("drush -r %s -l http://%s pm-enable -y %s" % (drupaldir,baseUri,module))
                     system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri,module))
-            # Disable modules.
-            # for module in modulesToDisable:
-                # Uninstall module - will remain in available module list.
-                # system("drush -r %s -l http://%s pm-uninstall -y %s" % (drupaldir,baseUri,module))
-                # system("drupal --root=%s --uri=\"http://%s\" module:uninstall  %s --no-interaction" % (drupaldir,baseUri,module))
 
         # Install sub-theme.
         system("drupal --root=%s --uri=\"http://%s\" theme:install  %s --set-default" % (drupaldir,baseUri,sitename))
         # Set configs.
-        # system("drush -r %s -l http://%s config-set -y system.theme default '%s' " % (drupaldir,baseUri,sitename))
-#        system("drupal --root=%s --uri=\"http://%s\" settings:set  system.theme default '%s'  --no-interaction" % (drupaldir,baseUri,sitename))
         system("drush -r %s -l http://%s config:set -y block.block.%s_powered status 0 " % (drupaldir,baseUri,sitename))
-#        system("drupal --root=%s --uri=\"http://%s\" settings:set  block.block.%s_powered status 0  --no-interaction" % (drupaldir,baseUri,sitename))
+        # system("drupal --root=%s --uri=\"http://%s\" settings:set  block.block.%s_powered status 0  --no-interaction" % (drupaldir,baseUri,sitename))
         # Clean up.
         system("echo ''")
         system("echo 'Rebuilding %s drupal caches...'" % baseUri)
-        # system("drush -r %s -l http://%s cache-rebuild" % (drupaldir,baseUri))
         system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'Rebuilding %s drupal content permissions...'" % baseUri)
-        # system("drush -r %s -l http://%s php-eval 'node_access_rebuild();'" % (drupaldir,baseUri))
         system("drupal --root=%s --uri=\"http://%s\" node:access:rebuild" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'Finishing setup of drupal files directory for %s...'" % baseUri)
-        system("mkdir %s/web/sites/%s/files/private" % (drupaldir,baseUri))
+        # Make private dir and set .htaccess file.
+        system("mkdir -p %s/web/sites/%s/files/private" % (drupaldir,baseUri))
         system("echo \"%s\" >  %s/web/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
-        system("chmod 0760 %s/web/sites/%s/files/private" % (drupaldir,baseUri))
         system("chmod 0444 %s/web/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
+        # Set admin owner all.
         system("chown -R admin:adm %s/web/sites/%s" % (drupaldir,baseUri))
-        system("touch %s/web/sites/%s/files/css" % (drupaldir,baseUri))
+        # Set individual perms.
+        system("mkdir -p %s/web/sites/%s/files/css" % (drupaldir,baseUri))
         system("chmod 0775 %s/web/sites/%s/files/css" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/css" % (drupaldir,baseUri))
-        system("touch %s/web/sites/%s/files/js" % (drupaldir,baseUri))
+        system("mkdir -p %s/web/sites/%s/files/js" % (drupaldir,baseUri))
         system("chmod 0775 %s/web/sites/%s/files/js" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/js" % (drupaldir,baseUri))
-        system("touch %s/web/sites/%s/files/php" % (drupaldir,baseUri))
-        system("chmod 0775 %s/web/sites/%s/files/php" % (drupaldir,baseUri))
+        system("mkdir -p %s/web/sites/%s/files/php" % (drupaldir,baseUri))
+        system("chmod 0777 %s/web/sites/%s/files/php" % (drupaldir,baseUri))
         system("chown -R www-data:www-data %s/web/sites/%s/files/php" % (drupaldir,baseUri))
+        system("chown www-data:www-data %s/web/sites/%s/files/private" % (drupaldir,baseUri))
+        system("chmod 0750 %s/web/sites/%s/files/private" % (drupaldir,baseUri))
+        system("mkdir -p %s/web/sites/%s/files/styles" % (drupaldir,baseUri))
+        system("chmod 0775 %s/web/sites/%s/files/styles" % (drupaldir,baseUri))
+        system("chown -R www-data:www-data %s/web/sites/%s/files/styles" % (drupaldir,baseUri))
         system("echo 'Completed setup of drupal site %s files directory.'" % baseUri)
         system("echo ''")
         system("echo 'Running initial cron job for drupal site %s...'" % baseUri)
-        # system("drush -r %s -l http://%s cron" % (drupaldir,baseUri))
         system("drupal --root=%s --uri=\"http://%s\" cron:execute" % (drupaldir,baseUri))
         system("echo ''")
-        system("echo 'Refreshing %s drupal status report...'" % baseUri)
-        # system("drush -r %s -l http://%s pm-refresh" % (drupaldir,baseUri))
-        # system("drupal --root=%s --uri=\"http://%s\" cron:execute" % (drupaldir,baseUri))
-        system("echo ''")
+        # Finished drupal setup.
         system("echo 'Please validate %s by viewing the drupal admin status report.'" % baseUri)
         if not os.path.exists("/var/www/admin/images/%s.svg" % sitename):
             system("ln -s %s/web/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
-        # log info
+        # Log info.
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
     # Set admin owner for sites/themes.
@@ -586,7 +544,7 @@ def main():
 
     # Check formavid logo.
     if not sitename == "formavidorg":
-        # set theme
+        # Set theme.
         lnTheme = "ln -s %s/web/themes/%s" % (drupaldir,sitename)
         # Admin Tools - use first "base" site logo.
         lnFile = "logo.svg"
@@ -604,12 +562,10 @@ def main():
     system("echo 'webmaster@%s admin' >> /etc/postfix/virtual" % hostname)
     system("echo 'admin@%s admin' >> /etc/postfix/virtual" % hostname)
     system("echo 'support@%s admin' >> /etc/postfix/virtual" % hostname)
-    # system("systemctl start postfix")
     system("postmap /etc/postfix/virtual")
-    # system("systemctl stop postfix")
     system("echo ''")
     system("echo 'Postfix has been updated.'")
-    # log info
+    # Log info.
     logging.info('Postfix has been updated.')
 
     # End default site setup.
@@ -621,7 +577,7 @@ def main():
     system("echo ''")
     system("echo ''")
 
-    # log end
+    # Log end.
     logging.info('Completed stack creation for %s: %s' % (hostname, datetime.datetime.now()))
 
 if __name__ == "__main__":
