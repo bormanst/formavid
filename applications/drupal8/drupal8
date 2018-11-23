@@ -112,7 +112,7 @@ PROJECT="prod"
 PROJECT_DIR=${APP_DIR}/${PROJECT}
 
 # create project template with --no-install
-COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --prefer-dist --no-install --no-progress --no-interaction"
+COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --stability dev --no-install --no-progress --no-interaction"
 su - admin -c "${COMMAND}"
 
 # apply composer files
@@ -146,9 +146,22 @@ su - admin -c "${COMMAND}"
 COMMAND="cp ${PROJECT_DIR}/vendor/drupal/console-core/dist/chain/* ${PROJECT_DIR}/console/chain"
 su - admin -c "${COMMAND}"
 
+# apply chain overlays
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/console/chain/* ${PROJECT_DIR}/console/chain
+    chown admin:adm ${PROJECT_DIR}/console/chain/*
+    MESSSAGE="Applied console chain files for ${PROJECT_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
 # change to drupal dir
 COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
+
+# clean up mod_php5 references in ${APP_DIR}
+find ${APP_DIR} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
 
 # add drush symlinks
 ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
