@@ -64,7 +64,6 @@ fi
 
 # use these defaults
 set ${PHP_MEMORY_LIMIT:=256M}           # php.ini default: 128MB
-set ${PHP_NO_MEMORY_LIMIT:=-1}          # php.ini default: 128MB
 set ${PHP_POST_MAX_SIZE:=16M}           # php.ini default: 8MB
 set ${PHP_UPLOAD_MAX_FILESIZE:=8M}      # php.ini default: 2MB
 
@@ -89,7 +88,7 @@ for f in /etc/php/?.?/*/php.ini; do
         setini $f opcache.revalidate_freq $OPCACHE_REVALIDATE_FREQ
     else
         # adjust settings for cli only (not Apache)
-        setini $f memory_limit $PHP_NO_MEMORY_LIMIT
+        setini $f memory_limit -1
     fi
 done
 
