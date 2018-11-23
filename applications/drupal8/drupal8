@@ -35,6 +35,7 @@ fi
 
 # dependencies check: apache2
 DEPENDS=apache2
+systemctl start ${DEPENDS} && sleep 10
 if ! (systemctl -q is-active ${DEPENDS}); then
     MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
@@ -48,6 +49,7 @@ fi
 
 # dependencies check: mysql
 DEPENDS=mysql
+systemctl start ${DEPENDS} && sleep 10
 if ! (systemctl -q is-active ${DEPENDS}); then
     MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}

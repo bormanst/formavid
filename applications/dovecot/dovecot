@@ -31,6 +31,7 @@ fi
 
 # dependencies check: postfix
 DEPENDS=postfix
+systemctl start ${DEPENDS} && sleep 10
 if ! (systemctl -q is-active ${DEPENDS}); then
     MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
