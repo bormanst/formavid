@@ -1,8 +1,7 @@
 IndexIgnore *
 
-<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|tpl)$"> 
-	Order Allow,Deny 
-	Deny from all 
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|fla|psd|log|sh|tpl)$">
+	Require all denied
 </FilesMatch>
 
 <FilesMatch "\.(htm|html|css|js|php)$">

@@ -106,9 +106,7 @@ cat > ${APACHE_CONF} <<EOF
     Alias /theme /var/www/drupal8/prod/web/themes/${SITENAME}
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
-        Order deny,allow
-        Deny from all
-        Satisfy Any
+        Require all denied
         AuthName "password protected area"
         AuthType Basic
         Require valid-user
@@ -117,9 +115,7 @@ cat > ${APACHE_CONF} <<EOF
     </Directory>
     <Location /server-status>
         SetHandler server-status
-        Order deny,allow
-        Deny from all
-        Satisfy Any
+        Require all denied
         Options none
         Allow from localhost ip6-localhost
         AuthName "password protected area"
