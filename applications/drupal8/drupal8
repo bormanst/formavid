@@ -264,9 +264,6 @@ chmod +x ${CRON_DRUPAL}
 # configure apache
 a2enmod rewrite
 
-# create base site
-${FORMAVID}/bin/deploy/python/create-drupal-stack.py
-
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} >> ${LOG}

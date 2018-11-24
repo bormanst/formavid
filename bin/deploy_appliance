@@ -302,31 +302,6 @@ if [ -n "${APP_EMAIL}" ]; then
     # close ${WEB_ROOT} perms
     chmod 0755 ${WEB_ROOT}
 
-    # run once post install
-    if [ ! "${ALREADY_RUN}" = "True" ]; then
-        # clean up mod_php5 references in ${WEB_ROOT}
-        echo ""
-        # MESSSAGE="$( date ) Replacing mod_php5 with mod_php7 in ${WEB_ROOT} for security..."
-        MESSSAGE="$( date ) No run-once post install scripts were specified."
-        echo "#############################################"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-        # find ${WEB_ROOT} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
-    else
-        # skipping
-        echo ""
-        MESSSAGE="$( date ) Skipped run-once post install scripts."
-        echo "#############################################"
-        echo "#"
-        echo "# ${MESSSAGE}"
-        echo "#"
-        echo "#############################################"
-        echo ${MESSSAGE} >> ${LOG}
-    fi
-
     # restart services
     echo ""
     MESSSAGE="$( date ) Restarting services..."
@@ -407,11 +382,43 @@ if [ -n "${APP_EMAIL}" ]; then
     # check etckeeper
     if [ ! "${ALREADY_RUN}" = "True" ]; then
         # initialize etckeeper
+        echo ""
+        MESSSAGE="$( date ) Initializing etckeeper for the appliance."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
         ${FORMAVID}/bin/initialize/shell/init_etckeeper
     else
         # let cron update
         echo ""
         MESSSAGE="$( date ) etckeeper is already initialized. Cron job will pick up changes."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+    fi
+
+    # run-once post install scripts
+    if [ ! "${ALREADY_RUN}" = "True" ]; then
+        echo ""
+        MESSSAGE="$( date ) Executing run-once post install scripts."
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
+        # create base site
+        ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+    else
+        # skipping
+        echo ""
+        MESSSAGE="$( date ) Skipped run-once post install scripts."
         echo "#############################################"
         echo "#"
         echo "# ${MESSSAGE}"
