@@ -162,11 +162,11 @@ fi
 COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
 
-# clean up mod_php5 references in ${APP_DIR}
-MESSSAGE="Replacing mod_php5 with mod_php7 within dir ${APP_DIR}..."
+# clean up mod_php5 references in htaccess
+MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}..."
 echo ${MESSSAGE} | tee -a ${LOG}
-find ${APP_DIR} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
-MESSSAGE="Finished replacing mod_php5 with mod_php7 within dir ${APP_DIR}."
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # add drush symlinks
