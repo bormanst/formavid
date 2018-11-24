@@ -94,14 +94,14 @@ def main():
                 # Update site db access password.
                 system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
                 # Update site admin password.
-                system('drush -r %s -l https://%s user-password admin --password="%s"' % (drupaldir, site, password))
+                system('drupal --root=%s --uri="http://%s" user:password:reset admin %s' % (drupaldir, site, password))
                 # Check emails too.
                 if update_email:
                     # Update email.
                     system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET mail=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                     system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET init=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                 # Clear site cache.
-                system('drush -r %s -l https://%s cache-rebuild' % (drupaldir, site))
+                system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
         # restart apache2
         system('systemctl restart apache2')
         system("echo 'Update password for admin has completed. Service apache2 has been restarted.'")
