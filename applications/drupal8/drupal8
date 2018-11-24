@@ -78,6 +78,9 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
+# set nice value for downloads
+NICE="nice -n -15"
+
 # add drupal8 user to database
 mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
 
@@ -107,7 +110,7 @@ su - admin -c "${COMMAND}"
 
 # load composer console in drupal root
 COMMAND="composer install -d ${APP_DIR} --no-progress --optimize-autoloader"
-su - admin -c "${COMMAND}"
+${NICE} su - admin -c "${COMMAND}"
 
 # drupal project subdir
 PROJECT="prod"
@@ -115,7 +118,7 @@ PROJECT_DIR=${APP_DIR}/${PROJECT}
 
 # create project template with --no-install
 COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --stability dev --no-install --no-progress --no-interaction"
-su - admin -c "${COMMAND}"
+${NICE} su - admin -c "${COMMAND}"
 
 # apply composer files
 if [ -d "${OVERLAY_DIR}" ]; then
@@ -133,10 +136,10 @@ su - admin -c "${COMMAND}"
 
 # download and install
 COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
-su - admin -c "${COMMAND}"
+${NICE} su - admin -c "${COMMAND}"
 
 # enable drupal console within subdirs
-curl https://drupalconsole.com/installer -L -o drupal.phar
+${NICE} curl https://drupalconsole.com/installer -L -o drupal.phar
 mv drupal.phar /usr/local/bin/drupal
 chmod +x /usr/local/bin/drupal
 
@@ -183,17 +186,17 @@ EOF
 
 # update nodejs to latest
 npm cache clean -f
-npm install -g n
-n stable
+${NICE} npm install -g n
+${NICE} n stable
 
 # update npm to latest
-npm install -g npm@latest
+${NICE} npm install -g npm@latest
 touch /usr/bin/npm
 rm /usr/bin/npm
 ln -s /usr/local/bin/npm /usr/bin/npm
 
 # install gulp-cli
-npm install -g gulp-cli
+${NICE} npm install -g gulp-cli
 
 # copy custom package.json
 if [ -d "${OVERLAY_DIR}" ]; then
@@ -209,7 +212,7 @@ chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 
 # preload node_modules for themes
 # background safe: depends on gulp-cli
-su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
+${NICE} su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
 
 # update settings
 CONF=${PROJECT_DIR}/web/sites/default/settings.php
