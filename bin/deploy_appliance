@@ -337,19 +337,29 @@ if [ -n "${APP_EMAIL}" ]; then
     echo "#############################################"
     echo ${MESSSAGE} >> ${LOG}
     # restart stunnel4
-    if (systemctl -q is-active stunnel4); then systemctl restart stunnel4; fi
+    DEPENDS=stunnel4
+    systemctl start ${DEPENDS} && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
 
     # restart shellinabox - depends on stunnel4
-    if (systemctl -q is-active shellinabox); then systemctl restart shellinabox; fi
+    DEPENDS=shellinabox
+    systemctl start ${DEPENDS} && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
 
     # restart webmin - depends on stunnel4
-    if (systemctl -q is-active webmin); then systemctl restart webmin; fi
+    DEPENDS=webmin
+    systemctl start ${DEPENDS} && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
 
     # restart apache2
-    if (systemctl -q is-active apache2); then systemctl restart apache2; fi
+    DEPENDS=apache2
+    systemctl start ${DEPENDS} && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
 
     # secure mysql installation
-    if (systemctl -q is-active mysql); then
+    DEPENDS=mysql
+    systemctl start ${DEPENDS} && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then
         # secure mysql
         echo ""
         MESSSAGE="$( date ) Securing mysql..."
