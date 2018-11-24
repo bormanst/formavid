@@ -43,6 +43,13 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
+# clean up mod_php5 references in ${APP_DIR}
+MESSSAGE="Replacing mod_php5 with mod_php7 within dir ${APP_DIR}..."
+echo ${MESSSAGE} | tee -a ${LOG}
+find ${APP_DIR} -type f -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php7 within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
+
 # create admin
 if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
     useradd -g adm -m -s /bin/bash admin
