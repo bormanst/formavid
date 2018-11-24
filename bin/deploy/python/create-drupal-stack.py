@@ -119,6 +119,20 @@ def main():
     # Log setup.
     logging.basicConfig(filename=DEFAULT_LOG,level=logging.INFO)
 
+    # TODO: Add option to specify subdir
+    drupalsubdir = "prod"
+
+    # Sites - drupal loaction.
+    drupaldir = "/".join(["/var/www/drupal8",drupalsubdir])
+
+    # Verify default/settings.php exists.
+    pathFile = "/".join([drupalsubdir,"web/sites/default/settings.php")
+    if not os.path.exists(pathFile):
+        # Log start.
+        logging.info('Missing requirement: %s - Missing sites/default/settings.php file.' % datetime.datetime.now())
+        logging.info('Please verify the drupal 8 installation in /var/www.' % datetime.datetime.now())
+        quit()
+
     # Log start.
     logging.info('Start time: %s' % datetime.datetime.now())
 
@@ -266,12 +280,6 @@ def main():
     system("echo ''")
     system("echo 'Creating default site for %s - this takes a while...'" % hostname)
     system("echo ''")
-
-    # TODO: Add option to specify subdir
-    drupalsubdir = "prod"
-
-    # Sites - drupal loaction.
-    drupaldir = "/".join(["/var/www/drupal8",drupalsubdir])
 
     # Sites - templates location.
     templates = formavid
