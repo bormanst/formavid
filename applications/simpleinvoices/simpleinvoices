@@ -87,9 +87,6 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# set nice value for downloads
-NICE="nice -n -13"
-
 DB_NAME=${PACKAGE}
 DB_USER=${PACKAGE}
 
@@ -100,7 +97,7 @@ ENABLED=/etc/apache2/sites-enabled
 # install latest
 URL="git://github.com/${PACKAGE}/${PACKAGE}.git"
 BRANCH="master"
-${NICE} git clone --recursive --depth 1 -b ${BRANCH} ${URL} ${APP_DIR}
+git clone --recursive --depth 1 -b ${BRANCH} ${URL} ${APP_DIR}
 
 # clean up mod_php5 references in htaccess
 MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}..."

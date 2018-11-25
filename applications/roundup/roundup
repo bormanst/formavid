@@ -64,9 +64,6 @@ fi
 MESSSAGE="Configuring ${PACKAGE}..."
 echo ${MESSSAGE} >> ${LOG}
 
-# set nice value for downloads
-NICE="nice -n -14"
-
 # setup database vars
 DB_NAME=${TRACKER}
 DB_USER=${PACKAGE}
@@ -102,7 +99,7 @@ fi
 HOME="/home/${DB_USER}/.local"
 if [ ! -d "${HOME}" ]; then
     # install roundup to user home
-    ${NICE} su - ${DB_USER} -c "pip install ${PACKAGE} --user"
+    su - ${DB_USER} -c "pip install ${PACKAGE} --user"
     # set home access perms
     chmod -R 0775 ${HOME}
     # add symlinks
@@ -158,7 +155,7 @@ if hash ${HACK}; then
     systemctl start ${HACK}
 else
     # docker: get docker
-    ${NICE} curl -sSL https://get.${HACK}.com/ | sh
+    curl -sSL https://get.${HACK}.com/ | sh
 fi
 
 # docker: check container is active
