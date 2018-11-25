@@ -286,7 +286,7 @@ if [ -n "${APP_EMAIL}" ]; then
             # background downloads can timout on single cpu configs if
             # an app script's thread is suspended too long
             # ${SCRIPT} ${CHILD_DIR} &
-            {SCRIPT} ${CHILD_DIR}
+            ${SCRIPT} ${CHILD_DIR}
         done
     done
     echo ""
