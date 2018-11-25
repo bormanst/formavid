@@ -130,7 +130,7 @@ def main():
     if not os.path.exists(pathFile):
         # Log start.
         logging.info('Missing requirement: %s - Missing sites/default/settings.php file.' % datetime.datetime.now())
-        logging.info('Please verify the drupal 8 installation in /var/www.' % datetime.datetime.now())
+        logging.info('Please verify the drupal 8 installation in /var/www.')
         quit()
 
     # Log start.
