@@ -321,10 +321,14 @@ if [ -n "${APP_EMAIL}" ]; then
     systemctl start ${DEPENDS} && sleep 10
     if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
 
-    # restart webmin - depends on stunnel4
-    DEPENDS=webmin
-    systemctl start ${DEPENDS} && sleep 10
-    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+    # check webmin exits
+    FILE=/etc/webmin/config
+    if [ -f "${FILE}" ]; then
+        # restart webmin - depends on stunnel4
+        DEPENDS=webmin
+        systemctl start ${DEPENDS} && sleep 10
+        if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+    fi
 
     # restart apache2
     DEPENDS=apache2
