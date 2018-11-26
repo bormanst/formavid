@@ -413,8 +413,12 @@ if [ -n "${APP_EMAIL}" ]; then
         echo "#"
         echo "#############################################"
         echo ${MESSSAGE} >> ${LOG}
-        # create base site
-        ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+        # check drupal default/default.settings.php exits
+        FILE=${WEB_ROOT}/drupal8/prod/web/sites/default/default.settings.php
+        if [ -f "${FILE}" ]; then
+            # create base site
+            ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+        fi
     else
         # skipping
         echo ""

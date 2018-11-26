@@ -126,10 +126,10 @@ def main():
     drupaldir = "/".join(["/var/www/drupal8",drupalsubdir])
 
     # Verify default/settings.php exists.
-    pathFile = "/".join([drupaldir,"web/sites/default/settings.php"])
+    pathFile = "/".join([drupaldir,"web/sites/default/default.settings.php"])
     if not os.path.exists(pathFile):
         # Log start.
-        logging.info('Missing requirement: %s - Missing sites/default/settings.php file.' % datetime.datetime.now())
+        logging.info('Missing requirement: %s - Missing sites/default/default.settings.php file.' % datetime.datetime.now())
         logging.info('Please verify the drupal 8 installation in /var/www.')
         quit()
 
