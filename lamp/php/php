@@ -16,7 +16,7 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check exists
 # Note: xdebug.max_nesting_level set below so using as a trigger
-if [[ $(php -r "echo ini_get('memory_limit');") == "256M" ]]; then
+if [[ $(php -r "echo ini_get('memory_limit');") == "-1" ]]; then
     MESSSAGE="The memory_limit is already set. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
