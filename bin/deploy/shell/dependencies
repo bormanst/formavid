@@ -22,7 +22,7 @@ fi
 
 # dependencies check: composer requires lotsa mem or just a swap
 SWAPFILE=/swapfile
-if [ $(swapon -s | grep -ci "${SWAPFILE}") -eq 0 ];  then
+if [ $(swapon -s | grep -ci "partition") -eq 0 ];  then
     # add permanent swap:
     echo "$( date ) Adding permanent swap." >> ${LOG}
     fallocate -l 2G ${SWAPFILE}
