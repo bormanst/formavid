@@ -4,7 +4,7 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-PACKAGE=simpleinvoices
+PACKAGE=invoiceninja
 
 # log check
 MESSSAGE="Check packages: ${PACKAGE}"
@@ -26,7 +26,7 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # install dependencies
-    export APTGETS="php-curl php-gd php-mbstring php-mcrypt php-xml unzip"
+    export APTGETS="composer php-gmp php-curl php-intl php-mbstring php-xmlrpc php-gd php-xml php-zip"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

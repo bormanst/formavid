@@ -1,0 +1,295 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=invoiceninja
+
+# log check
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+WEB_ROOT=/var/www
+APP_DIR=${WEB_ROOT}/${PACKAGE}
+# check dir
+if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: mysql
+DEPENDS=mysql
+systemctl start ${DEPENDS} && sleep 10
+if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: apache2
+DEPENDS=apache2
+systemctl start ${DEPENDS} && sleep 10
+if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: php
+DEPENDS=php
+if ! hash ${DEPENDS} 2>/dev/null; then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: git
+DEPENDS=git
+if ! hash ${DEPENDS} 2>/dev/null; then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: composer
+DEPENDS=composer
+if ! hash ${DEPENDS} 2>/dev/null; then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# set subdomain for app
+SUBDOMAIN="billing."
+
+# create database
+MESSSAGE="Creating database for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+DB_NAME=${PACKAGE}
+DB_USER=${PACKAGE}
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+MYSQL_ADMIN="/usr/bin/mysqladmin ${ROOT_CREDS}"
+MYSQL_BATCH="/usr/bin/mysql ${ROOT_CREDS} --batch"
+if (${MYSQL_ADMIN} create ${DB_NAME}); then
+    # add database user
+    ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${DB_USER}@localhost IDENTIFIED BY '${APP_PASS}'; FLUSH PRIVILEGES;"
+else
+    echo ""
+    echo ""
+    echo "WARNING! The ${DB_NAME} database already exists."
+    echo "WARNING! Please drop the database before running this script."
+    echo "WARNING! Be sure to make a backup if applicable."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# install latest
+MESSSAGE="Installing latest distro zip for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+URL="https://download.invoiceninja.com"
+wget -qO- -O ${PACKAGE}.zip ${URL}
+unzip -qq ${PACKAGE}.zip -d ${WEB_ROOT}
+rm ${PACKAGE}.zip
+mv ${WEB_ROOT}/ninja ${APP_DIR}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# clean up mod_php5 references in htaccess
+MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# initialize app env file
+MESSSAGE="Initializing env for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+APP_SECRET=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+PHANTOM_SECRET=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+ENV=${APP_DIR}/.env
+cat > ${ENV} <<EOF
+APP_ENV=production
+APP_DEBUG=false
+APP_LOCALE=en
+APP_URL=https://${SUBDOMAIN}${APP_HOSTNAME}
+APP_KEY=${APP_SECRET}
+APP_CIPHER=AES-256-CBC
+REQUIRE_HTTPS=true
+DB_TYPE=mysql
+DB_HOST=localhost
+DB_DATABASE=${DB_NAME}
+DB_USERNAME=${DB_USER}
+DB_PASSWORD=${APP_PASS}
+MAIL_DRIVER=smtp
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_HOST=
+MAIL_USERNAME=
+MAIL_FROM_NAME=
+MAIL_FROM_ADDRESS=
+MAIL_PASSWORD=
+PHANTOMJS_CLOUD_KEY=a-demo-key-with-low-quota-per-ip-address
+PHANTOMJS_SECRET=${PHANTOM_SECRET}
+MAILGUN_DOMAIN=
+MAILGUN_SECRET=
+EOF
+
+# tweak configuration
+# sed -i "0,/params.username/s/params.username.*/params.username = ${DB_USER}/" ${CONF}
+# sed -i "s|Europe/London|UTC|" ${CONF}
+
+# set drupal theme dir
+# TODO: put in envars as defaults.
+PROJECT="prod"
+DRUPAL_DIR="/var/www/drupal8"
+THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes/${SITENAME}
+
+# set theme alias
+ALIAS_THEME=""
+ALIAS_THEME_CSS=""
+if [ -d "${THEME_DIR}" ]; then
+    ALIAS_THEME="Alias /theme ${THEME_DIR}"
+    ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
+fi
+
+# apply theme.
+# FILE=${APP_DIR}/templates/default/header.tpl
+# sed -i "/<title/d" ${FILE}
+# sed -i "/favicon.ico/d" ${FILE}
+# sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${FILE}
+# sed -i '/base.css/d' ${FILE}
+# sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${FILE}
+# sed -i "/<body/r /etc/formavid/header.txt" ${FILE}
+# sed -i "s/sedtoolname/Billing/g" ${FILE}
+# sed -i "s/sedbrsize/50px/g" ${FILE}
+
+# set permissions
+MESSSAGE="Setting perms for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+chown -R admin:adm ${APP_DIR}
+chmod -R 755 ${APP_DIR}/storage
+chown www-data:www-data ${APP_DIR}/.env
+chown -R www-data:www-data ${APP_DIR}/storage
+chown -R www-data:www-data ${APP_DIR}/bootstrap
+chown -R www-data:www-data ${APP_DIR}/public/logo
+
+# create etc dir
+ETC=/etc/${PACKAGE}
+mkdir -p ${ETC}
+
+# apache2: create conf
+MESSSAGE="Configuring apache for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+CONF=${ETC}/apache.conf
+cat > ${CONF} <<EOF
+<VirtualHost *:443>
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAlias www.${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    SSLEngine on
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    ${ALIAS_THEME}
+    ${ALIAS_THEME_CSS}
+    DocumentRoot ${APP_DIR}/public
+    <Directory ${APP_DIR}/public>
+        AllowOverride All
+        Options +FollowSymLinks
+        AuthName "password protected area"
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAlias www.${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+    RedirectPermanent / "https://${SUBDOMAIN}${APP_HOSTNAME}/"
+</VirtualHost>
+EOF
+
+#  apache2: set conf perms
+chmod 0644 ${CONF}
+
+# apache2: link conf file
+AVAILABLE=/etc/apache2/sites-available
+ln -s ${CONF} ${AVAILABLE}/${PACKAGE}.conf
+
+# apache2: enable conf
+a2enmod rewrite
+a2ensite ${PACKAGE}
+
+# add hosts entry
+MESSSAGE="Adding host entry for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+sed -i "/127.0.1.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
+
+# clean up
+
+# set admin password and email
+MESSSAGE="Initializing admin info for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+${FORMAVID}/bin/initialize/python/${PACKAGE}.py
+
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0

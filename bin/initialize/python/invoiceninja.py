@@ -6,7 +6,7 @@
 
 """
 
-Set SimpleInvoices admin password and email
+Set Invoice Ninja admin password and email
 
 """
 
@@ -26,21 +26,23 @@ def main():
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
     hostname = os.environ.get("APP_HOSTNAME")
-    password = os.environ.get("SIMPLEINVOICES_PASS")
+    password = os.environ.get("APP_EMAIL")
     update_email = os.environ.get("UPDATE_EMAIL")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
     username = "admin"
+    restart_apache = False
 
     # Set hostname.
     if not hostname: hostname = DEFAULT_HOSTNAME
 
     # Check password.
     if not password:
+        restart_apache = True
         password = d.get_password(
-            "Simple Invoices admin Password",
-            "Enter password for the Simple Invoices apache site access and admin account.")
+            "Invoice Ninja admin Password",
+            "Enter password for the Invoice Ninja apache site access and admin account.")
 
     # Check dbpass.
     if not dbpass:
@@ -50,22 +52,23 @@ def main():
 
     # Check apachepass.
     if not apachepass:
+        restart_apache = True
         apachepass = d.get_password(
             "Apache access password",
-            "Please enter password for Apache access to Simple Invoices.")
+            "Please enter password for Apache access to Invoice Ninja.")
 
     # Check update_email.
     if not update_email and not email:
         update_email = d.yesno(
-            "Simple Invoices admin Email",
-            "Change the admin email for Simple Invoices?",
+            "Invoice Ninja admin Email",
+            "Change the admin email for Invoice Ninja?",
             "Yes",
             "No")
         if update_email:
             # Get email.
             email = d.get_email(
-                "Simple Invoices admin Email",
-                "Enter email address for the Simple Invoices admin account.",
+                "Invoice Ninja admin Email",
+                "Enter email address for the Invoice Ninja admin account.",
                 "%s@%s" (username, hostname))
     # if email do update
     elif email: update_email = True
@@ -79,25 +82,25 @@ def main():
     con = ""
     try:
         # Get db conection.
-        con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
+        # con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
         # Get db cursor.
-        cur = con.cursor()
+        # cur = con.cursor()
         # Update simpleinvoices password.
-        cur.execute('SET PASSWORD FOR simpleinvoices@localhost = PASSWORD("%s"); flush privileges;' % password)
-        cur.execute('UPDATE simpleinvoices.si_user SET password=\"%s\" WHERE id=1;' % hashpass)
+        # cur.execute("ALTER USER invoiceninja@localhost IDENTIFIED BY '%s'; FLUSH PRIVILEGES;" % password)
+        # cur.execute('UPDATE simpleinvoices.si_user SET password=\"%s\" WHERE id=1;' % hashpass)
         # Check update email.
-        if update_email: cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
-        system('sed -i "0,/params.password/s/params.password.*/params.password = %s/" /var/www/simpleinvoices/config/config.php' % password)
-        system("sed -i 's|^encryption.default.key.*|encryption.default.key = %s|' /var/www/simpleinvoices/config/config.php" % password)
+        # if update_email: cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
+        # system('sed -i "0,/params.password/s/params.password.*/params.password = %s/" /var/www/simpleinvoices/config/config.php' % password)
+        # system("sed -i 's|^encryption.default.key.*|encryption.default.key = %s|' /var/www/simpleinvoices/config/config.php" % password)
         # Set apache2 htdbm password.
-        directory = "/usr/local/apache2/passwd/simpleinvoices"
+        directory = "/usr/local/apache2/passwd/invoiceninja"
         if os.path.isdir(directory): system("rm -rf %s" % directory)
         system("mkdir -p %s" % directory)
         directory = "".join([directory, '/passwords.dbm'])
         command = " ".join(['htdbm -bc', directory, username, apachepass])
         system(command)
         # restart apache2
-        system('systemctl restart apache2')
+        if restart_apache: system('systemctl restart apache2')
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
