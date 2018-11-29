@@ -32,8 +32,8 @@ if [ -f "${MYSQL_CONF}" ]; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -45,26 +45,28 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
-BATCH_EX="--batch --execute"
-ROOT_CREDS="--user=root --password=${DB_PASS}"
-
 # set root password
-mysqladmin -u root password ${DB_PASS}
-
-# set required global vars
-QUERY="SET GLOBAL innodb_file_format=Barracuda; SET GLOBAL innodb_file_format_max=Barracuda; SET GLOBAL innodb_file_per_table=ON; SET GLOBAL innodb_large_prefix=1;"
-mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+MESSSAGE="Setting root password for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+/usr/bin/mysqladmin -u root password ${DB_PASS}
 
 # enable db socket access
+MESSSAGE="Enabling db socket access for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
 sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
 
 # restart service
+MESSSAGE="Restarting service for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 systemctl restart ${PACKAGE}
 
 # add admin user to database
-mysql --user=root --password=${DB_PASS} --execute "CREATE USER admin@localhost IDENTIFIED BY '${APP_PASS}';"
-mysql --user=root --password=${DB_PASS} --execute "GRANT ALL PRIVILEGES ON *.* TO admin@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;"
+MESSSAGE="Add admin user for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+MYSQL_BATCH="/usr/bin/mysql ${ROOT_CREDS} --batch"
+${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON *.* TO admin@localhost IDENTIFIED BY '${APP_PASS}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
