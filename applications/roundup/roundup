@@ -64,6 +64,9 @@ fi
 MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# set subdomain for app
+SUBDOMAIN="${TRACKER}."
+
 # create database
 MESSSAGE="Creating database for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
@@ -205,7 +208,8 @@ echo ${MESSSAGE} | tee -a ${LOG}
 CONF=${ETC}/apache.conf
 cat > ${CONF} <<EOF
 <VirtualHost *:443>
-    ServerName support.${APP_HOSTNAME}
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAlias www.${SUBDOMAIN}${APP_HOSTNAME}
     ServerAdmin webmaster@localhost
     UseCanonicalName Off
     SSLEngine on
@@ -231,13 +235,14 @@ cat > ${CONF} <<EOF
 </VirtualHost>
 
 <VirtualHost *:80>
-    ServerName support.${APP_HOSTNAME}
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAlias www.${SUBDOMAIN}${APP_HOSTNAME}
     ServerAdmin webmaster@localhost
     UseCanonicalName Off
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    RedirectPermanent /${TRACKER}/ "https://support.${APP_HOSTNAME}/${TRACKER}/"
-    RedirectPermanent / "https://support.${APP_HOSTNAME}/${TRACKER}/"
+    RedirectPermanent /${TRACKER}/ "https://${SUBDOMAIN}${APP_HOSTNAME}/${TRACKER}/"
+    RedirectPermanent / "https://${SUBDOMAIN}${APP_HOSTNAME}/${TRACKER}/"
 </VirtualHost>
 EOF
 
