@@ -7,8 +7,8 @@
 PACKAGE=roundup
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -61,29 +61,20 @@ if ! (systemctl -q is-active ${DEPENDS}); then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
-
-# setup database vars
-DB_NAME=${TRACKER}
-DB_USER=${PACKAGE}
-
-# add roundup user for pip install
-if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
-    useradd -U -m -r -s /bin/bash ${DB_USER}
-fi
-
-# set mysql vars
-BATCH_EX="--batch --execute"
-ROOT_CREDS="--user=root --password=${DB_PASS}"
-MYSQL_ADMIN=/usr/bin/mysqladmin
-MYSQL_DUMP=/usr/bin/mysqldump
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # create database
+MESSSAGE="Creating database for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+DB_NAME=${TRACKER}
+DB_USER=${PACKAGE}
+ROOT_CREDS="--user=root --password=${DB_PASS}"
+MYSQL_ADMIN="/usr/bin/mysqladmin ${ROOT_CREDS}"
+MYSQL_BATCH="/usr/bin/mysql ${ROOT_CREDS} --batch"
 if (${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}); then
     # add database user
-    QUERY="grant all privileges on ${DB_NAME}.* to ${DB_USER}@localhost identified by '${ROUNDUP_PASS}'; flush privileges;"
-    mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
+    ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${DB_USER}@localhost IDENTIFIED BY '${APP_PASS}'; FLUSH PRIVILEGES;"
 else
     echo ""
     echo ""
@@ -95,7 +86,15 @@ else
     exit 0
 fi
 
-# check pip install
+# pip install
+MESSSAGE="Installing latest pip distro for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# add roundup user for pip install
+if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
+    useradd -U -m -r -s /bin/bash ${DB_USER}
+fi
+
 HOME="/home/${DB_USER}/.local"
 if [ ! -d "${HOME}" ]; then
     # install roundup to user home
@@ -118,104 +117,17 @@ if [ ! -d "${HOME}" ]; then
 fi
 
 # tracker creation
+MESSSAGE="Creating tracker for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 BACKEND=mysql
 TEMPLATE=classic
 OPTIONS="admin_email=admin,email_registration_confirmation=no,dispatcher_email=admin,tracker_name=\"${SITETITLE} Issue Tracker\",tracker_web=https://support.${APP_HOSTNAME}/${TRACKER}/,mail_domain=${APP_HOSTNAME},mail_host=localhost,rdbms_name=${TRACKER},rdbms_password=${DB_PASS}"
 su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} install ${TEMPLATE} ${BACKEND} ${OPTIONS}"
 
-# tracker conf
-CONF=${APP_DIR}/config.ini
-
-#
-# HACK start:
-# need to install to a db that doesn't default to ROW_FORMAT=COMPACT
-# install into compatible docker db and restore to local mariadb
-#
-
-# set docker vars
-HACK=docker
-LOCAL_PORT=3306
-DOCKER_PORT=3310
-DOCKER_HOST=127.0.0.1
-
-# set docker db port
-OPTION=port
-sed -i "1,/^${OPTION} =/s/^${OPTION} =/${OPTION} = ${DOCKER_PORT}/" ${CONF}
-# docker needs actual 127.0.0.1 ip vs localhost
-OPTION=host
-sed -i "1,/^${OPTION} = localhost/s/^${OPTION} = localhost/${OPTION} = ${DOCKER_HOST}/" ${CONF}
-# docker needs "remote" db access so use root
-OPTION=user
-sed -i "1,/^${OPTION} = ${DB_USER}/s/^${OPTION} = ${DB_USER}/${OPTION} = root/" ${CONF}
-
-# check docker exists
-if hash ${HACK}; then
-    # docker: start docker
-    systemctl enable ${HACK}
-    systemctl start ${HACK}
-else
-    # docker: get docker
-    curl -sSL https://get.${HACK}.com/ | sh
-fi
-
-# docker: check container is active
-CONTAINER=mariadb-10133-container
-if [ ! "`/usr/bin/${HACK} inspect -f {{.State.Running}} ${CONTAINER}`" == "true" ]; then
-    # docker: start docker db with remove-on-stop flag --rm
-    ${HACK} run --rm --name ${CONTAINER} -p ${DOCKER_HOST}:${DOCKER_PORT}:${LOCAL_PORT} -e MYSQL_ROOT_PASSWORD=${DB_PASS} -d mariadb:10.1.33
-fi
-
-# docker: have to wait for active container db
-COUNTER=0
-while ! (${HACK} exec ${CONTAINER} ${MYSQL_ADMIN} ${ROOT_CREDS} --host "${DOCKER_HOST}" ping --silent &> /dev/null); do
-    # sleep a bit
-    sleep 2
-    # check COUNTER for exit in case of "hang"
-    if [ ${COUNTER} -gt 120 ]; then exit 0; fi
-    # inc COUNTER
-    let COUNTER=COUNTER+1
-done
-
-# initialise tracker using docker db
-su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS}"
-
-# dump docker db to home to avoid perm issues
-${HACK} exec ${CONTAINER} ${MYSQL_DUMP} ${ROOT_CREDS} ${DB_NAME} > ~/${DB_NAME}.sql
-
-# drop docker db
-QUERY="drop database ${DB_NAME};"
-${HACK} exec ${CONTAINER} mysql ${ROOT_CREDS} ${BATCH_EX} "${QUERY}"
-
-# remove-on-stop docker
-${HACK} stop ${CONTAINER}
-
-# docker: disable but leave for adding tackers
-systemctl stop ${HACK}
-systemctl disable ${HACK}
-rm /etc/apt/sources.list.d/${HACK}.list
-
-# force ROW_FORMAT=DYNAMIC
-sed -i '/^) ENGINE/s/) ENGINE/) ROW_FORMAT=DYNAMIC ENGINE/g' ~/${DB_NAME}.sql
-
-# restore dump to local db
-mysql ${ROOT_CREDS} ${DB_NAME} < ~/${DB_NAME}.sql
-
-# remove dump
-rm ~/${DB_NAME}.sql
-
-# reset local db port - empty uses default
-OPTION=port
-sed -i "1,/^${OPTION} = ${DOCKER_PORT}/s/^${OPTION} = ${DOCKER_PORT}/${OPTION} =/" ${CONF}
-# reset localhost
-OPTION=host
-sed -i "1,/^${OPTION} = ${DOCKER_HOST}/s/^${OPTION} = ${DOCKER_HOST}/${OPTION} = localhost/" ${CONF}
-# reset user
-OPTION=user
-sed -i "1,/^${OPTION} = root/s/^${OPTION} = root/${OPTION} = ${DB_USER}/" ${CONF}
-
-#
-# HACK completed: continue usual
-#
+# initialise tracker
+MESSSAGE="Initializing tracker for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+su - ${DB_USER} -c "roundup-admin -i ${APP_DIR} initialise ${ROUNDUP_PASS} <<< y"
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -226,6 +138,11 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
     echo ""
 fi
+
+# tracker conf
+MESSSAGE="Configuring tracker for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+CONF=${APP_DIR}/config.ini
 
 # create etc dir
 ETC=/etc/${PACKAGE}/${TRACKER}
@@ -269,12 +186,22 @@ mkdir -p ${APP_DIR}/html/images
 # give apache2 db access
 chown -R www-data:www-data ${APP_DIR}/db
 
-# drupal theme dir
+# set drupal theme dir
 PROJECT="prod"
 DRUPAL_DIR="/var/www/drupal8"
 THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes/${SITENAME}
 
+# set theme alias
+ALIAS_THEME=""
+ALIAS_THEME_CSS=""
+if [ -d "${THEME_DIR}" ]; then
+    ALIAS_THEME="Alias /${TRACKER}/theme ${THEME_DIR}"
+    ALIAS_THEME_CSS="Alias /${TRACKER}/theme/css ${THEME_DIR}/components/asset-builds/css"
+fi
+
 # apache2: create conf
+MESSSAGE="Configuring apache for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 CONF=${ETC}/apache.conf
 cat > ${CONF} <<EOF
 <VirtualHost *:443>
@@ -286,9 +213,9 @@ cat > ${CONF} <<EOF
     CustomLog \${APACHE_LOG_DIR}/access.log combined
     RedirectMatch ^/$ /${TRACKER}/
     PythonOptimize On
+    ${ALIAS_THEME}
+    ${ALIAS_THEME_CSS}
     Alias /${TRACKER}/docs ${APP_DIR}/docs/html
-    Alias /${TRACKER}/theme/css ${THEME_DIR}/components/asset-builds/css
-    Alias /${TRACKER}/theme ${THEME_DIR}
     AliasMatch ^/${TRACKER}/@@file/(.*) ${APP_DIR}/html/\$1
     AliasMatch ^/${TRACKER}/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1
     DocumentRoot ${APP_DIR}
