@@ -15,7 +15,7 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check dir
-APP_DIR=/var/www/admin
+APP_DIR=${WEBROOT}/admin
 if [ -d "${APP_DIR}" ]; then
     MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
@@ -56,11 +56,6 @@ if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
     echo admin:${APP_PASS} | chpasswd
     usermod -aG sudo admin
 fi
-
-# drupal project subdir
-PROJECT="prod"
-DRUPAL_DIR="/var/www/drupal8"
-PROJECT_DIR=${DRUPAL_DIR}/${PROJECT}
 
 # create cssadmin user
 if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then

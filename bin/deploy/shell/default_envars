@@ -19,7 +19,13 @@ export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
 export SITETITLE="Example Site Name" # will map to Example Site Name for drupal and base admin site
 export APP_EMAIL="admin@${APP_HOSTNAME}"
 export SOLR_INSTALL="False" # default: False
-export DEFAULT_PASS=""
+
+# warning - do not modify as some python scripts have this statically wired
+export WEBROOT=/var/www
+export DRUPAL_NAME=drupal8
+export DRUPAL_DIR=${WEBROOT}/${DRUPAL_NAME}
+export PROJECT=prod
+export PROJECT_DIR=${DRUPAL_DIR}/${PROJECT}
 
 # gcloud envars
 GCS_PROJECT_ID="None"

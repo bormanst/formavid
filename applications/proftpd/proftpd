@@ -48,9 +48,7 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # drupal theme dir
-PROJECT="prod"
-DRUPAL_DIR="/var/www/drupal8"
-THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes
+THEME_DIR=${PROJECT_DIR}/web/themes
 
 # set cssadmin dir
 cat >> ${CONF} <<EOF

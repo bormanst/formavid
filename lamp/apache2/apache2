@@ -91,8 +91,15 @@ sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"sho
 sed -i "/Require ip/a\                Deny from all" ${CONF}
 sed -i "/Require ip/a\                Order deny,allow" ${CONF}
 
+# set drupal theme dir
+THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+
+# set theme alias
+ALIAS_THEME="Alias /theme ${THEME_DIR}"
+ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
+
 # tools: create conf
-APP_DIR=/var/www/admin
+APP_DIR=${WEBROOT}/admin
 APACHE_CONF=/etc/apache2/sites-available/zzz-admin.${SITENAME}.conf
 cat > ${APACHE_CONF} <<EOF
 <VirtualHost *:443>
@@ -102,8 +109,8 @@ cat > ${APACHE_CONF} <<EOF
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    Alias /theme/css /var/www/drupal8/prod/web/themes/${SITENAME}/components/asset-builds/css
-    Alias /theme /var/www/drupal8/prod/web/themes/${SITENAME}
+    ${ALIAS_THEME}
+    ${ALIAS_THEME_CSS}
     DocumentRoot ${APP_DIR}
     <Directory ${APP_DIR}>
         Require all denied

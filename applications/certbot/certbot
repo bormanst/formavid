@@ -68,9 +68,7 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # drupal project subdir
-PROJECT="prod"
-DRUPAL_DIR="/var/www/drupal8"
-WEB_ROOT=${DRUPAL_DIR}/${PROJECT}/web
+WEB_ROOT=${PROJECT_DIR}/web
 
 # get cert
 # can add more domains

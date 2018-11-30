@@ -73,6 +73,17 @@ fi
 # add apache port
 sed -i "/# vim:/iListen ${ADMINER_PORT}" /etc/apache2/ports.conf
 
+# set drupal theme dir
+THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+
+# set theme alias
+ALIAS_THEME=""
+ALIAS_THEME_CSS=""
+if [ -d "${THEME_DIR}" ]; then
+    ALIAS_THEME="Alias /theme ${THEME_DIR}"
+    ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
+fi
+
 # append apache conf
 cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
 
@@ -82,8 +93,8 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-    Alias /theme/css /var/www/drupal8/themes/${SITENAME}/components/asset-builds/css
-    Alias /theme /var/www/drupal8/themes/${SITENAME}
+    ${ALIAS_THEME}
+    ${ALIAS_THEME_CSS}
     Alias /adminer/static /usr/share/adminer/adminer/static
     Alias /externals /usr/share/adminer/externals
     Alias /editor   /usr/share/adminer/editor

@@ -62,11 +62,8 @@ echo "" >> ${LOG}
 # already run
 export ALREADY_RUN="False"
 
-# set web root
-WEB_ROOT=/var/www
-
 # check dir
-APP_DIR=${WEB_ROOT}/admin
+APP_DIR=${WEBROOT}/admin
 if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
 
 # configure apt for queued access
@@ -270,8 +267,8 @@ if [ -n "${APP_EMAIL}" ]; then
     PARENT_DIR=${FORMAVID}/applications
     # check script dir
     if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
-    # open ${WEB_ROOT} perms
-    chmod 0777 ${WEB_ROOT}
+    # open ${WEBROOT} perms
+    chmod 0777 ${WEBROOT}
     # get application dirs
     for CHILD_DIR in $(find ${PARENT_DIR} -maxdepth 1 -mindepth 1 -type d | sort); do
         # loop through scripts
@@ -299,8 +296,8 @@ if [ -n "${APP_EMAIL}" ]; then
     echo ${MESSSAGE} >> ${LOG}
     # wait for processes completed
     wait
-    # close ${WEB_ROOT} perms
-    chmod 0755 ${WEB_ROOT}
+    # close ${WEBROOT} perms
+    chmod 0755 ${WEBROOT}
 
     # restart services
     echo ""
@@ -418,7 +415,7 @@ if [ -n "${APP_EMAIL}" ]; then
         echo "#############################################"
         echo ${MESSSAGE} >> ${LOG}
         # check drupal default/default.settings.php exits
-        FILE=${WEB_ROOT}/drupal8/prod/web/sites/default/default.settings.php
+        FILE=${PROJECT_DIR}/web/sites/default/default.settings.php
         if [ -f "${FILE}" ]; then
             # create base site
             ${FORMAVID}/bin/deploy/python/create-drupal-stack.py

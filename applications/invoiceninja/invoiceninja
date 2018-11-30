@@ -14,8 +14,7 @@ echo ${MESSSAGE} | tee -a ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-WEB_ROOT=/var/www
-APP_DIR=${WEB_ROOT}/${PACKAGE}
+APP_DIR=${WEBROOT}/${PACKAGE}
 # check dir
 if [ -d "${APP_DIR}" ]; then
     MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
@@ -131,9 +130,9 @@ MESSSAGE="Installing latest distro zip for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 URL="https://download.invoiceninja.com"
 wget -qO- -O ${PACKAGE}.zip ${URL}
-unzip -qq ${PACKAGE}.zip -d ${WEB_ROOT}
+unzip -qq ${PACKAGE}.zip -d ${WEBROOT}
 rm ${PACKAGE}.zip
-mv ${WEB_ROOT}/ninja ${APP_DIR}
+mv ${WEBROOT}/ninja ${APP_DIR}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -190,10 +189,7 @@ EOF
 # sed -i "s|Europe/London|UTC|" ${CONF}
 
 # set drupal theme dir
-# TODO: put in envars as defaults.
-PROJECT="prod"
-DRUPAL_DIR="/var/www/drupal8"
-THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
 
 # set theme alias
 ALIAS_THEME=""

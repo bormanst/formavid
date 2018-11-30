@@ -11,9 +11,7 @@ MESSSAGE="Check packages: ${PACKAGE}"
 echo ${MESSSAGE} >> ${LOG}
 
 # set dirs
-DRUPAL_DIR=${PACKAGE}
-WWW_DIR=/var/www
-APP_DIR=${WWW_DIR}/${DRUPAL_DIR}
+APP_DIR=${DRUPAL_DIR}
 # check dir
 # check packages
 PKG_CHECK=${PACKAGE^^}

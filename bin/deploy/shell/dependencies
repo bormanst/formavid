@@ -7,7 +7,7 @@
 PACKAGE=dependencies
 
 # check dir
-APP_DIR=/var/www/admin
+APP_DIR=${WEBROOT}/admin
 if [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""

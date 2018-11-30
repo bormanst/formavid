@@ -15,9 +15,7 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # set dirs
-DRUPAL_DIR=${PACKAGE}
-WWW_DIR=/var/www
-APP_DIR=${WWW_DIR}/${DRUPAL_DIR}
+APP_DIR=${DRUPAL_DIR}
 
 # check dir
 if [ -d "${APP_DIR}" ]; then
@@ -108,10 +106,6 @@ su - admin -c "${COMMAND}"
 # load composer console in drupal root
 COMMAND="composer install -d ${APP_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
-
-# drupal project subdir
-PROJECT="prod"
-PROJECT_DIR=${APP_DIR}/${PROJECT}
 
 # create project template with --no-install
 COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --stability dev --no-install --no-progress --no-interaction"

@@ -18,7 +18,7 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 TRACKER=support
 
 # check dir
-APP_DIR=/var/www/${TRACKER}
+APP_DIR=${WEBROOT}/${TRACKER}
 if [ -d "${APP_DIR}" ]; then
     MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
@@ -179,9 +179,7 @@ sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n
 chown -R www-data:www-data ${APP_DIR}/db
 
 # set drupal theme dir
-PROJECT="prod"
-DRUPAL_DIR="/var/www/drupal8"
-THEME_DIR=${DRUPAL_DIR}/${PROJECT}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
 
 # set theme alias
 ALIAS_THEME=""
