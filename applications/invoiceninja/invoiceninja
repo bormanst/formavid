@@ -194,7 +194,7 @@ THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
 # set theme alias
 ALIAS_THEME=""
 ALIAS_THEME_CSS=""
-if [ -d "${THEME_DIR}" ]; then
+if [ -f "${DRUPAL_SCRIPT}" ]; then
     ALIAS_THEME="Alias /theme ${THEME_DIR}"
     ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
 fi

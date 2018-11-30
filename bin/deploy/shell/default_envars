@@ -26,6 +26,7 @@ export DRUPAL_NAME=drupal8
 export DRUPAL_DIR=${WEBROOT}/${DRUPAL_NAME}
 export PROJECT=prod
 export PROJECT_DIR=${DRUPAL_DIR}/${PROJECT}
+export DRUPAL_SCRIPT=${FORMAVID}/applications/drupal8/drupal8
 
 # gcloud envars
 GCS_PROJECT_ID="None"
