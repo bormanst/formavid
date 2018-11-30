@@ -37,12 +37,14 @@ def main():
     d = Dialog(DEFAULT_DIALOG_HEADER)
     drupaldir = "/var/www/drupal8"
     username = "admin"
+    restart_apache = False
 
     # Set hostname.
     if not hostname: hostname = DEFAULT_HOSTNAME
 
     # Check password.
     if not password:
+        restart_apache = True
         password = d.get_password(
             "Drupal admin and cssadmin password",
             "Please enter password for Drupal admin and cssadmin accounts.")
@@ -102,9 +104,10 @@ def main():
                     system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET init=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                 # Clear site cache.
                 system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
-        # restart apache2
-        system('systemctl restart apache2')
-        system("echo 'Update password for admin has completed. Service apache2 has been restarted.'")
+        if restart_apache:
+            # restart apache2
+            system('systemctl restart apache2')
+            system("echo 'Update password for admin has completed. Service apache2 has been restarted.'")
     except KeyError:
         # Error admin.
         system("")
