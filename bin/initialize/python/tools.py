@@ -24,8 +24,10 @@ def main():
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
     username = "admin"
+    restart_apache = False
 
     if not apachepass:
+        restart_apache = True
         apachepass = d.get_password(
             "Tools page admin Password",
             "Please enter password for Apache access to tools page.")
@@ -38,7 +40,7 @@ def main():
     system(command)
 
     # restart apache2
-    system('systemctl restart apache2')
+    if restart_apache: system('systemctl restart apache2')
 
 if __name__ == "__main__":
     main()
