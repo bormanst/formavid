@@ -60,14 +60,14 @@ echo "$( date ) -------------------" >> ${LOG}
 echo "" >> ${LOG}
 
 # already run
-ALREADY_RUN="False"
+export ALREADY_RUN="False"
 
 # set web root
 WEB_ROOT=/var/www
 
 # check dir
 APP_DIR=${WEB_ROOT}/admin
-if [ -d "${APP_DIR}" ]; then ALREADY_RUN="True"; fi
+if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
 
 # configure apt for queued access
 CONF=/etc/apt/apt.conf
@@ -111,7 +111,7 @@ else
 fi
 
 # set passwords by input
-. ${FORMAVID}/bin/deploy/shell/get_passwords ${DEFAULT_PASS}
+. ${FORMAVID}/bin/deploy/shell/get_passwords
 
 # dependencies check
 ${FORMAVID}/bin/deploy/shell/dependencies
