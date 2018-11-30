@@ -456,7 +456,7 @@ MINUTES=$(( (${TIME_TOTAL}-${SECONDS})%3600 ))
 HOURS=$(( ((${TIME_TOTAL}-${MINUTES}-${SECONDS})%216000)/3600 ))
 MINUTES=$(( ${MINUTES}/60 ))
 echo ""
-MESSSAGE="$( date ) Appliance deployment completed in ${HOURS}-hr:${MINUTES}-min:${SECONDS}-sec."
+MESSSAGE="$( date ) Deployment completed in ${HOURS}hr:${MINUTES}min:${SECONDS}sec."
 echo "#############################################"
 echo "#"
 echo "#"
