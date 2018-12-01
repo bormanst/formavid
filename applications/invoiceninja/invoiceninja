@@ -240,13 +240,9 @@ cat > ${CONF} <<EOF
     ${ALIAS_THEME_CSS}
     DocumentRoot ${APP_DIR}/public
     <Directory ${APP_DIR}/public>
+        Options +FollowSymlinks
         AllowOverride All
-        Options +FollowSymLinks
-        AuthName "password protected area"
-        AuthType Basic
-        Require valid-user
-        AuthBasicProvider dbm
-        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
+        Require all granted
     </Directory>
 </VirtualHost>
 
