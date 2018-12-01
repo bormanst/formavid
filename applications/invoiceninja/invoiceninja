@@ -185,8 +185,6 @@ MAILGUN_SECRET=
 EOF
 
 # tweak configuration
-# sed -i "0,/params.username/s/params.username.*/params.username = ${DB_USER}/" ${CONF}
-# sed -i "s|Europe/London|UTC|" ${CONF}
 
 # set drupal theme dir
 THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
@@ -197,18 +195,8 @@ ALIAS_THEME_CSS=""
 if [ -f "${DRUPAL_SCRIPT}" ]; then
     ALIAS_THEME="Alias /theme ${THEME_DIR}"
     ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
+    # apply theme
 fi
-
-# apply theme.
-# FILE=${APP_DIR}/templates/default/header.tpl
-# sed -i "/<title/d" ${FILE}
-# sed -i "/favicon.ico/d" ${FILE}
-# sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${FILE}
-# sed -i '/base.css/d' ${FILE}
-# sed -i "/<head/a<title>${SITETITLE} Billing</title>" ${FILE}
-# sed -i "/<body/r /etc/formavid/header.txt" ${FILE}
-# sed -i "s/sedtoolname/Billing/g" ${FILE}
-# sed -i "s/sedbrsize/50px/g" ${FILE}
 
 # set permissions
 MESSSAGE="Setting perms for ${PACKAGE} ..."
@@ -256,7 +244,7 @@ cat > ${CONF} <<EOF
 </VirtualHost>
 EOF
 
-#  apache2: set conf perms
+# apache2: set conf perms
 chmod 0644 ${CONF}
 
 # apache2: link conf file
@@ -275,9 +263,9 @@ sed -i "/127.0.1.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
 # clean up
 
 # set admin password and email
-MESSSAGE="Initializing admin info for ${PACKAGE} ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-${FORMAVID}/bin/initialize/python/${PACKAGE}.py
+# MESSSAGE="Initializing admin info for ${PACKAGE} ..."
+# echo ${MESSSAGE} | tee -a ${LOG}
+# ${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}
