@@ -80,8 +80,11 @@ THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
 ALIAS_THEME=""
 ALIAS_THEME_CSS=""
 if [ -f "${DRUPAL_SCRIPT}" ]; then
+    MESSSAGE="Applying system theme for ${PACKAGE} ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
     ALIAS_THEME="Alias /theme ${THEME_DIR}"
     ALIAS_THEME_CSS="Alias /theme/css ${THEME_DIR}/components/asset-builds/css"
+    # apply theme
 fi
 
 # append apache conf

@@ -185,10 +185,12 @@ THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
 ALIAS_THEME=""
 ALIAS_THEME_CSS=""
 if [ -f "${DRUPAL_SCRIPT}" ]; then
+    MESSSAGE="Applying system theme for ${PACKAGE} ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
     # update aliases
     ALIAS_THEME="Alias /${TRACKER}/theme ${THEME_DIR}"
     ALIAS_THEME_CSS="Alias /${TRACKER}/theme/css ${THEME_DIR}/components/asset-builds/css"
-    # apply theme header
+    # apply theme
     FILE=${APP_DIR}/html/page.html
     sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/images\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${FILE}
     sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"/support/theme/css/header.css\" \/>" ${FILE}
@@ -253,6 +255,6 @@ a2ensite ${TRACKER}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0
