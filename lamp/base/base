@@ -78,7 +78,7 @@ if [ ! -d "${TEMPLATES}" ]; then
     # mkdir is graceful so use it
     mkdir -p ${TEMPLATES}
     # make copy of templates
-    cp -p ${FORMAVID}/templates/* ${TEMPLATES}
+    cp -rp ${FORMAVID}/templates/* ${TEMPLATES}
     # configure templates
     DEFAULT_HEADER=${TEMPLATES}/sites-template/header.txt
     # tools: update header
