@@ -17,8 +17,8 @@ fi
 
 # check install
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -54,8 +54,8 @@ if [ -d "${APP_DIR}" ]; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -68,6 +68,9 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # drupal project subdir
+MESSSAGE="Configuring certs for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
 WEB_ROOT=${PROJECT_DIR}/web
 
 # get cert
@@ -103,6 +106,9 @@ systemctl restart stunnel4
 systemctl restart apache2
 
 # logrotate file for letsencrypt
+MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
 FILE=/etc/logrotate.d/letsencrypt
 cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
@@ -119,6 +125,6 @@ EOF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

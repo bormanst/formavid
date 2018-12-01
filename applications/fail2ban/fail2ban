@@ -7,8 +7,8 @@
 PACKAGE=fail2ban
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -32,8 +32,8 @@ if [ -f "${MYSQL_CONF}" ]; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -50,6 +50,6 @@ systemctl restart ${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

@@ -7,8 +7,8 @@
 PACKAGE=mysql
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -70,6 +70,6 @@ ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON *.* TO admin@localhost IDENTIF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

@@ -24,8 +24,8 @@ if [ "${GCS_BUCKET}" == "None" ] && [ "${GCS_PROJECT_ID}" == "None" ]; then
 fi
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -94,8 +94,8 @@ if ( ! gsutil -q ls -b gs://${GCS_BUCKET} ); then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # create app dir
 mkdir -p ${APP_DIR}
@@ -115,6 +115,8 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # set fuse mount point
+MESSSAGE="Mounting file system for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 MOUNT=/mnt/${PACKAGE}
 
 # create fuse backup point
@@ -137,12 +139,16 @@ fusermount -u -z ${MOUNT}
 gcsfuse --only-dir ${BACKUP_DIR}/ ${GCS_BUCKET} ${MOUNT}
 
 # initialize repository
+MESSSAGE="Initializing repository for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 BORG_PASSPHRASE="${BORGBACKUP_PASS}" borg init --info --encryption=repokey ${MOUNT} 2>> ${PACKAGE_LOG_DIR}/$( date +%Y%m%d ).log
 
 # unmount fuse
 fusermount -u -z ${MOUNT}
 
 # create cron job
+MESSSAGE="Creating cron job for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=${APP_DIR}/${PACKAGE}
 cat > ${FILE} <<EOF
 #!/bin/sh
@@ -440,6 +446,8 @@ chmod 0755 ${FILE}
 ln -sf ${FILE} /etc/cron.hourly/${PACKAGE}
 
 # create borg gcs mount script
+MESSSAGE="Creating borg gcs mount script for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=/usr/bin/borg-mount-gcs-archive
 cat > ${FILE} <<EOF
 #!/bin/bash -e
@@ -525,6 +533,8 @@ EOF
 chmod 0700 ${FILE}
 
 # logrotate file
+MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
@@ -544,6 +554,6 @@ ln -sf ${FILE} /etc/logrotate.d/${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

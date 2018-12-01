@@ -7,8 +7,8 @@
 PACKAGE=drupal8
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -73,13 +73,17 @@ if ! (hash php); then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # add drupal8 user to database
+MESSSAGE="Adding drupal8 user to database for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
 
 # composer peformance issue
+MESSSAGE="Disabling xdebug for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 phpdismod xdebug
 
 # make drupal dir
@@ -104,10 +108,14 @@ COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
 
 # load composer console in drupal root
+MESSSAGE="Installing composer for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="composer install -d ${APP_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # create project template with --no-install
+MESSSAGE="Creating project template for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:8.x-dev ${PROJECT_DIR} --stability dev --no-install --no-progress --no-interaction"
 su - admin -c "${COMMAND}"
 
@@ -126,19 +134,27 @@ COMMAND="cd ${PROJECT_DIR}"
 su - admin -c "${COMMAND}"
 
 # download and install
+MESSSAGE="Installing composer into project for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # enable drupal console within subdirs
+MESSSAGE="Enabling drupal console for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 curl https://drupalconsole.com/installer -L -o drupal.phar
 mv drupal.phar /usr/local/bin/drupal
 chmod +x /usr/local/bin/drupal
 
 # init drupal project console
+MESSSAGE="Initializing installation for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="drupal init --destination=${PROJECT_DIR}/console/ -q"
 su - admin -c "${COMMAND}"
 
 # copy chain files required for drupal project
+MESSSAGE="Copying chain files required for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="cp ${PROJECT_DIR}/vendor/drupal/console-core/dist/chain/* ${PROJECT_DIR}/console/chain"
 su - admin -c "${COMMAND}"
 
@@ -164,6 +180,8 @@ MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${A
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # add drush symlinks
+MESSSAGE="Configuring drush for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
 ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush.complete.sh /etc/bash_completion.d/drush
 
@@ -176,6 +194,8 @@ cat > /etc/drush/drushrc.php <<EOF
 EOF
 
 # update nodejs to latest
+MESSSAGE="Installing gulp for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 npm cache clean -f
 npm install -g n
 n stable
@@ -206,6 +226,8 @@ chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
 
 # update settings
+MESSSAGE="Updating settings for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 CONF=${PROJECT_DIR}/web/sites/default/settings.php
 cp ${PROJECT_DIR}/web/sites/default/default.settings.php ${CONF}
 
@@ -214,6 +236,8 @@ NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.
 sed -i "/trusted_host_patterns/,/\*\//{n;s|^$|${NEW_LINES}|}" ${CONF}
 
 # disable poor mans cron and setup drush cron
+MESSSAGE="Updating cron for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 cat >> ${CONF} <<EOF
 
 /**
@@ -260,6 +284,6 @@ a2enmod rewrite
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

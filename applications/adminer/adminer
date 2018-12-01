@@ -7,8 +7,8 @@
 PACKAGE=adminer
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -57,8 +57,8 @@ if ! (hash php); then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -88,6 +88,8 @@ if [ -f "${DRUPAL_SCRIPT}" ]; then
 fi
 
 # append apache conf
+MESSSAGE="Configuring apache for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
 
 <VirtualHost *:${ADMINER_PORT}>
@@ -127,6 +129,6 @@ EOF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

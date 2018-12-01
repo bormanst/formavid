@@ -7,7 +7,7 @@
 PACKAGE=php
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages

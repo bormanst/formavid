@@ -21,8 +21,8 @@ if [ "${GCS_PROJECT_ID}" == "None" ]; then
 fi
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -44,8 +44,8 @@ if [ -d "${APP_DIR}" ]; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # create app dir
 mkdir -p ${APP_DIR}
@@ -66,6 +66,8 @@ fi
 
 # create cron daily job
 # modified https://github.com/jacksegal/google-compute-snapshot/blob/master/gcloud-snapshot.sh
+MESSSAGE="Creating cron job for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=${APP_DIR}/${PACKAGE}
 cat > ${FILE} <<EOF
 #!/bin/bash
@@ -284,6 +286,8 @@ chmod 0755 ${FILE}
 ln -sf ${FILE} /etc/cron.daily/${PACKAGE}
 
 # logrotate file
+MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
@@ -303,6 +307,6 @@ ln -sf ${FILE} /etc/logrotate.d/${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

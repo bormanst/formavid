@@ -17,8 +17,8 @@ if [ "${SOLR_INSTALL}" != "True" ]; then
 fi
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -42,8 +42,8 @@ if [ -d "${APP_DIR}" ]; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # set version
 SOLR_SPEC="7.5.0"
@@ -110,6 +110,8 @@ sed -i "s/solr.log=logs/solr.log=\/var\/log\/solr/g" ${SOLR_HOME}/log4j.properti
 sed -i "s/SOLR_LOGS_DIR=\/var\/lib\/solr\/logs/SOLR_LOGS_DIR=\/var\/log\/solr/g" ${SOLR_OVERRIDES}
 
 # logrotate file for solr
+MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=/etc/logrotate.d/solr
 cat > ${FILE} <<EOF
 # Logrotate file for solr
@@ -137,6 +139,8 @@ EOF
 # openssl pkcs12 -passin pass:secret -passout pass:${APP_PASS} -in solr-ssl.keystore.p12 -out solr-ssl.pem
 
 # update configs/port
+MESSSAGE="Configuring access for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=/etc/default/solr.in.sh
 sed -i "s|^SOLR_PID_DIR=\(.*\)|SOLR_PID_DIR=${SOLR_HOME}|" ${FILE}
 sed -i "s|^SOLR_HOME=\(.*\)|SOLR_HOME=${SOLR_HOME}\/data|" ${FILE}
@@ -160,6 +164,8 @@ sed -i "s|^SOLR_PORT=\(.*\)|SOLR_PORT=${SOLR_PORT}|" ${FILE}
 # sed -i "s/jetty.port:8983/jetty.port:${SOLR_PORT}/" ${FILE}
 
 # add solr systemd
+MESSSAGE="Configuring systemd for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FILE=/etc/systemd/system/solr.service
 cat > ${FILE} <<EOF
 [Unit]
@@ -221,6 +227,6 @@ rm -rf ${SRC}/*${PACKAGE}*
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

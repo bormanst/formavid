@@ -7,8 +7,8 @@
 PACKAGE=proftpd
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -30,8 +30,8 @@ if [ $(grep -c 'cssadmin' ${CONF}) -gt 0 ];  then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # Disable memcache module: wheezy issue until patch???
 # Use dedicated ftp appliance if memcache useful/required.
@@ -48,6 +48,8 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # drupal theme dir
+MESSSAGE="Configuring cssadmin for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 THEME_DIR=${PROJECT_DIR}/web/themes
 
 # set cssadmin dir
@@ -62,6 +64,6 @@ systemctl restart ${PACKAGE}
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0

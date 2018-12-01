@@ -7,8 +7,8 @@
 PACKAGE=webmin
 
 # log check
-MESSSAGE="Check packages: ${PACKAGE}"
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # check packages
 PKG_CHECK=${PACKAGE^^}
@@ -31,8 +31,8 @@ if grep -q "inetd_ssl=1" ${CONF}; then
 fi
 
 # log configure
-MESSSAGE="Configuring ${PACKAGE}..."
-echo ${MESSSAGE} >> ${LOG}
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -45,6 +45,8 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # update miniserv
+MESSSAGE="Updating miniserv for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 sed -i "/^ssl=/ s|=.*|=|" ${CONF}
 sed -i "/^ipv6=/ s|=.*|=0|" ${CONF}
 set ${BIND_ADDR:=127.0.0.1}
@@ -57,6 +59,8 @@ no_resolv_myname=0
 EOF
 
 # add stunnel entry
+MESSSAGE="Adding stunnel entry for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 set ${ACCEPT_PORT:=12321}
 set ${WEBMIN_PORT:=10000}
 CONF=/etc/stunnel/stunnel.conf
@@ -91,6 +95,8 @@ for f in ${files}; do
 done
 
 # set theme
+MESSSAGE="Setting theme for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 set ${WEBMIN_THEME:=authentic-theme}
 CONF_DIR=/etc/webmin
 LOGO_DIR=${CONF_DIR}/${WEBMIN_THEME}
@@ -98,6 +104,8 @@ echo "theme=$WEBMIN_THEME" >> ${CONF_DIR}/config
 echo "preroot=$WEBMIN_THEME" >> ${CONF_DIR}/miniserv.conf
 
 # configure firewall
+MESSSAGE="Configuring firewall for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 FTP=21
 SSH=22
 HTTP=80
@@ -154,6 +162,8 @@ echo "COMMIT" >> ${CONF}
 sed -i "/^$/d" ${CONF}
 
 # set Webmin root password
+MESSSAGE="Initializing admin info for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 ${FORMAVID}/bin/initialize/python/webmin.py
 
 # clean up
@@ -161,6 +171,6 @@ rm -f /etc/webmin/*.cache
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
-echo ${MESSSAGE} >> ${LOG}
+echo ${MESSSAGE} | tee -a ${LOG}
 
 exit 0
