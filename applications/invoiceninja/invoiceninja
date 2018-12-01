@@ -234,6 +234,15 @@ cat > ${CONF} <<EOF
         AllowOverride All
         Require all granted
     </Directory>
+    <Location /setup>
+        Require all denied
+        Options +FollowSymlinks
+        AuthName "To complete setup, please enter app password entered during install or initialization - admin:password."
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
+    </Location>
 </VirtualHost>
 
 <VirtualHost *:80>
@@ -264,10 +273,10 @@ sed -i "/127.0.1.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
 
 # clean up
 
-# set admin password and email
-# MESSSAGE="Initializing admin info for ${PACKAGE} ..."
-# echo ${MESSSAGE} | tee -a ${LOG}
-# ${FORMAVID}/bin/initialize/python/${PACKAGE}.py
+# initialize admin info
+MESSSAGE="Initializing admin info for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}

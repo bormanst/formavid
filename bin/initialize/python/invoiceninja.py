@@ -6,7 +6,7 @@
 
 """
 
-Set Invoice Ninja admin password and email
+Set Invoice Ninja admin password
 
 """
 
@@ -22,11 +22,11 @@ DEFAULT_HOSTNAME="examplesitename.com"
 
 def main():
     # Get envars.
-    apachepass = os.environ.get("TOOLS_PASS")
+    apachepass = os.environ.get("APP_PASS")
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
     hostname = os.environ.get("APP_HOSTNAME")
-    password = os.environ.get("APP_EMAIL")
+    password = os.environ.get("APP_PASS")
     update_email = os.environ.get("UPDATE_EMAIL")
 
     # set vars
@@ -85,13 +85,10 @@ def main():
         # con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
         # Get db cursor.
         # cur = con.cursor()
-        # Update simpleinvoices password.
+        # Update invoiceninja password.
         # cur.execute("ALTER USER invoiceninja@localhost IDENTIFIED BY '%s'; FLUSH PRIVILEGES;" % password)
-        # cur.execute('UPDATE simpleinvoices.si_user SET password=\"%s\" WHERE id=1;' % hashpass)
         # Check update email.
-        # if update_email: cur.execute('UPDATE simpleinvoices.si_user SET email=\"%s\" WHERE id=1;' % email)
-        # system('sed -i "0,/params.password/s/params.password.*/params.password = %s/" /var/www/simpleinvoices/config/config.php' % password)
-        # system("sed -i 's|^encryption.default.key.*|encryption.default.key = %s|' /var/www/simpleinvoices/config/config.php" % password)
+        # Example ONLY - if update_email: cur.execute('UPDATE invoiceninja.user SET email=\"%s\" WHERE id=1;' % email)
         # Set apache2 htdbm password.
         directory = "/usr/local/apache2/passwd/invoiceninja"
         if os.path.isdir(directory): system("rm -rf %s" % directory)
