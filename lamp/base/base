@@ -72,23 +72,24 @@ sed -i "s/sedlowername/${SITENAME}/g" ${APP_DIR}/*.php
 sed -i "s/sedsitename/${SITETITLE}/g" ${APP_DIR}/*.php
 sed -i "s/sedhostname/${APP_HOSTNAME}/g" ${APP_DIR}/*.php
 
-# check default envars
-DEFAULT_HEADER=/etc/formavid/header.txt
-if [ ! -f "${DEFAULT_HEADER}" ]; then
+# check templates
+TEMPLATES=/etc/formavid/templates
+if [ ! -d "${TEMPLATES}" ]; then
     # mkdir is graceful so use it
-    mkdir -p /etc/formavid
-    # create etc default_envars to avoid git update overwrite
-    cp -p ${FORMAVID}/sites-template/header.txt ${DEFAULT_HEADER}
+    mkdir -p ${TEMPLATES}
+    # make copy of templates
+    cp -p ${FORMAVID}/templates/* ${TEMPLATES}
+    # configure templates
+    DEFAULT_HEADER=${TEMPLATES}/sites-template/header.txt
     # tools: update header
     sed -i "s/sedlowername/${SITENAME}/g" ${DEFAULT_HEADER}
     sed -i "s/sedsitename/${SITETITLE}/g" ${DEFAULT_HEADER}
+    # tools: theme
+    sed -i "/<head/r ${TEMPLATES}/sites-template/styles.txt" ${APP_DIR}/*.php
+    sed -i "/<body/r ${DEFAULT_HEADER}" ${APP_DIR}/*.php
+    sed -i "s/sedtoolname/Admin/g" ${APP_DIR}/*.php
+    sed -i "s/sedbrsize/57px/g" ${APP_DIR}/*.php
 fi
-
-# tools: theme
-sed -i "/<head/r ${FORMAVID}/sites-template/styles.txt" ${APP_DIR}/*.php
-sed -i "/<body/r ${DEFAULT_HEADER}" ${APP_DIR}/*.php
-sed -i "s/sedtoolname/Admin/g" ${APP_DIR}/*.php
-sed -i "s/sedbrsize/57px/g" ${APP_DIR}/*.php
 
 # stunnel conf
 CONF=/etc/stunnel/stunnel.conf

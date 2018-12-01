@@ -301,7 +301,7 @@ def main():
         system("mkdir -p %s/%s" % (templates,sitename))
         for sitetype in siteTypes:
             system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-            system("cp -f %s/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,templates,sitename,sitetype))
+            system("cp -f /etc/formavid/templates/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,sitename,sitetype))
             system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
             system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
         # Solr - load cores.
@@ -331,7 +331,7 @@ def main():
         logging.info('/etc/hosts configuration is complete.')
 
     # Sites - prepare templates.
-    system("cp -rf %s/sites-template %s/sites-staging" % (templates,templates))
+    system("cp -rf /etc/formavid/templates/sites-template %s/sites-staging" % templates)
 
     # Apache - replace sitehostname in confs.
     system("find %s/sites-staging -name \"*.conf\" -exec sed -i \"s/sitehostname/%s/g\" '{}' \\;" % (templates,hostname))

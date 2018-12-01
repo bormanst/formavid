@@ -48,13 +48,13 @@
     <ul>
       <li>Confirm its contents.</li>
       <li>Confirm its enabled in apache (been symlinked into sites-enabled.)</li>
-      <li>Compare /etc/apache2/sites-available/SITEHOSTNAME.conf to the original template /usr/local/formavid-gce/sites-template/sitehostname.conf.</li>
+      <li>Compare /etc/apache2/sites-available/SITEHOSTNAME.conf to the original template /etc/formavid/templates/sites-template/sitehostname.conf.</li>
       <li>Modify and substitute SITEHOSTNAME accordingly.</li>
       <li>Apply/restart apache.</li>
     </ul>
     <li>/etc/apache2/sites-available/<b>SITEHOSTNAME.conf does NOT exist:</b></li>
     <ul>
-      <li>Copy /usr/local/formavid-gce/sites-template/sitehostname.conf into /etc/apache2/sites-available.</li>
+      <li>Copy /etc/formavid/templates/sites-template/sitehostname.conf into /etc/apache2/sites-available.</li>
       <li>Substitute the desired SITEHOSTNAME for sitehostname in both the file name and the file contents.</li>
       <li>Modify accordingly.</li>
       <li>Add to apache via webmin or symlink into sites-enabled.</li>
