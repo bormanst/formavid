@@ -31,7 +31,7 @@ def main():
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
-    username = "admin"
+    username = "invoiceninja"
     restart_apache = False
 
     # Set hostname.

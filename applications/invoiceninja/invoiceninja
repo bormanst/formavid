@@ -237,7 +237,7 @@ cat > ${CONF} <<EOF
     <Location /setup>
         Require all denied
         Options +FollowSymlinks
-        AuthName "To complete setup, please enter app password entered during install or initialization - admin:password."
+        AuthName "To complete setup, please enter app password entered during install or initialization - invoiceninja:password."
         AuthType Basic
         Require valid-user
         AuthBasicProvider dbm
