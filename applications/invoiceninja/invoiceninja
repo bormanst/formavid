@@ -14,8 +14,8 @@ echo ${MESSSAGE} | tee -a ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-APP_DIR=${WEBROOT}/${PACKAGE}
 # check dir
+APP_DIR=${WEBROOT}/${PACKAGE}
 if [ -d "${APP_DIR}" ]; then
     MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
