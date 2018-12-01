@@ -108,7 +108,7 @@ APACHE_CONF=/etc/apache2/sites-available/zzz-admin.${SITENAME}.conf
 cat > ${APACHE_CONF} <<EOF
 <VirtualHost *:443>
     ServerName admin.${APP_HOSTNAME}
-    ServerAdmin admin@${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
     UseCanonicalName Off
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
@@ -139,7 +139,7 @@ cat > ${APACHE_CONF} <<EOF
 
 <VirtualHost *:80>
     ServerName admin.${APP_HOSTNAME}
-    ServerAdmin admin@${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
     UseCanonicalName Off
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined

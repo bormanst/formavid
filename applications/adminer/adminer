@@ -89,7 +89,7 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
 
 <VirtualHost *:${ADMINER_PORT}>
     ServerName admin.${APP_HOSTNAME}
-    ServerAdmin admin@${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
