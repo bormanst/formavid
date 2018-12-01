@@ -219,7 +219,7 @@ CONF=${ETC}/apache.conf
 cat > ${CONF} <<EOF
 <VirtualHost *:443>
     ServerName ${SUBDOMAIN}${APP_HOSTNAME}
-    ServerAdmin webmaster@localhost
+    ServerAdmin admin@${APP_HOSTNAME}
     UseCanonicalName Off
     SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
@@ -236,7 +236,7 @@ cat > ${CONF} <<EOF
 
 <VirtualHost *:80>
     ServerName ${SUBDOMAIN}${APP_HOSTNAME}
-    ServerAdmin webmaster@localhost
+    ServerAdmin admin@${APP_HOSTNAME}
     UseCanonicalName Off
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
