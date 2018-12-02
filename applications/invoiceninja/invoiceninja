@@ -138,7 +138,7 @@ mv ${WEBROOT}/ninja ${APP_DIR}
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then
     cp -rf ${OVERLAY_DIR}/* /
-    echo ${MESSSAGE} | tee -a ${LOG}
+    MESSSAGE="Applied overlay for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
