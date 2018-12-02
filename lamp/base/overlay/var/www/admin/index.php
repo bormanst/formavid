@@ -14,7 +14,7 @@
 <br>
 <div align="center">
   <a href="/sites.php" title="Drupal Sites"><img src="images/drupal.png"/></a>
-  <a href="https://billing.sedhostname" title="Simple Invoices (Billing)"><img src="images/simpleinvoices.png"/></a>
+  <a href="https://billing.sedhostname" title="Invoice Ninja (Billing)"><img src="images/invoiceninja.png"/></a>
   <a href="https://support.sedhostname" title="Roundup (Support)"><img src="images/roundup.png"/></a>
   <a href="https://admin.sedhostname:12321" title="Webmin"><img src="images/webmin.png"/></a>
   <a href="https://admin.sedhostname:12322" title="Adminer"><img src="images/adminer.png"/></a>

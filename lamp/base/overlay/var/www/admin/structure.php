@@ -114,15 +114,11 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</h3></div><br>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</h3></div><br>
   <ul>
     <li><b>Address:</b> https://billing.sedhostname</li>
-    <li><b>Location:</b> /var/www/simpleinvoices</li>
-    <li><b>Configuration:</b> /etc/simpleinvoices/simpleinvoices.conf</li>
-    <li><b>Security:</b> protected by apache2 authn_dbm</li>
-    <li><b>Users:</b> htdbm -bc /usr/local/apache2/passwd/simpleinvoices/passwords.dbm username password</li>
-    <li><b>Logs:</b> /var/log/apache2</li>
-    <li><b>Header CSS:</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
+    <li><b>Location:</b> /var/www/invoiceninja</li>
+    <li><b>Apache2 Configuration:</b> /etc/invoiceninja/apache.conf</li>
   </ul>
 </div>
 <div>

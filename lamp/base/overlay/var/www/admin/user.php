@@ -84,7 +84,7 @@
       <li>Composer.</li>
       <li>Drupal.</li>
       <li>Roundup.</li>
-      <li>Simple Invoices.</li>
+      <li>Invoice Ninja.</li>
     </ul>
     <li><b>drupal8:</b></li>
     <ul>
@@ -119,14 +119,10 @@
     <li>cssadmin access.</li>
     <li>root access (when enabled by admin).</li>
   </ul>
-  <div><h3><a href="/simpleinvoices.php" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3></div><br>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Invoice Ninja</h3></div><br>
   <ul>
-    <li>Initial site and application password entered for Simple Invoices admin during appliance install.</li>
-    <li>Special note: application requires <b>admin@BASESITENAME.TLD:password</b> for access (email address not just user name.)</li>
-    <li>Site access and initial application account are created with the same password so it is recommended that the passwords are "unsynced" at first opportunity for security reasons.</li>
-    <li>Initial apache site access is "admin:password".</li>
-    <li>Initial application access is "admin@BASESITENAME.TLD:password".</li>
-    <li>Two layer security: need to first access apache site with "admin:sharedpassword" and then the application with "email:userpassword".</li>
+    <li>Initial apache password entered for Invoice Ninja setup page occurs during appliance install.</li>
+    <li>Special note: application requires <b>user@BASESITENAME.TLD:password</b> for access (email address not just user name.)</li>
   </ul>
   <div><h3><a href="/solr.php" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div><br>
   <ul>

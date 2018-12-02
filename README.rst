@@ -115,19 +115,18 @@ Initial configuration: */etc/roundup/support/tracker-config.ini*
     domain = example.com
 
 
-SimpleInvoices - Invoicing system
+Invoice Ninja - Invoicing system
 =================================
 
-`SimpleInvoices`_ is a web based invoicing system developed by the
-community for the community that helps users create quick and nice
-looking invoices without having to set up to much. Install the software,
-enter a biller, a customer and go nuts creating invoices!
+`Invoice Ninja`_ is a web based invoicing system that is 100% open source, and supported 
+by a growing community of developers around the world. A suite of features to invoice, 
+track-time, and to get paid.
 
-- SimpleInvoices configurations:
+- Invoice Ninja configurations:
 
-   - Installed from upstream source code to /var/www/simpleinvoices.
-   - Apache protected site using 'admin':simpleinvoices_password.
-   - Initial user login 'admin@hostname':simpleinvoices_password.
+   - Installed from zip to /var/www/invoiceninja.
+   - Setup page is Apache password protected using 'invoiceninja':invoiceninja_password.
+   - Apache2 conf file symlinked from /etc/invoiceninja.
 
 
 Additional Features
@@ -153,7 +152,7 @@ Credentials *(passwords required for initialization)*
 -------------------------------------------
 
 -  Webmin, Webshell, SSH, MariaDB, Adminer: username **root**
--  Drupal 8, Roundup, SimpleInvoices: username **admin**
+-  Drupal 8, Roundup: username **admin**
 -  ProFTPD: username **cssadmin**
 -  BorgBackup: repository passphrase
 
@@ -168,6 +167,6 @@ Credentials *(passwords required for initialization)*
 .. _Postfix: https://www.postfix.org/
 .. _ProFTPD: https://www.proftpd.org/
 .. _Roundup: https://roundup.sourceforge.net/
-.. _SimpleInvoices: https://www.simpleinvoices.org/
+.. _Invoice Ninja: https://www.invoiceninja.com/
 .. _Webmin: https://www.webmin.com/
 .. _Webshell: https://code.google.com/p/shellinabox/

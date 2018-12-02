@@ -80,6 +80,17 @@
   </ul>
 </div>
 <div>
+  <div><h3><a href="https://www.invoiceninja.com/" title="Invoice Ninja"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</a></h3></div><br>
+  <ul>
+    <li><a href="https://invoice-ninja.readthedocs.io/en/latest/" title="Invoice Ninja User Guide">Invoice Ninja User Guide</a></li>
+    <li><a href="https://www.invoiceninja.com/invoice-template-designs/" title="Invoice & Quotation Template Designs">Invoice & Quotation Template Designs</a></li>
+    <li><a href="https://www.invoiceninja.com/forums/forum/support/" title="Invoice Ninja Support Forum">Invoice Ninja Support Forum</a></li>
+    <li><a href="https://www.invoiceninja.com/videos/" title="Invoice Ninja Video Tutorials">Invoice Ninja Video Tutorials</a></li>
+    <li><a href="https://invoice-ninja.readthedocs.io/en/latest/developer_guide.html" title="Invoice Ninja Developer Guide">Invoice Ninja Developer Guide</a></li>
+    <li><a href="https://www.invoiceninja.com/giving/" title="Invoice Ninja Donate">Invoice Ninja <b><i>Donate</i></b></a></li>
+  </ul>
+</div>
+<div>
   <div><h3><a href="https://mariadb.org/" title="MariaDB"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>MariaDB</a></h3></div><br>
   <ul>
     <li><a href="https://mariadb.com/kb/en/" title="MariaDB Documentation">MariaDB Knowledge Base</a></li>
@@ -145,17 +156,6 @@
   <div><h3><a href="https://code.google.com/p/shellinabox/" title="Shell In A Box"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell In A Box</a></h3></div><br>
   <ul>
     <li><a href="https://code.google.com/p/shellinabox/wiki/shellinaboxd_man" title="Shell In A Box">Shell In A Box Documentation</a></li>
-  </ul>
-</div>
-<div>
-  <div><h3><a href="https://simpleinvoices.org/" title="Simple Invoices"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/simpleinvoices.png"/><br><br>Simple Invoices</a></h3></div><br>
-  <ul>
-    <li><a href="/simpleinvoices.php" title="Simple Invoices Local Info">Simple Invoices Local Info</a></li>
-    <li><a href="https://simpleinvoices.org/wiki" title="Simple Invoices Wiki">Simple Invoices Wiki</a></li>
-    <li><a href="https://simpleinvoices.org/wiki/faqs" title="Simple Invoices FAQs">Simple Invoices FAQs</a></li>
-    <li><a href="https://simpleinvoices.org/help" title="Simple Invoices Help">Simple Invoices Help</a></li>
-    <li><a href="https://simpleinvoices.org/wiki/extensions" title="Simple Invoices Extensions">Simple Invoices Extensions</a></li>
-    <li><a href="https://simpleinvoices.org/support" title="Simple Invoices Donate">Simple Invoices <b><i>Donate</i></b></a></li>
   </ul>
 </div>
 <div>

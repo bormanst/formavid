@@ -67,7 +67,7 @@ def main():
     system("python %s/bin/initialize/python/roundup.py" % formavid)
 
     # Simple Invoices password.
-    system("python %s/bin/initialize/python/simpleinvoices.py" % formavid)
+    system("python %s/bin/initialize/python/invoiceninja.py" % formavid)
 
     # Tools password.
     system("python %s/bin/initialize/python/tools.py" % formavid)
