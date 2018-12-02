@@ -26,7 +26,7 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # install dependencies
-    export APTGETS="composer php-gmp php-curl php-intl php-mbstring php-xmlrpc php-gd php-xml php-zip"
+    export APTGETS="composer php libapache2-mod-php php-common php-gmp php-curl php-intl php-mbstring php-xmlrpc php-mysql php-gd php-xml php-cli php-zip"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
