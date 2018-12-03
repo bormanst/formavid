@@ -40,6 +40,16 @@
     <li><b>php Pages:</b> /var/www/admin</li>
     <li><b>Images:</b> /var/www/admin/images</li>
     <li><b>Header CSS (symlinked):</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
+    <li><b>Apache configuration:</b> /etc/apache2/sites-available/zzz-admin.HOSTNAME.conf</li>
+  </ul>
+</div>
+<div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/adminer.png"/><br><br>Adminer</h3></div><br>
+  <ul>
+    <li><b>Dependencies:</b> Apache2, MariaDb, PHP</li>
+    <li><b>Location:</b> /usr/share/adminer</li>
+    <li><b>Apache port:</b> /etc/apache2/ports.conf</li>
+    <li><b>Apache configuration:</b> /etc/apache2/sites-available/zzz-admin.HOSTNAME.conf</li>
   </ul>
 </div>
 <div>
@@ -62,6 +72,7 @@
 <div>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal8</h3></div><br>
   <ul>
+    <li><b>Dependencies:</b> Apache2, MariaDb, PHP, [Solr]</li>
     <li><b>Location:</b> /var/www/drupal8</li>
     <li><b>System admin:</b> admin</li>
     <li><b>CSS admin:</b> cssadmin</li>
@@ -80,6 +91,15 @@
     <li><b>Jails:</b> /etc/fail2ban</li>
     <li><b>Log:</b> /var/log/fail2ban.log</li>
     <li>Webmin module for administration.</li>
+  </ul>
+</div>
+<div>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</h3></div><br>
+  <ul>
+    <li><b>Dependencies:</b> Apache2, MariaDb, PHP</li>
+    <li><b>Address:</b> https://billing.sedhostname/support/</li>
+    <li><b>Location:</b> /var/www/invoiceninja</li>
+    <li><b>Apache configuration:</b> symlink /etc/invoiceninja/apache.conf /etc/apache2/sites-available/billing.sedhostname.conf</li>
   </ul>
 </div>
 <div>
@@ -105,25 +125,18 @@
 <div>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3></div><br>
   <ul>
+    <li><b>Dependencies:</b> Apache2, MariaDb, Python</li>
     <li><b>Address:</b> https://support.sedhostname/support/</li>
-    <li><b>Location:</b> /etc/roundup</li>
-    <li><b>Data location:</b> /var/www/support</li>
+    <li><b>Location:</b> /var/www/support</li>
     <li><b>Tracker configuration:</b> symlink /etc/roundup/tracker-config.ini /var/www/support/config.ini</li>
     <li><b>Apache configuration:</b> symlink /etc/roundup/apache.conf /etc/apache2/sites-available/support.sedhostname.conf</li>
     <li><b>Header CSS:</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</h3></div><br>
-  <ul>
-    <li><b>Address:</b> https://billing.sedhostname</li>
-    <li><b>Location:</b> /var/www/invoiceninja</li>
-    <li><b>Apache2 Configuration:</b> /etc/invoiceninja/apache.conf</li>
-  </ul>
-</div>
-<div>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</h3></div><br>
   <ul>
+    <li><b>Dependencies:</b> JDK</li>
     <li><b>Admin Address:</b> http://sedhostname:8983/solr/#/</li>
     <li><b>Location:</b> /usr/local/solr</li>
     <li><b>Data:</b> /var/lib/solr/data</li>
@@ -140,9 +153,9 @@
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/webmin.png"/><br><br>Webmin</h3></div><br>
   <ul>
     <li><b>Address:</b> https://admin.sedhostname:12321</li>
-     <li><b>Location:</b> /etc/webmin</li>
-     <li><b>Data:</b> /var/webmin</li>
-     <li><b>Log:</b> /var/webmin</li>
+    <li><b>Location:</b> /etc/webmin</li>
+    <li><b>Data:</b> /var/webmin</li>
+    <li><b>Log:</b> /var/webmin</li>
   </ul>
 </div>
 <br>
