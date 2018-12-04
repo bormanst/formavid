@@ -102,11 +102,8 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # change log location
-mkdir ${SOLR_LOG}
+mkdir -p ${SOLR_LOG}
 chown ${PACKAGE}:${PACKAGE} ${SOLR_LOG}
-sed -i "s/solr.log=logs/solr.log=\/var\/log\/solr/g" ${SOLR_HOME}/log4j.properties
-
-# solr overides
 sed -i "s/SOLR_LOGS_DIR=\/var\/lib\/solr\/logs/SOLR_LOGS_DIR=\/var\/log\/solr/g" ${SOLR_OVERRIDES}
 
 # logrotate file for solr
@@ -207,11 +204,11 @@ cat > ${FILE} <<EOF
 EOF
 
 # set owner to solr
-chown solr:solr /var/lib/solr/data/security.json
+chown solr:solr ${SOLR_HOME}/data/security.json
 
 # update passwords
 systemctl enable solr
-systemctl start solr
+systemctl start solr && sleep 20
 curl -k --user admin:SolrRocks http://localhost:${SOLR_PORT}/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"drupal8\":\"${APP_PASS}\"}}"
 curl -k --user admin:SolrRocks http://localhost:${SOLR_PORT}/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"${APP_PASS}\"}}"
 systemctl stop solr
