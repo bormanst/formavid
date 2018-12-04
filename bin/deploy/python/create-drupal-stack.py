@@ -460,7 +460,7 @@ def main():
     system("chown -R www-data:www-data %s/web/themes/%s/styleguide" % (drupaldir,sitename))
 
     # Set path to solr configs.
-    solrconfigpath = "/".join([drupaldir,"modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
+    solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
 
     # Drupal - enable/disable properties.
     for sitetype in siteTypes:
