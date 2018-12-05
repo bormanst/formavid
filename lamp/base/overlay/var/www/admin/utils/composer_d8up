@@ -43,7 +43,8 @@ printf "\nWARNING! Keep a copy of the compsoser.json file in the default directo
 printf "\n\nWARNING! This will automatically update dbs and clear caches!"
 printf "\nWARNING! Save any work prior to running this script."
 printf "\nWARNING! Please notify other users if applicable."
-printf "\n\nNote: Some updates may be blocked by unmet installs and/or dependecies."
+printf "\n\nNote: Some updates may be blocked by unmet installs and/or dependecies,"
+printf "\nNote: especially modules outside of the main drupal/* branch."
 printf "\nNote: File composer.json may have to be manually modified to resolve issues."
 printf "\nNote: Please see /var/log/formavid/update_drupal.log for relevant messages.\n\n"
 
