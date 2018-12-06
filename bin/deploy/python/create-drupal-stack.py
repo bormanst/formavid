@@ -498,11 +498,12 @@ def main():
                 else:
                     # Enable module.
                     system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri,module))
-            # Disable default search module.
-            system("drupal --root=%s --uri=\"http://%s\" module:uninstall  search --no-interaction" % (drupaldir,baseUri))
 
         # Install sub-theme.
         system("drupal --root=%s --uri=\"http://%s\" theme:install  %s --set-default" % (drupaldir,baseUri,sitename))
+        if installSolr:
+            # After all installs disable default search module if solr.
+            system("drupal --root=%s --uri=\"http://%s\" module:uninstall  search --no-interaction" % (drupaldir,baseUri))
         # Set configs.
         system("drush -r %s -l http://%s config:set -y block.block.%s_powered status 0 " % (drupaldir,baseUri,sitename))
         # system("drupal --root=%s --uri=\"http://%s\" settings:set  block.block.%s_powered status 0  --no-interaction" % (drupaldir,baseUri,sitename))
