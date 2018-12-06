@@ -498,6 +498,8 @@ def main():
                 else:
                     # Enable module.
                     system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri,module))
+                # Disable default search module.
+                system("drupal --root=%s --uri=\"http://%s\" module:uninstall search --no-interaction" % (drupaldir,baseUri))
 
         # Install sub-theme.
         system("drupal --root=%s --uri=\"http://%s\" theme:install  %s --set-default" % (drupaldir,baseUri,sitename))
