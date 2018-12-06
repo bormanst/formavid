@@ -194,9 +194,9 @@ echo ${MESSSAGE} | tee -a ${LOG}
 systemctl stop apache2
 
 # clean swap
-MESSSAGE="$( date ) Clean swap by disable/enable..."
-echo ${MESSSAGE} | tee -a ${LOG}
-swapoff -a && swapon -a
+# MESSSAGE="$( date ) Clean swap by disable/enable..."
+# echo ${MESSSAGE} | tee -a ${LOG}
+# swapoff -a && swapon -a
 
 # start apache2
 MESSSAGE="$( date ) Starting apache2 server..."
