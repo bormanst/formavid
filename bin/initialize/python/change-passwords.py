@@ -45,9 +45,9 @@ def main():
         "Roundup admin password",
         "Please enter password for the Roundup admin account.")
 
-    os.environ["SIMPLEINVOICES_PASS"] = d.get_password(
-        "Simple Invoices admin password",
-        "Enter password for the Simple Invoices apache site access and admin account.")
+    os.environ["INVOICENINJA_PASS"] = d.get_password(
+        "Invoice Ninja admin password",
+        "Enter password for the Invoice Ninja apache site access and admin account.")
 
     os.environ["TOOLS_PASS"] = d.get_password(
         "Tools page admin password",
