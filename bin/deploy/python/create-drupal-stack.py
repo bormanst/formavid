@@ -311,6 +311,7 @@ def main():
         apachesolr = "/".join([drupaldir,"web/modules/contrib/search_api_solr/solr-conf/7.x"])
         for sitetype in siteTypes:
             system("cp -r %s %s/%s/%s/conf" % (apachesolr,solrdata,sitename,sitetype))
+            system("sed -i \"s|solr.install.dir=.*|solr.install.dir=/usr/local/solr|g\" %s/%s/%s/conf/solrcore.properties" % (solrdata,sitename,sitetype))
         # Solr - ensure owner.
         system("chown -R solr:solr %s/%s" % (solrdata,sitename))
         # Solr - enable changes.
