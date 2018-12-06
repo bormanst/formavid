@@ -278,7 +278,7 @@ def main():
     system("echo ''")
     system("echo ''")
     system("echo ''")
-    system("echo 'Creating default site for %s - this takes a while...'" % hostname)
+    system("echo 'Creating default site for %s - this takes a while ...'" % hostname)
     system("echo ''")
 
     # Sites - templates location.
@@ -295,7 +295,7 @@ def main():
     if installSolr:
         # Solr - set core properties.
         system("echo ''")
-        system("echo 'Configuring solr search core data...'")
+        system("echo 'Configuring solr search core data ...'")
         system("echo ''")
         # Solr - create template dir.
         system("mkdir -p %s/%s" % (templates,sitename))
@@ -360,7 +360,7 @@ def main():
         baseUri = sitetypemod + hostname
         # Create site type.
         system("echo ''")
-        system("echo 'Creating %s drupal site...'" % baseUri)
+        system("echo 'Creating %s drupal site ...'" % baseUri)
         system("echo ''")
         system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\"" % (drupaldir,baseUri,baseUri,baseUri))
         system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\"" % (drupaldir,baseUri,sitename,sitetype,password,sitetitle,hostname,hostname,password))
@@ -395,7 +395,7 @@ def main():
             logging.info('Allow perms for drush db access on %s_%s.*.' % (sitename,sitetype))
         # Restart mysql.
         system("echo ''")
-        system("echo 'Restarting mysql service...'")
+        system("echo 'Restarting mysql service ...'")
         system("echo ''")
         system("systemctl restart mysql")
         system("echo ''")
@@ -410,7 +410,7 @@ def main():
 
     # Restart apache2.
     system("echo ''")
-    system("echo 'Restarting apache2 service...'")
+    system("echo 'Restarting apache2 service ...'")
     system("echo ''")
     system("systemctl restart apache2")
     system("echo ''")
@@ -422,14 +422,14 @@ def main():
             sitetypemod = sitetype + '.'
         baseUri = sitetypemod + hostname
         system("echo ''")
-        system("echo 'Rebuilding %s drupal caches...'" % baseUri)
+        system("echo 'Rebuilding %s drupal caches ...'" % baseUri)
         system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
         system("echo 'Site %s can now be modified.'" % baseUri)
 
     # Start configuring drupal.
     system("echo ''")
     system("echo ''")
-    system("echo 'Creating custom theme for %s based on zen theme...'" % sitetitle)
+    system("echo 'Creating custom theme for %s based on zen theme ...'" % sitetitle)
     system("echo ''")
 
     # Enable zen theme.
@@ -447,7 +447,7 @@ def main():
 
     # Set local gulp for SASS.
     system("echo ''")
-    system("echo 'Setting up local Gulp for %s theme...'" % sitetitle)
+    system("echo 'Setting up local Gulp for %s theme ...'" % sitetitle)
     system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
     system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/web/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
     system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
@@ -477,7 +477,7 @@ def main():
         # Start configuring sites.
         system("echo ''")
         system("echo ''")
-        system("echo 'Enabling and disabling Drupal properties for %s...'" % sitetitle)
+        system("echo 'Enabling and disabling Drupal properties for %s ...'" % sitetitle)
         system("echo ''")
         # Enable modules.
         system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri," ".join(modulesToEnable)))
@@ -509,13 +509,13 @@ def main():
         # system("drupal --root=%s --uri=\"http://%s\" settings:set  block.block.%s_powered status 0  --no-interaction" % (drupaldir,baseUri,sitename))
         # Clean up.
         system("echo ''")
-        system("echo 'Rebuilding %s drupal caches...'" % baseUri)
+        system("echo 'Rebuilding %s drupal caches ...'" % baseUri)
         system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
         system("echo ''")
-        system("echo 'Rebuilding %s drupal content permissions...'" % baseUri)
+        system("echo 'Rebuilding %s drupal content permissions ...'" % baseUri)
         system("drupal --root=%s --uri=\"http://%s\" node:access:rebuild" % (drupaldir,baseUri))
         system("echo ''")
-        system("echo 'Finishing setup of drupal files directory for %s...'" % baseUri)
+        system("echo 'Finishing setup of drupal files directory for %s ...'" % baseUri)
         # Make private dir and set .htaccess file.
         system("mkdir -p %s/web/sites/%s/files/private" % (drupaldir,baseUri))
         system("echo \"%s\" >  %s/web/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
@@ -539,7 +539,7 @@ def main():
         system("chown -R www-data:www-data %s/web/sites/%s/files/styles" % (drupaldir,baseUri))
         system("echo 'Completed setup of drupal site %s files directory.'" % baseUri)
         system("echo ''")
-        system("echo 'Running initial cron job for drupal site %s...'" % baseUri)
+        system("echo 'Running initial cron job for drupal site %s ...'" % baseUri)
         system("drupal --root=%s --uri=\"http://%s\" cron:execute" % (drupaldir,baseUri))
         system("echo ''")
         # Finished drupal setup.
@@ -569,7 +569,7 @@ def main():
     # Postfix - add virtual addresses.
     system("echo ''")
     system("echo ''")
-    system("echo 'Adding %s email addresses to postfix...'" % hostname)
+    system("echo 'Adding %s email addresses to postfix ...'" % hostname)
     system("echo ''")
     system("echo 'webmaster@%s admin' >> /etc/postfix/virtual" % hostname)
     system("echo 'admin@%s admin' >> /etc/postfix/virtual" % hostname)
