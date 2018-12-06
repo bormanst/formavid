@@ -27,7 +27,7 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add base packages
-    export APTGETS="apt-listchanges apt-show-versions apt-transport-https apticron build-essential cron-apt dtach etckeeper git monit openssl perl unzip libauthen-pam-perl libffi-dev libio-pty-perl libnet-ssleay-perl libssl-dev ncurses-term python-babel python-debtcollector python-dev python-dialog python-funcsigs python-requests-futures python-iso8601 python-keystoneauth1 python-monotonic python-msgpack python-netaddr python-netifaces python-oslo.config python-oslo.i18n python-oslo.utils python-oslo.serialization python-pbr python-pip python-openssl python-pyparsing python-keystoneclient python-swiftclient python-rfc3986 python-stevedore python-wrapt rsync shellinabox stunnel4"
+    export APTGETS="apt-listchanges apt-show-versions apt-transport-https apticron build-essential cron-apt dtach etckeeper git libauthen-pam-perl libffi-dev libio-pty-perl libnet-ssleay-perl libssl-dev monit ncurses-term openssl perl python-babel python-debtcollector python-dev python-dialog python-funcsigs python-iso8601 python-keystoneauth1 python-keystoneclient python-monotonic python-msgpack python-netaddr python-netifaces python-openssl python-oslo.config python-oslo.i18n python-oslo.serialization python-oslo.utils python-pbr python-pip python-pyparsing python-requests-futures python-rfc3986 python-stevedore python-swiftclient python-wrapt rsync shellinabox stunnel4 unzip"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
