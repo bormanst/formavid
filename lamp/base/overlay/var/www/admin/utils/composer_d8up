@@ -146,6 +146,14 @@ MESSSAGE="$( date ) Copying composer.json to composer.json.old ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 cp -f ${JSON} composer.json.old
 
+LOCK=${PROJECT_DIR}/composer.lock
+if [ -f "${LOCK}" ]; then
+    # backup composer.lock
+    MESSSAGE="$( date ) Copying composer.lock to composer.lock.old ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    cp -f ${LOCK} composer.lock.old
+fi
+
 # check update core
 if ${UPDATE_CORE}; then
     # drupal core update via composer
