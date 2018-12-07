@@ -380,7 +380,7 @@ if [ -n "${APP_EMAIL}" ]; then
     fi
 
     # check etckeeper
-    if [ ! "${ALREADY_RUN}" = "True" ]; then
+    if [[ "${ALREADY_RUN}" != "True" ]]; then
         # initialize etckeeper
         echo ""
         MESSSAGE="$( date ) Initializing etckeeper for the appliance."
@@ -404,7 +404,7 @@ if [ -n "${APP_EMAIL}" ]; then
     fi
 
     # run-once post install scripts
-    if [ ! "${ALREADY_RUN}" = "True" ]; then
+    if [[ "${ALREADY_RUN}" != "True" ]]; then
         echo ""
         MESSSAGE="$( date ) Executing run-once post install scripts."
         echo "#############################################"
