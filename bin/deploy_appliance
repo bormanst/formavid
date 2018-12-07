@@ -59,13 +59,6 @@ echo "$( date ) Deployment started." >> ${LOG}
 echo "$( date ) -------------------" >> ${LOG}
 echo "" >> ${LOG}
 
-# already run
-export ALREADY_RUN="False"
-
-# check dir
-APP_DIR=${WEBROOT}/admin
-if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
-
 # configure apt for queued access
 CONF=/etc/apt/apt.conf
 if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
@@ -112,6 +105,13 @@ fi
 
 # dependencies check
 ${FORMAVID}/bin/deploy/shell/dependencies
+
+# already run
+export ALREADY_RUN="False"
+
+# check dir
+APP_DIR=${WEBROOT}/admin
+if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
 
 # check envars
 if [ -n "${APP_EMAIL}" ]; then
