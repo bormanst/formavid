@@ -77,7 +77,7 @@ MYSQL_ADMIN="/usr/bin/mysqladmin ${ROOT_CREDS}"
 MYSQL_BATCH="/usr/bin/mysql ${ROOT_CREDS} --batch"
 if (${MYSQL_ADMIN} ${ROOT_CREDS} create ${DB_NAME}); then
     # add database user
-    ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${DB_USER}@localhost IDENTIFIED BY '${APP_PASS}'; FLUSH PRIVILEGES;"
+    ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${DB_USER}@localhost IDENTIFIED BY '${ROUNDUP_PASS}'; FLUSH PRIVILEGES;"
 else
     echo ""
     echo ""
