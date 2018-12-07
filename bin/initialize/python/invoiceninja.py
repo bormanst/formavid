@@ -22,11 +22,11 @@ DEFAULT_HOSTNAME="examplesitename.com"
 
 def main():
     # Get envars.
-    apachepass = os.environ.get("APP_PASS")
+    apachepass = os.environ.get("INVOICENINJA_PASS")
     dbpass = os.environ.get("DB_PASS")
     email = os.environ.get("APP_EMAIL")
     hostname = os.environ.get("APP_HOSTNAME")
-    password = os.environ.get("APP_PASS")
+    password = os.environ.get("INVOICENINJA_PASS")
     update_email = os.environ.get("UPDATE_EMAIL")
 
     # set vars
