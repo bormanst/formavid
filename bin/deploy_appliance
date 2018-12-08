@@ -100,18 +100,18 @@ else
     . ${FORMAVID}/bin/deploy/shell/set_envars
 fi
 
-# set passwords by input
-. ${FORMAVID}/bin/deploy/shell/get_passwords
-
-# dependencies check
-${FORMAVID}/bin/deploy/shell/dependencies
-
 # already run
 export ALREADY_RUN="False"
 
 # check dir
 APP_DIR=${WEBROOT}/admin
 if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
+
+# set passwords by input
+. ${FORMAVID}/bin/deploy/shell/get_passwords
+
+# dependencies check
+${FORMAVID}/bin/deploy/shell/dependencies
 
 # check envars
 if [ -n "${APP_EMAIL}" ]; then
