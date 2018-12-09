@@ -458,7 +458,8 @@ def main():
         system("echo ''")
         firstTheme = "%s/web/themes/%s" % (drupaldir,sitename)
         sysTheme = "%s/web/themes/system" % (drupaldir)
-        system("ln -sf %s %s" % (firstTheme,sysTheme))
+        system("rm -f %s" % sysTheme)
+        system("ln -s %s %s" % (firstTheme,sysTheme))
 
     # Set local gulp for SASS.
     system("echo ''")
