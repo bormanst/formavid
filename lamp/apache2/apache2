@@ -92,7 +92,7 @@ sed -i "/Require ip/a\                Deny from all" ${CONF}
 sed -i "/Require ip/a\                Order deny,allow" ${CONF}
 
 # set drupal theme dir
-THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/system
 
 # set theme alias
 ALIAS_THEME=""

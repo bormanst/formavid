@@ -349,6 +349,11 @@ def main():
     # Set root owner for sites/themes.
     system("chown root:root %s/web/themes" % drupaldir)
 
+    # Set first site flag.
+    firstSite = False
+    pathFile = "/".join([drupaldir,"web/sites/sites.php"])
+    if not os.path.exists(pathFile): firstSite = True
+
     # Create drupal sites.
     os.chdir(drupaldir)
     for sitetype in siteTypes:
@@ -444,6 +449,16 @@ def main():
     system("echo ''")
     system("echo 'Theme %s is ready for modification.'" % sitename)
     system("echo ''")
+
+    # Set system theme if first site.
+    if firstSite:
+        # Symlink system theme to first theme.
+        system("echo ''")
+        system("echo 'Symlinking system theme to %s theme ...'" % sitename)
+        system("echo ''")
+        firstTheme = "%s/web/themes/%s" % (drupaldir,sitename)
+        sysTheme = "%s/web/themes/system" % (drupaldir)
+        system("ln -sf %s %s" % (firstTheme,sysTheme))
 
     # Set local gulp for SASS.
     system("echo ''")
@@ -557,7 +572,7 @@ def main():
     # Check formavid logo.
     if not sitename == "formavidorg":
         # Set theme.
-        lnTheme = "ln -s %s/web/themes/%s" % (drupaldir,sitename)
+        lnTheme = "ln -sf %s/web/themes/%s" % (drupaldir,sitename)
         # Admin Tools - use first "base" site logo.
         lnFile = "logo.svg"
         pathDir = "/var/www/admin/images"

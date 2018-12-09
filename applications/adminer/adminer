@@ -74,7 +74,7 @@ fi
 sed -i "/# vim:/iListen ${ADMINER_PORT}" /etc/apache2/ports.conf
 
 # set drupal theme dir
-THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/system
 
 # set theme alias
 ALIAS_THEME=""

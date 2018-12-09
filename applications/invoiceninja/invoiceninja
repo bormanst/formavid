@@ -187,7 +187,7 @@ EOF
 # tweak configuration
 
 # set drupal theme dir
-THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/system
 
 # set theme alias
 ALIAS_THEME=""

@@ -179,7 +179,7 @@ sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n
 chown -R www-data:www-data ${APP_DIR}/db
 
 # set drupal theme dir
-THEME_DIR=${PROJECT_DIR}/web/themes/${SITENAME}
+THEME_DIR=${PROJECT_DIR}/web/themes/system
 
 # set theme alias
 ALIAS_THEME=""

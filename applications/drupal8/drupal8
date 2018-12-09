@@ -218,6 +218,16 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
+# set temp system theme to be updated by create-drupal-stack
+DEFAULT_THEME=${PROJECT_DIR}/web/themes/contrib/zen/STARTERKIT
+if [ -d "${DEFAULT_THEME}" ]; then
+    # symlink system theme to default zen theme if file_exists
+    ln -sf ${DEFAULT_THEME} ${PROJECT_DIR}/web/themes/system
+else
+    # empty structure to satisfy apache.conf dependencies of other apps
+    mkdir -p ${PROJECT_DIR}/web/themes/system/components/asset-builds/css
+fi
+
 # set cssadmin perms
 chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 
