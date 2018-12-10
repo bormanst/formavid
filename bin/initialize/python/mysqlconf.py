@@ -104,7 +104,8 @@ def main():
     m = MySQL()
 
     # set password
-    m.execute('update mysql.user set authentication_string=PASSWORD(\"%s\") where User=\"%s\"; flush privileges;' % (escape_chars(password), username))
+    # m.execute('update mysql.user set authentication_string=PASSWORD(\"%s\") where User=\"%s\"; flush privileges;' % (escape_chars(password), username))
+    m.execute('SET PASSWORD FOR root@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
 
     # edge case: update DEBIAN_CNF
     if username == "debian-sys-maint":
