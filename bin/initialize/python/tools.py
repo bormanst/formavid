@@ -29,8 +29,8 @@ def main():
     if not apachepass:
         restart_apache = True
         apachepass = d.get_password(
-            "Tools page admin Password",
-            "Please enter password for Apache access to tools page.")
+            "Tools page 'admin' password",
+            "Please enter password for tools page 'admin' access.")
 
     # apache2 htdbm password
     directory = "/usr/local/apache2/passwd/admintools"

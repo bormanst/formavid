@@ -20,7 +20,6 @@ DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
 
 def main():
     # Get envars.
-    apachepass = os.environ.get("TOOLS_PASS")
     dbpass = os.environ.get("DB_PASS")
     password = os.environ.get("ROUNDUP_PASS")
 
@@ -31,18 +30,13 @@ def main():
 
     if not password:
         password = d.get_password(
-            "Roundup admin password",
-            "Please enter password for the Roundup admin account.")
+            "Roundup 'admin' password",
+            "Please enter password for Roundup 'admin' and MariaDb account.")
 
     if not dbpass:
         dbpass = d.get_input(
-            "MySQL 'root' password",
-            "Please enter new password for the MySQL 'root' account.")
-
-    if not apachepass:
-        apachepass = d.get_password(
-            "Apache access password",
-            "Please enter password for Apache access to Roundup.")
+            "MariaDb 'root' password",
+            "Please enter password for MariaDb 'root' account.")
 
     con = ""
     try:
