@@ -98,8 +98,8 @@ def main():
 
     if not password:
         password = d.get_password(
-            "MySQL Password",
-            "Please enter new password for the MySQL '%s' account." % username)
+            "MariaDb 'root' password",
+            "Please enter password for MariaDb 'root' account.")
 
     m = MySQL()
 
