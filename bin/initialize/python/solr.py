@@ -21,7 +21,6 @@ def main():
     # Get envars.
     solrnew = os.environ.get("SOLR_NEW")
     solrold = os.environ.get("SOLR_OLD")
-    solrport = os.environ.get("SOLR_PORT")
 
     # Set vars.
     d = Dialog(DEFAULT_DIALOG_HEADER)
@@ -47,18 +46,11 @@ def main():
             "New Solr 'admin' password",
             "Please enter NEW password for Solr access.")
 
-    # Check solrport.
-    if not solrport:
-        solrport = d.get_input(
-            "Solr port number",
-            "Please enter the port number for Solr access.",
-            "8983")
-
     # Change non-admin passwords first.
-    system('curl -k --user admin:%s http://localhost:%s/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"drupal8\":\"%s\"}}"' % (solrold, solrport, solrnew))
+    system('curl -k --user admin:%s http://localhost:8983/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"drupal8\":\"%s\"}}"' % (solrold, solrnew))
 
     # Change admin password last.
-    system('curl -k --user admin:%s http://localhost:%s/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"%s\"}}"' % (solrold, solrport, solrnew))
+    system('curl -k --user admin:%s http://localhost:8983/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"%s\"}}"' % (solrold, solrnew))
 
     # Apply changes.
     system('systemctl restart solr')

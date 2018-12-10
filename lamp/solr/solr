@@ -213,7 +213,6 @@ systemctl enable solr
 systemctl start solr && sleep 20
 export SOLR_NEW="${APP_PASS}"
 export SOLR_OLD="SolrRocks"
-export SOLR_PORT="${SOLR_PORT}"
 ${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 systemctl stop solr
 
