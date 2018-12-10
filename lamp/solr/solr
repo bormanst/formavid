@@ -206,11 +206,15 @@ EOF
 # set owner to solr
 chown solr:solr ${SOLR_HOME}/data/security.json
 
-# update passwords
+# initialize admin info
+MESSSAGE="Initializing admin info for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 systemctl enable solr
 systemctl start solr && sleep 20
-curl -k --user admin:SolrRocks http://localhost:${SOLR_PORT}/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"drupal8\":\"${APP_PASS}\"}}"
-curl -k --user admin:SolrRocks http://localhost:${SOLR_PORT}/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"${APP_PASS}\"}}"
+export SOLR_NEW="${APP_PASS}"
+export SOLR_OLD="SolrRocks"
+export SOLR_PORT="${SOLR_PORT}"
+${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 systemctl stop solr
 
 # open firewall ports in GCE/Webin
