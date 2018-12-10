@@ -21,16 +21,19 @@ def main():
     # Get envars.
     password = os.environ.get("WEBMIN_PASS")
 
-    # set vars
+    # Set vars.
     d = Dialog(DEFAULT_DIALOG_HEADER)
     username = "root"
 
     if not password:
         password = d.get_password(
-            "Webmin root password",
-            "Please enter password for Webmin root access.")
+            "Webmin and System 'root' password",
+            "Please enter password for Webmin 'root' access and system account.")
 
-    # set webmin root password
+    # Set system root password.
+    system("echo %s:%s | chpasswd" % (username, password))
+
+    # Set webmin root password.
     system("/usr/share/webmin/changepass.pl /etc/webmin %s %s" % (username, password))
 
 if __name__ == "__main__":
