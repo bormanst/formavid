@@ -26,7 +26,8 @@ def main():
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
     # Check solr running.
-    if not system('systemctl is-active solr'):
+    out = system("systemctl is-active solr")
+    if out and out.strip().lower() != 'active':
         system("echo ''")
         system("echo 'Solr service is not active.'")
         system("echo 'Please ensure Solr service is running prior to changing passwords.'")
