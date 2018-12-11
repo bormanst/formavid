@@ -278,6 +278,7 @@ MESSSAGE="Initializing admin info for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 ${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 
+# log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}
 

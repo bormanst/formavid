@@ -18,62 +18,45 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME="examplesitename.com"
+
+def escape_chars(s):
+    """escape special characters: required by nested quotes in query"""
+    s = s.replace("\\", "\\\\")  # \  ->  \\
+    s = s.replace('"', '\\"')    # "  ->  \"
+    s = s.replace("'", "'\\''")  # '  ->  '\''
+    return s
 
 def main():
     # Get envars.
     apachepass = os.environ.get("INVOICENINJA_PASS")
     dbpass = os.environ.get("DB_PASS")
-    email = os.environ.get("APP_EMAIL")
-    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("INVOICENINJA_PASS")
-    update_email = os.environ.get("UPDATE_EMAIL")
 
     # set vars
     d = Dialog(DEFAULT_DIALOG_HEADER)
-    username = "invoiceninja"
+    env_file = "/var/www/invoiceninja/.env"
     restart_apache = False
-
-    # Set hostname.
-    if not hostname: hostname = DEFAULT_HOSTNAME
+    username = "invoiceninja"
 
     # Check password.
     if not password:
         restart_apache = True
         password = d.get_password(
             "Invoice Ninja admin Password",
-            "Enter password for the Invoice Ninja apache site access and admin account.")
+            "Enter password for the Invoice Ninja apache setup access and admin account.")
 
     # Check dbpass.
     if not dbpass:
         dbpass = d.get_password(
-            "MySQL 'root' Password",
-            "Please enter new password for the MySQL 'root' account.")
+            "MariaDb 'root' password",
+            "Please enter password for MariaDb 'root' account.")
 
     # Check apachepass.
     if not apachepass:
         restart_apache = True
         apachepass = d.get_password(
             "Apache access password",
-            "Please enter password for Apache access to Invoice Ninja.")
-
-    # Check update_email.
-    if not update_email and not email:
-        update_email = d.yesno(
-            "Invoice Ninja admin Email",
-            "Change the admin email for Invoice Ninja?",
-            "Yes",
-            "No")
-        if update_email:
-            # Get email.
-            email = d.get_email(
-                "Invoice Ninja admin Email",
-                "Enter email address for the Invoice Ninja admin account.",
-                "%s@%s" (username, hostname))
-    # if email do update
-    elif email: update_email = True
-    # no email no update
-    else: update_email = False
+            "Please enter password for Apache access to Invoice Ninja setup.")
 
     # Set hashpass.
     hashpass = hashlib.md5(password).hexdigest()
@@ -82,13 +65,14 @@ def main():
     con = ""
     try:
         # Get db conection.
-        # con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
+        con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
         # Get db cursor.
-        # cur = con.cursor()
-        # Update invoiceninja password.
-        # cur.execute("ALTER USER invoiceninja@localhost IDENTIFIED BY '%s'; FLUSH PRIVILEGES;" % password)
-        # Check update email.
-        # Example ONLY - if update_email: cur.execute('UPDATE invoiceninja.user SET email=\"%s\" WHERE id=1;' % email)
+        cur = con.cursor()
+        # Update invoiceninja MariaDb password.
+        cur.execute("ALTER USER invoiceninja@localhost IDENTIFIED BY '%s'; FLUSH PRIVILEGES;" % escape_chars(password))
+        # Update invoiceninja .env with MariaDb and Postfix password.
+        system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
+        system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
         # Set apache2 htdbm password.
         directory = "/usr/local/apache2/passwd/invoiceninja"
         if os.path.isdir(directory): system("rm -rf %s" % directory)

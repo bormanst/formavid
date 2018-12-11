@@ -19,7 +19,14 @@ from dialog_wrapper import Dialog
 from local_methods import *
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME="examplesitename.com"
+DEFAULT_HOSTNAME = "examplesitename.com"
+
+def escape_chars(s):
+    """escape special characters: required by nested quotes in query"""
+    s = s.replace("\\", "\\\\")  # \  ->  \\
+    s = s.replace('"', '\\"')    # "  ->  \"
+    s = s.replace("'", "'\\''")  # '  ->  '\''
+    return s
 
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
@@ -46,27 +53,27 @@ def main():
     if not password:
         restart_apache = True
         password = d.get_password(
-            "Drupal admin and cssadmin password",
-            "Please enter password for Drupal admin and cssadmin accounts.")
+            "Drupal/MariaDb/System 'admin' and 'cssadmin' password",
+            "Please enter password for Drupal 'admin' and 'cssadmin' accounts.")
 
     # Check dbpass.
     if not dbpass:
         dbpass = d.get_password(
-            "MySQL 'root' password",
-            "Please enter new password for the MySQL 'root' account.")
+            "Current MariaDb 'root' password",
+            "Please enter current MariaDb 'root' password for db access.")
 
     # Check update_email.
     if not update_email and not email:
         update_email = d.yesno(
-            "Drupal admin Email",
-            "Change the admin email for Drupal site(s)?",
+            "Drupal 'admin' Email",
+            "Change the 'admin' email for Drupal site(s)?",
             "Yes",
             "No")
         if update_email:
             # Get email.
             email = d.get_email(
-                "Drupal admin Email",
-                "Please enter email address for Drupal admin account(s).",
+                "Drupal 'admin' Email",
+                "Please enter email address for Drupal 'admin' account.",
                 "%s@%s" % (username, hostname))
     # if email do update
     elif email: update_email = True
@@ -83,8 +90,8 @@ def main():
         # Get db cursor.
         cur = con.cursor()
         # Update mariaDB user passwords.
-        cur.execute('SET PASSWORD FOR admin@localhost = PASSWORD("%s"); flush privileges;' % password)
-        cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % password)
+        cur.execute('SET PASSWORD FOR admin@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
+        cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
         # Cycle through /var/www/drupal8/sites.
         sites_dir = "/".join([drupaldir, 'sites'])
         sites = get_immediate_subdirectories(sites_dir)
@@ -117,7 +124,7 @@ def main():
         if con:
             con.close()
 
-    # Check change cssadmin/password with toggle to create base site.
+    # Check change cssadmin password.
     try:
         # Check cssadmin exists with exception if not.
         pwd.getpwnam('cssadmin')
