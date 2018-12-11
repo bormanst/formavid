@@ -7,7 +7,7 @@
 # set log
 LOG=/var/log/formavid/deploy_appliance.log
 
-MESSSAGE="$( date ) Regenerating SSH cryptographic keys..."
+MESSSAGE="$( date ) Regenerating SSH cryptographic keys ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # remove existing ssh keys and generate new ones

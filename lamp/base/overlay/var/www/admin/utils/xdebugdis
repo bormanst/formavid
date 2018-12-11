@@ -54,7 +54,7 @@ sed -i "/^xdebug.idekey=/s/.*/;&/g" ${FILE}
 
 # notify of changes
 printf "\n\nThe xdebug related parameters have been disabled."
-printf "\n\nRestarting apache2..."
+printf "\n\nRestarting apache2 ..."
 
 # restart apache
 systemctl restart apache2

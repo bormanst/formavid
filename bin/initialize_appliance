@@ -54,7 +54,7 @@ if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 # export log
 export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 
-MESSSAGE="$( date ) Initializing appliance..."
+MESSSAGE="$( date ) Initializing appliance ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # set envars by input
@@ -70,7 +70,7 @@ ${FORMAVID}/bin/initialize/shell/regen_sshkeys
 ${FORMAVID}/bin/initialize/shell/init_etckeeper
 
 # reboot appliance
-MESSSAGE="$( date ) Rebooting appliance..."
+MESSSAGE="$( date ) Rebooting appliance ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 shutdown -r now
 

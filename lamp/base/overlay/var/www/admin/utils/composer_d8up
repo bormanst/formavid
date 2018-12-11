@@ -68,7 +68,7 @@ chmod 0644 ${LOG}
 # start updates
 MESSSAGE="$( date ) ----------------------------"
 echo ${MESSSAGE} | tee -a ${LOG}
-MESSSAGE="$( date ) Starting drupal 8 updates..."
+MESSSAGE="$( date ) Starting drupal 8 updates ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 MESSSAGE="$( date ) ----------------------------"
 echo ${MESSSAGE} | tee -a ${LOG}
@@ -117,7 +117,7 @@ FORMAVID_LOGS=/var/log/formavid
 if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 
 # put sites in maintenance mode
-MESSSAGE="$( date ) Putting drupal sites into maintenance mode..."
+MESSSAGE="$( date ) Putting drupal sites into maintenance mode ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 ENABLE_LIST=""
 PARENT_DIR=${PROJECT_DIR}/web/sites
@@ -131,7 +131,7 @@ for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort
         # add to enable list
         ENABLE_LIST=${ENABLE_LIST}${SITE_NAME}" "
         # disable site
-        MESSSAGE="$( date ) Putting drupal site ${SITE_NAME} into maintenance mode..."
+        MESSSAGE="$( date ) Putting drupal site ${SITE_NAME} into maintenance mode ..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} sset -y system.maintenance_mode 1 | tee -a ${LOG}
         # clear caches
@@ -157,31 +157,31 @@ fi
 # check update core
 if ${UPDATE_CORE}; then
     # drupal core update via composer
-    MESSSAGE="$( date ) Updating core from ${OLD_VER} to ${NEW_VER}..."
+    MESSSAGE="$( date ) Updating core from ${OLD_VER} to ${NEW_VER} ..."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # drupal core update via composer
-    MESSSAGE="$( date ) Core unchanged: checking update other components..."
+    MESSSAGE="$( date ) Core unchanged: checking update other components ..."
     echo ${MESSSAGE} | tee -a ${LOG}
 fi
 
 # composer clear cache
-MESSSAGE="$( date ) Clearing base composer caches..."
+MESSSAGE="$( date ) Clearing base composer caches ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer clear-cache -d ${DRUPAL} 2>&1 | tee -a ${LOG}"
 
 # update drupal base
-MESSSAGE="$( date ) Update base drupal console..."
+MESSSAGE="$( date ) Update base drupal console ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer update -d ${DRUPAL} drupal/console --with-dependencies 2>&1 | tee -a ${LOG}"
 
 # composer clear cache
-MESSSAGE="$( date ) Clearing project composer caches..."
+MESSSAGE="$( date ) Clearing project composer caches ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer clear-cache -d ${PROJECT_DIR} 2>&1 | tee -a ${LOG}"
 
 # check drupal dependencies
-MESSSAGE="$( date ) Check outdated project components..."
+MESSSAGE="$( date ) Check outdated project components ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer outdated -d ${PROJECT_DIR} drupal/* 2>&1 | tee -a ${LOG}"
 
@@ -189,30 +189,30 @@ su - admin -c "composer outdated -d ${PROJECT_DIR} drupal/* 2>&1 | tee -a ${LOG}
 HAS_UPDATES=false
 
 # stop apache2
-MESSSAGE="$( date ) Stopping apache2 server..."
+MESSSAGE="$( date ) Stopping apache2 server ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 systemctl stop apache2
 
 # clean swap
-# MESSSAGE="$( date ) Clean swap by disable/enable..."
+# MESSSAGE="$( date ) Clean swap by disable/enable ..."
 # echo ${MESSSAGE} | tee -a ${LOG}
 # swapoff -a && swapon -a
 
 # start apache2
-MESSSAGE="$( date ) Starting apache2 server..."
+MESSSAGE="$( date ) Starting apache2 server ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 systemctl start apache2
 
 # check symfony dependencies
 if [ $(composer prohibits -d ${PROJECT_DIR} drupal/core:${NEW_VER} 2>&1 | grep -c "There is no installed package depending on") != 1 ]; then
     # update symfony dependencies
-    MESSSAGE="$( date ) Updating project drupal and symfony dependencies..."
+    MESSSAGE="$( date ) Updating project drupal and symfony dependencies ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     su - admin -c "composer update -d ${PROJECT_DIR} drupal/* symfony/* webflo/drupal-core-require-dev --with-dependencies 2>&1 | tee -a ${LOG}"
     HAS_UPDATES=true
 else
     # update drupal dependencies
-    MESSSAGE="$( date ) Updating project drupal..."
+    MESSSAGE="$( date ) Updating project drupal ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     # check no updates
     if [ $(su - admin -c "composer update -d ${PROJECT_DIR} drupal/* --with-dependencies 2>&1 | tee -a ${LOG} | grep -c 'Nothing to install or update'") != 1 ]; then HAS_UPDATES=true; fi
@@ -221,7 +221,7 @@ fi
 # check HAS_UPDATES
 if ${HAS_UPDATES}; then
     # update sites
-    MESSSAGE="$( date ) Updating project drupal sites..."
+    MESSSAGE="$( date ) Updating project drupal sites ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
         SITE_NAME=${CHILD_DIR##*/}
@@ -239,13 +239,13 @@ if ${HAS_UPDATES}; then
 fi
 
 # enable selected sites
-MESSSAGE="$( date ) Returning project drupal sites to live mode..."
+MESSSAGE="$( date ) Returning project drupal sites to live mode ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 for SITE_NAME in ${ENABLE_LIST}; do
     # get drush base ex
     DRUSH_EXECUTE="drush -r ${PROJECT_DIR} -l http://${SITE_NAME}"
     # enable site
-    MESSSAGE="$( date ) Returning project drupal site ${SITE_NAME} to live mode..."
+    MESSSAGE="$( date ) Returning project drupal site ${SITE_NAME} to live mode ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     ${DRUSH_EXECUTE} sset -y system.maintenance_mode 0 | tee -a ${LOG}
     # clear caches

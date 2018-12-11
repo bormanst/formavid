@@ -124,7 +124,7 @@ if [ -n "${APP_EMAIL}" ]; then
     PARENT_DIR=${FORMAVID}/lamp
     # check script dir
     if [ ! -d "${PARENT_DIR}" ]; then exit 0; fi
-    MESSSAGE="$( date ) Building list of apt packages..."
+    MESSSAGE="$( date ) Building list of apt packages ..."
     echo "#############################################"
     echo "#"
     echo "#"
@@ -170,7 +170,7 @@ if [ -n "${APP_EMAIL}" ]; then
     # if ALLAPTGETS then install
     if [[ ! -z "${ALLAPTGETS// }" ]]; then
         echo ""
-        MESSSAGE="$( date ) Installing apt packages..."
+        MESSSAGE="$( date ) Installing apt packages ..."
         echo "#############################################"
         echo "#"
         echo "#"
@@ -198,7 +198,7 @@ if [ -n "${APP_EMAIL}" ]; then
     echo ${MESSSAGE} >> ${LOG}
 
     echo ""
-    MESSSAGE="$( date ) Installing base lamp applications..."
+    MESSSAGE="$( date ) Installing base lamp applications ..."
     echo "#############################################"
     echo "#"
     echo "#"
@@ -226,7 +226,7 @@ if [ -n "${APP_EMAIL}" ]; then
         done
     done
     echo ""
-    MESSSAGE="$( date ) Waiting for background processes..."
+    MESSSAGE="$( date ) Waiting for background processes ..."
     echo "#############################################"
     echo "#"
     echo "# ${MESSSAGE}"
@@ -254,7 +254,7 @@ if [ -n "${APP_EMAIL}" ]; then
 
     # run app scripts
     echo ""
-    MESSSAGE="$( date ) Installing dependent applications..."
+    MESSSAGE="$( date ) Installing dependent applications ..."
     echo "#############################################"
     echo "#"
     echo "#"
@@ -286,7 +286,7 @@ if [ -n "${APP_EMAIL}" ]; then
         done
     done
     echo ""
-    MESSSAGE="$( date ) Waiting for background processes..."
+    MESSSAGE="$( date ) Waiting for background processes ..."
     echo "#############################################"
     echo "#"
     echo "# ${MESSSAGE}"
@@ -300,7 +300,7 @@ if [ -n "${APP_EMAIL}" ]; then
 
     # restart services
     echo ""
-    MESSSAGE="$( date ) Restarting services..."
+    MESSSAGE="$( date ) Restarting services ..."
     echo "#############################################"
     echo "#"
     echo "# ${MESSSAGE}"
@@ -337,7 +337,7 @@ if [ -n "${APP_EMAIL}" ]; then
     if (systemctl -q is-active ${DEPENDS}); then
         # secure mysql
         echo ""
-        MESSSAGE="$( date ) Securing mysql..."
+        MESSSAGE="$( date ) Securing mysql ..."
         echo "#############################################"
         echo "#"
         echo "# ${MESSSAGE}"

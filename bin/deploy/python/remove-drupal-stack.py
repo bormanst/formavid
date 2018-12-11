@@ -92,7 +92,7 @@ def main():
     if os.path.isfile(apache_conf):
         system("echo ''")
         system("echo ''")
-        system("echo 'Should not remove initial base site stack for %s...'" % hostname)
+        system("echo 'Should not remove initial base site stack for %s ...'" % hostname)
         system("echo ''")
         system("echo 'Manually remove the prefix \"aaa-\" file %s and rerun this script if you really must remove the initial stack completely.'" % apache_conf)
         system("echo ''")
@@ -119,12 +119,12 @@ def main():
 
     # Start stack removal.
     system("echo ''")
-    system("echo 'Removing site stack for %s...'" % hostname)
+    system("echo 'Removing site stack for %s ...'" % hostname)
     system("echo ''")
 
     # Hosts - remove hosts: order important.
     system("echo ''")
-    system("echo 'Removing %s entries from hosts...'" % hostname)
+    system("echo 'Removing %s entries from hosts ...'" % hostname)
     system("echo ''")
     system("sed -i 's/poll.%s\\s//' /etc/hosts" % hostname)
     system("sed -i 's/poll.%s//' /etc/hosts" % hostname)
@@ -138,7 +138,7 @@ def main():
 
     # Apache - remove stack conf.
     system("echo ''")
-    system("echo 'Removing apache2 confs for %s...'" % hostname)
+    system("echo 'Removing apache2 confs for %s ...'" % hostname)
     system("echo ''")
     system("touch /etc/apache2/sites-enabled/%s.conf" % hostname)
     system("rm -f /etc/apache2/sites-enabled/%s.conf" % hostname)
@@ -150,7 +150,7 @@ def main():
 
     # Postfix - remove virtual addresses.
     system("echo ''")
-    system("echo 'Removing postfix virtual addresses for %s...'" % hostname)
+    system("echo 'Removing postfix virtual addresses for %s ...'" % hostname)
     system("echo ''")
     system("sed -i '/%s/d' /etc/postfix/virtual" % hostname)
     system("postmap /etc/postfix/virtual")
@@ -162,7 +162,7 @@ def main():
     solrdata = "/var/lib/solr/data"
     if os.path.exists(solrdata):
         system("echo ''")
-        system("echo 'Removing solr cores for %s...'" % hostname)
+        system("echo 'Removing solr cores for %s ...'" % hostname)
         system("echo ''")
         system("touch %s/%s" % (solrdata, sitename))
         system("rm -rf %s/%s" % (solrdata, sitename))
@@ -184,7 +184,7 @@ def main():
     sites = "/".join([drupaldir,"sites"])
     if os.path.exists(sites):
         system("echo ''")
-        system("echo 'Removing drupal stack sites for %s...'" % hostname)
+        system("echo 'Removing drupal stack sites for %s ...'" % hostname)
         system("echo ''")
         system("touch %s/poll.%s" % (sites, hostname))
         system("rm -rf %s/poll.%s" % (sites, hostname))
@@ -209,19 +209,19 @@ def main():
 
     # Drupal - remove tools logo symlink.
     system("echo ''")
-    system("echo 'Remove logo symlink for %s from tools...'" % hostname)
+    system("echo 'Remove logo symlink for %s from tools ...'" % hostname)
     system("echo ''")
     if not sitename == "formavidorg":
         system("touch /var/www/admin/images/%s.svg" % sitename)
         system("rm -f /var/www/admin/images/%s.svg" % sitename)
         # log info
-        logging.info('Removed logo symlink for %s from tools...' % hostname)
+        logging.info('Removed logo symlink for %s from tools ...' % hostname)
 
     # Drupal - remove stack site theme.
     themes = "/".join([drupaldir,"themes"])
     if os.path.exists(themes):
         system("echo ''")
-        system("echo 'Removing drupal theme for %s...'" % hostname)
+        system("echo 'Removing drupal theme for %s ...'" % hostname)
         system("echo ''")
         system("touch %s/%s" % (themes, sitename))
         system("rm -rf %s/%s" % (themes, sitename))
@@ -234,7 +234,7 @@ def main():
         cur = con.cursor()
         # MySQL - remove tables.
         system("echo ''")
-        system("echo 'Removing mysql databases for %s...'" % hostname)
+        system("echo 'Removing mysql databases for %s ...'" % hostname)
         system("echo ''")
         cur.execute("DROP DATABASE IF EXISTS %s_aggregator;" % sitename)
         cur.execute("DROP DATABASE IF EXISTS %s_article;" % sitename)
