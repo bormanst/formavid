@@ -69,7 +69,7 @@ def main():
         # Get db cursor.
         cur = con.cursor()
         # Update invoiceninja MariaDb password.
-        cur.execute("ALTER USER invoiceninja@localhost IDENTIFIED BY '%s'; FLUSH PRIVILEGES;" % escape_chars(password))
+        cur.execute('SET PASSWORD FOR invoiceninja@localhost = PASSWORD("%s"); FLUSH PRIVILEGES;' % escape_chars(password))
         # Update invoiceninja .env with MariaDb and Postfix password.
         system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
         system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
