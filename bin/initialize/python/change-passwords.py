@@ -28,7 +28,7 @@ def main():
 
     update_drupal8 = False
     # The sites.php is created by create-drupal-stack.py implying a site exists.
-    sites_file = "/var/www/drupal8/prod/sites/sites.php"
+    sites_file = "/var/www/drupal8/prod/web/sites/sites.php"
     if os.path.exists(sites_file): update_drupal8 = True
 
     # Check use singl password.
