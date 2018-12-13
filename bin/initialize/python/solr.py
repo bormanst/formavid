@@ -14,6 +14,7 @@ import os
 
 from dialog_wrapper import Dialog
 from local_methods import *
+from subprocess import Popen, PIPE
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
 
@@ -27,16 +28,18 @@ def main():
     stop_solr = False
 
     # Check solr running.
-    out = system("systemctl is-active solr")
+    subproc = Popen(['systemctl', 'is-active', 'solr'], stdout=PIPE, stderr=PIPE)
+    out, err = subproc.communicate()
     if out and out.strip().lower() != 'active':
         # Solr not running so stop if started here.
         stop_solr = True
         # Try start solr.
         system("echo 'Solr service is not active so attempting to start it ...'")
         system("systemctl enable solr")
-        system("systemctl start solr && sleep 20")
+        system("systemctl start solr")
         # Re-check solr running.
-        out = system("systemctl is-active solr")
+        subproc = Popen(['systemctl', 'is-active', 'solr'], stdout=PIPE, stderr=PIPE)
+        out, err = subproc.communicate()
         if out and out.strip().lower() != 'active':
             system("echo ''")
             system("echo 'Solr service is not available.'")

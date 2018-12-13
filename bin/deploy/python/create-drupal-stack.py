@@ -29,6 +29,7 @@ import yaml
 
 from dialog_wrapper import Dialog
 from local_methods import *
+from subprocess import Popen, PIPE
 
 # Sets the site specific default solr configurations.
 def set_solr_configs(solrconfigpath, solrserverid, solrservername, solrcorename, password, formavid):
@@ -243,7 +244,8 @@ def main():
         # Check solr service available.
         system("systemctl enable solr")
         system("systemctl start solr")
-        out = system("systemctl is-active solr")
+        subproc = Popen(['systemctl', 'is-active', 'solr'], stdout=PIPE, stderr=PIPE)
+        out, err = subproc.communicate()
         if out and out.strip().lower() != 'active':
             system("echo ''")
             system("echo ''")
