@@ -26,8 +26,7 @@ def escape_chars(s):
     return s
 
 def get_immediate_subdirectories(a_dir):
-    return [name for name in os.listdir(a_dir)
-        if os.path.isdir(os.path.join(a_dir, name))]
+    return [name for name in os.listdir(a_dir) if os.path.isdir(os.path.join(a_dir, name))]
 
 DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
 
@@ -80,22 +79,23 @@ def main():
         cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
         # Cycle through /var/www/drupal8/sites.
         sites_dir = "/".join([drupaldir, 'sites'])
-        sites = get_immediate_subdirectories(sites_dir)
-        for site in sites:
-            # Skip default directory.
-            if "default" not in site:
-                # Show which site.
-                system("echo 'Updating: %s'" % site)
-                # Update site db access password.
-                system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
-                # Update site admin password.
-                system('drupal --root=%s --uri="http://%s" user:password:reset admin %s' % (drupaldir, site, password))
-                # Clear site cache.
-                system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
-        if restart_apache:
-            # restart apache2
-            system('systemctl restart apache2')
-            system("echo 'Update password for admin has completed. Service apache2 has been restarted.'")
+        if os.path.exists(sites_dir):
+            sites = get_immediate_subdirectories(sites_dir)
+            for site in sites:
+                # Skip default directory.
+                if "default" not in site:
+                    # Show which site.
+                    system("echo 'Updating: %s'" % site)
+                    # Update site db access password.
+                    system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
+                    # Update site admin password.
+                    system('drupal --root=%s --uri="http://%s" user:password:reset admin %s' % (drupaldir, site, password))
+                    # Clear site cache.
+                    system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
+            if restart_apache:
+                # restart apache2
+                system('systemctl restart apache2')
+                system("echo 'Update password for admin has completed. Service apache2 has been restarted.'")
     except KeyError:
         # Error admin.
         system("")

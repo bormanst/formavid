@@ -37,17 +37,19 @@ def main():
 
     # Cycle through /var/www/drupal8/sites.
     sites_dir = "/".join([drupaldir, 'sites'])
-    sites = get_immediate_subdirectories(sites_dir)
-    for site in sites:
-        # Skip default directory.
-        if "default" not in site:
-            # Show which site.
-            system("echo 'Updating: %s'" % site)
-            # Update solr access password.
-            system("drush -r %s -l http://%s config:set -y search_api.server.%s_solr_server backend_config.connector_config.password %s" % (drupaldir, baseUri, get_sitename(site), solrnew))
-            # Clear site cache.
-            system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
-        system("echo 'Update password for Drupal8 Solr access has completed.'")
+    if os.path.exists(sites_dir):
+        sites = get_immediate_subdirectories(sites_dir)
+        for site in sites:
+            # Skip default directory.
+            if "default" not in site:
+                # Show which site.
+                system("echo 'Updating: %s'" % site)
+                # Update solr access password.
+                system("drush -r %s -l http://%s config:set -y search_api.server.%s_solr_server backend_config.connector_config.password %s" % (drupaldir, baseUri, get_sitename(site), solrnew))
+                # Clear site cache.
+                system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
+
+    system("echo 'Update password for Drupal8 Solr access has completed.'")
 
 if __name__ == "__main__":
     main()
