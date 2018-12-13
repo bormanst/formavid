@@ -144,6 +144,7 @@ def main():
     password = os.environ.get("APP_PASS")
     sitetitle = os.environ.get("SITETITLE")
     solr = os.environ.get("SOLR_INSTALL")
+    solrnew = os.environ.get("SOLR_NEW")
 
     # Check for dbpass.
     isdbpass = "DbpasswordEnvar"
@@ -191,6 +192,8 @@ def main():
             sitetitle = val
         elif opt == '--solr':
             solr = val
+        elif opt == '--solrpass':
+            solrnew = val
 
     # Get formavid location.
     if not formavid or formavid == "None": formavid = "/usr/local/formavid"
@@ -256,6 +259,10 @@ def main():
             # Log info.
             logging.info('You selected Solr search but the solr service is not available!!!')
             quit()
+        if not solrnew or solrnew == "None":
+            solrnew = d.get_password(
+                "Solr server access.",
+                "Please enter Solr password for the drupal8 account.")
 
     if not dbpass or dbpass == "None":
         dbpass = d.get_password(
@@ -505,7 +512,7 @@ def main():
                     system("cp %s/search_api.server.default_solr_server.yml %s/search_api.server.default_solr_server.bak" % (solrconfigpath,solrconfigpath))
                     system("cp %s/search_api.index.default_solr_index.yml %s/search_api.index.default_solr_index.bak" % (solrconfigpath,solrconfigpath))
                     # Update solr defaults yaml settings.
-                    set_solr_configs(solrconfigpath,solrserverid,solrservername,solrcorename,password,formavid)
+                    set_solr_configs(solrconfigpath,solrserverid,solrservername,solrcorename,solrnew,formavid)
                     # Enable module.
                     system("drupal --root=%s --uri=\"http://%s\" module:install %s --no-interaction" % (drupaldir,baseUri,module))
                     # Restore solr defaults yaml files.

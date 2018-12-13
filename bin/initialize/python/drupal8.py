@@ -6,7 +6,7 @@
 
 """
 
-Set admin passwords
+Set admin system and drupal8 passwords.
 
 """
 
@@ -17,9 +17,6 @@ import string
 
 from dialog_wrapper import Dialog
 from local_methods import *
-
-DEFAULT_DIALOG_HEADER = "FormaVid - First boot configuration"
-DEFAULT_HOSTNAME = "examplesitename.com"
 
 def escape_chars(s):
     """escape special characters: required by nested quotes in query"""
@@ -35,26 +32,22 @@ def get_immediate_subdirectories(a_dir):
 def main():
     # Get envars.
     dbpass = os.environ.get("DB_PASS")
-    email = os.environ.get("APP_EMAIL")
-    hostname = os.environ.get("APP_HOSTNAME")
     password = os.environ.get("APP_PASS")
-    update_email = os.environ.get("UPDATE_EMAIL")
+    sync_cssadmin = os.environ.get("SYNC_CSSADMIN")
 
-    # set vars
+    # Set vars.
     d = Dialog(DEFAULT_DIALOG_HEADER)
     drupaldir = "/var/www/drupal8"
     username = "admin"
     restart_apache = False
-
-    # Set hostname.
-    if not hostname: hostname = DEFAULT_HOSTNAME
+    update_cssadmin = False
 
     # Check password.
     if not password:
         restart_apache = True
         password = d.get_password(
-            "Drupal/MariaDb/System 'admin' and 'cssadmin' password",
-            "Please enter password for Drupal 'admin' and 'cssadmin' accounts.")
+            "Drupal8/MariaDb/System 'admin' password",
+            "Please enter password for 'admin' account.")
 
     # Check dbpass.
     if not dbpass:
@@ -62,23 +55,14 @@ def main():
             "Current MariaDb 'root' password",
             "Please enter current MariaDb 'root' password for db access.")
 
-    # Check update_email.
-    if not update_email and not email:
-        update_email = d.yesno(
-            "Drupal 'admin' Email",
-            "Change the 'admin' email for Drupal site(s)?",
+    # Check sync_cssadmin.
+    if not sync_cssadmin or sync_cssadmin == "None":
+        update_cssadmin = d.yesno(
+            "Sync 'cssadmin' system password",
+            "Sync the 'cssadmin' password with 'admin' account?",
             "Yes",
             "No")
-        if update_email:
-            # Get email.
-            email = d.get_email(
-                "Drupal 'admin' Email",
-                "Please enter email address for Drupal 'admin' account.",
-                "%s@%s" % (username, hostname))
-    # if email do update
-    elif email: update_email = True
-    # no email no update
-    else: update_email = False
+    elif sync_cssadmin == "True": update_cssadmin = True
 
     # Init db connection.
     con = ""
@@ -104,11 +88,6 @@ def main():
                 system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
                 # Update site admin password.
                 system('drupal --root=%s --uri="http://%s" user:password:reset admin %s' % (drupaldir, site, password))
-                # Check emails too.
-                if update_email:
-                    # Update email.
-                    system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET mail=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
-                    system('drush -r %s -l https://%s sql-query "UPDATE users_field_data SET init=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                 # Clear site cache.
                 system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
         if restart_apache:
@@ -125,17 +104,18 @@ def main():
             con.close()
 
     # Check change cssadmin password.
-    try:
-        # Check cssadmin exists with exception if not.
-        pwd.getpwnam('cssadmin')
-        # Change cssadmin password.
-        system("echo cssadmin:%s | chpasswd" % password)
-        system("echo 'Update password for cssadmin has completed.'")
-    except KeyError:
-        # Error cssadmin.
-        system("")
-        system("echo 'Unable to update password for cssadmin. Ensure cssadmin account exists.'")
-        system("")
+    if update_cssadmin:
+        try:
+            # Check cssadmin exists with exception if not.
+            pwd.getpwnam('cssadmin')
+            # Change cssadmin password.
+            system("echo cssadmin:%s | chpasswd" % password)
+            system("echo 'Update password for cssadmin has completed.'")
+        except KeyError:
+            # Error cssadmin.
+            system("")
+            system("echo 'Unable to update password for cssadmin. Ensure cssadmin account exists.'")
+            system("")
 
 if __name__ == "__main__":
     main()

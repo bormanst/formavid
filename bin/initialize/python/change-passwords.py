@@ -76,6 +76,11 @@ def main():
                 "New Solr 'admin' password",
                 "Please enter NEW password for Solr access.")
 
+        if update_drupal8 and not os.environ.get("SOLR_OLD"):
+            os.environ["SOLR_OLD"] = d.get_password(
+                "Old Solr 'admin' password",
+                "Please enter OLD password for Solr access.")
+
         if not os.environ.get("INVOICENINJA_PASS"):
             os.environ["INVOICENINJA_PASS"] = d.get_password(
                 "Invoice Ninja 'admin' password",
@@ -91,17 +96,6 @@ def main():
                 "Tools page 'admin' password",
                 "Please enter password for tools page 'admin' access.")
 
-    # Set remaining vars.
-    if update_drupal8 and not os.environ.get("APP_EMAIL"):
-        os.environ["APP_EMAIL"] = d.get_email(
-            "Drupal 'admin' Email",
-            "Please enter email address for Drupal 'admin' account.")
-
-    if not os.environ.get("SOLR_OLD"):
-        os.environ["SOLR_OLD"] = d.get_password(
-            "Old Solr 'admin' password",
-            "Please enter OLD password for Solr access.")
-
     # Change system and db passwords first.
 
     # Webmin password.
@@ -116,14 +110,18 @@ def main():
     # Roundup password.
     system("python %s/bin/initialize/python/roundup.py" % formavid)
 
-    # Solr password.
-    system("python %s/bin/initialize/python/solr.py" % formavid)
-
     # Tools password.
     system("python %s/bin/initialize/python/tools.py" % formavid)
 
     # Drupal password.
-    if update_drupal8: system("python %s/bin/initialize/python/drupal8.py" % formavid)
+    if update_drupal8:
+        os.environ["SYNC_CSSADMIN"] = "True"
+        system("python %s/bin/initialize/python/drupal8.py" % formavid)
+
+    # Solr password.
+    solrold = os.environ.get("SOLR_OLD")
+    if solrold and not solrold == "None":
+        system("python %s/bin/initialize/python/solr.py" % formavid)
 
 if __name__ == "__main__":
     main()

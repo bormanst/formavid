@@ -6,7 +6,7 @@
 
 """
 
-Set Solr password
+Set Solr passwords.
 
 """
 
@@ -52,6 +52,11 @@ def main():
 
     # Change admin password last.
     system('curl -k --user admin:%s http://localhost:8983/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"%s\"}}"' % (solrold, solrnew))
+
+    # The sites.php is created by create-drupal-stack.py implying a site exists.
+    sites_file = "/var/www/drupal8/prod/web/sites/sites.php"
+    if os.path.exists(sites_file):
+        system("python %s/bin/initialize/python/drupal8-solr.py" % formavid)
 
     # Apply changes.
     system('systemctl restart solr')
