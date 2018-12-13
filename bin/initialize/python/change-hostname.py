@@ -41,13 +41,17 @@ def main():
         "Set Base Appliance Site Title",
         "Please enter the site title to be used for this appliance.",
         DEFAULT_TITLE)
-
+    
     # Format domain.
     domain = format_domain(domain)
     # Get hostname.
     hostname = get_hostname(domain)
     # Get sitename.
     sitename = get_sitename(domain)
+
+    # Set envars.
+    os.environ["DOMAIN"] = domain
+    os.environ["SITETITLE"] = sitetitle
 
     # Update system files.
     old_file = "/etc/formavid/default_envars"
