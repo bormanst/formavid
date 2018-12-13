@@ -78,7 +78,7 @@ def main():
     # Stop if started by this script.
     if stop_solr:
         system("echo 'Solr was previously not active so returning to stopped state ...'")
-        system('systemctl stop Solr')
+        system('systemctl stop solr')
 
 if __name__ == "__main__":
     main()
