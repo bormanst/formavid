@@ -26,11 +26,6 @@ def main():
     formavid = "/usr/local/formavid"
     if os.environ.get("FORMAVID"): formavid = os.environ.get("FORMAVID")
 
-    update_drupal8 = False
-    # The sites.php is created by create-drupal-stack.py implying a site exists.
-    sites_file = "/var/www/drupal8/prod/web/sites/sites.php"
-    if os.path.exists(sites_file): update_drupal8 = True
-
     # Check use singl password.
     single_pass = os.environ.get("SINGLE_PASS")
     if not single_pass:
@@ -66,17 +61,17 @@ def main():
                 "MariaDb 'root' password",
                 "Please enter password for MariaDb 'root' account.")
 
-        if update_drupal8 and not os.environ.get("APP_PASS"):
+        if not os.environ.get("APP_PASS"):
             os.environ["APP_PASS"] = d.get_password(
                 "Drupal/MariaDb/Solr/System 'admin' and 'cssadmin' password",
                 "Please enter password for Drupal 'admin' and 'cssadmin' accounts.")
 
-        if update_drupal8 and not os.environ.get("SOLR_NEW"):
+        if not os.environ.get("SOLR_NEW"):
             os.environ["SOLR_NEW"] = d.get_password(
                 "New Solr 'admin' password",
                 "Please enter NEW password for Solr access.")
 
-        if update_drupal8 and not os.environ.get("SOLR_OLD"):
+        if not os.environ.get("SOLR_OLD"):
             os.environ["SOLR_OLD"] = d.get_password(
                 "Old Solr 'admin' password",
                 "Please enter OLD password for Solr access.")
@@ -104,24 +99,22 @@ def main():
     # MariaDB password.
     system("python %s/bin/initialize/python/mysqlconf.py" % formavid)
 
+    # Drupal password.
+    system("python %s/bin/initialize/python/drupal8.py" % formavid)
+
     # Invoice Ninja password.
     system("python %s/bin/initialize/python/invoiceninja.py" % formavid)
 
     # Roundup password.
     system("python %s/bin/initialize/python/roundup.py" % formavid)
 
-    # Tools password.
-    system("python %s/bin/initialize/python/tools.py" % formavid)
-
-    # Drupal password.
-    if update_drupal8:
-        os.environ["SYNC_CSSADMIN"] = "True"
-        system("python %s/bin/initialize/python/drupal8.py" % formavid)
-
     # Solr password.
     solrold = os.environ.get("SOLR_OLD")
     if solrold and not solrold == "None":
         system("python %s/bin/initialize/python/solr.py" % formavid)
+
+    # Tools password.
+    system("python %s/bin/initialize/python/tools.py" % formavid)
 
 if __name__ == "__main__":
     main()
