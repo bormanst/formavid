@@ -24,15 +24,26 @@ def main():
 
     # Set vars.
     d = Dialog(DEFAULT_DIALOG_HEADER)
+    stop_solr = False
 
     # Check solr running.
     out = system("systemctl is-active solr")
     if out and out.strip().lower() != 'active':
-        system("echo ''")
-        system("echo 'Solr service is not active.'")
-        system("echo 'Please ensure Solr service is running prior to changing passwords.'")
-        system("echo ''")
-        quit()
+        # Solr not running so stop if started here.
+        stop_solr = True
+        # Try start solr.
+        system("echo 'Solr service is not active so attempting to start it ...'")
+        system("systemctl enable solr")
+        system("systemctl start solr && sleep 20")
+        # Re-check solr running.
+        out = system("systemctl is-active solr")
+        if out and out.strip().lower() != 'active':
+            system("echo ''")
+            system("echo 'Solr service is not available.'")
+            system("echo 'The service is not active and could not be started.'")
+            system("echo 'Please ensure Solr service is available prior to changing passwords.'")
+            system("echo ''")
+            quit()
 
     # Check solrold.
     if not solrold:
@@ -60,6 +71,11 @@ def main():
 
     # Apply changes.
     system('systemctl restart solr')
+
+    # Stop if started by this script.
+    if stop_solr:
+        system("echo 'Solr was previously not active so returning to stopped state ...'")
+        system('systemctl stop Solr')
 
 if __name__ == "__main__":
     main()
