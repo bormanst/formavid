@@ -22,14 +22,6 @@ DEFAULT_DOMAIN = "www.examplesitename.com"
 DEFAULT_TITLE = "Example Site Name"
 
 def main():
-    # Check default apache admin conf.
-    old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
-    if not os.path.exists(old_file):
-        system("echo ''")
-        system("echo 'The default hostname has already been updated.'")
-        system("echo ''")
-        quit()
-
     # Assign common dialog header.
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
@@ -38,6 +30,14 @@ def main():
     default_hostname = get_hostname(default_domain)
     default_sitename = get_sitename(default_domain)
     default_sitetitle = DEFAULT_TITLE
+
+    # Check default apache admin conf.
+    old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
+    if not os.path.exists(old_file):
+        system("echo ''")
+        system("echo 'The default hostname has already been updated.'")
+        system("echo ''")
+        quit()
 
     # Get domain.
     domain = d.get_input(
