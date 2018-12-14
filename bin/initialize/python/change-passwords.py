@@ -123,9 +123,9 @@ def main():
     system("echo 'Finished updating the appliance passwords.'")
 
     # Make envars available to parent.
-    app_pass = os.environ.get["APP_PASS"]
-    db_pass = os.environ.get["DB_PASS"]
-    solr_new = os.environ.get["SOLR_NEW"]
+    app_pass = os.environ.get("APP_PASS")
+    db_pass = os.environ.get("DB_PASS")
+    solr_new = os.environ.get("SOLR_NEW")
     print([app_pass, db_pass, solr_new])
 
 if __name__ == "__main__":
