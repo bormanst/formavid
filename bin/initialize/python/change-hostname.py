@@ -70,6 +70,7 @@ def main():
 
     # Update admin tools.
     system("echo 'Updating FormaVid admin pages and tools ...'")
+    old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
     system("a2dissite %s" % old_file)
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
