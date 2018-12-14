@@ -19,6 +19,12 @@ from local_methods import *
 
 DEFAULT_SINGLE_PASSWORD="F0rm4V1d"
 
+def gen_password(length=16, charset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"):
+    random_bytes = os.urandom(length)
+    len_charset = len(charset)
+    indices = [int(len_charset * (ord(byte) / 256.0)) for byte in random_bytes]
+    return "".join([charset[index] for index in indices])
+
 def main():
     # Check blocked.
     blocking_file = "/etc/formavid/do_not_delete_this_file"
@@ -30,8 +36,7 @@ def main():
         quit()
 
     # Get random password.
-    alphabet = string.ascii_letters + string.digits
-    single_pass = ''.join(choice(alphabet) for i in range(16))
+    single_pass = gen_password()
 
     # Set envars.
     os.environ["APP_EMAIL"] = ""
