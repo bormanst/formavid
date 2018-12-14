@@ -64,10 +64,12 @@ def main():
 
     # Update admin tools.
     system("echo 'Updating FormaVid admin pages and tools ...'")
+    system("a2dissite zzz-admin.%s.conf" % default_sitename)
     new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
     old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     system("mv %s %s" % (old_file, new_file))
+    system("a2ensite zzz-admin.%s.conf" % sitename)
     old_file = "/var/www/admin/*.php"
     system("sed -i 's/%s/%s/g' %s" % (default_sitename, sitename, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
