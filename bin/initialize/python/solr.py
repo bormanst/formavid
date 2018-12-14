@@ -62,9 +62,11 @@ def main():
             "Please enter NEW password for Solr access.")
 
     # Change non-admin passwords first.
+    system("echo 'Updating Solr drupal8 password ...'")
     system('curl -k --user admin:%s http://localhost:8983/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"drupal8\":\"%s\"}}"' % (solrold, solrnew))
 
     # Change admin password last.
+    system("echo 'Updating Solr admin password ...'")
     system('curl -k --user admin:%s http://localhost:8983/solr/admin/authentication -H "Content-type:application/json" -d "{\"set-user\": {\"admin\":\"%s\"}}"' % (solrold, solrnew))
 
     # The sites.php is created by create-drupal-stack.py implying a site exists.

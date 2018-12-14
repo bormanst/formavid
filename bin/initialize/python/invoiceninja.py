@@ -69,13 +69,17 @@ def main():
         # Get db cursor.
         cur = con.cursor()
         # Update invoiceninja MariaDb password.
+        system("echo 'Updating MariaDb invoiceninja password ...'")
         cur.execute('SET PASSWORD FOR invoiceninja@localhost = PASSWORD("%s"); FLUSH PRIVILEGES;' % escape_chars(password))
         # Update invoiceninja .env with MariaDb and Postfix password.
+        system("echo 'Updating Invoice Ninja .env file MariaDb and Postfix passwords ...'")
         system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
         system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
         # Set apache2 htdbm password.
+        system("echo 'Updating Invoice Ninja .env file MariaDb and Postfix passwords ...'")
         directory = "/usr/local/apache2/passwd/invoiceninja"
         if os.path.isdir(directory): system("rm -rf %s" % directory)
+        system("echo 'Updating Apache2 invoiceninja password for setup access ...'")
         system("mkdir -p %s" % directory)
         directory = "".join([directory, '/passwords.dbm'])
         command = " ".join(['htdbm -bc', directory, username, apachepass])

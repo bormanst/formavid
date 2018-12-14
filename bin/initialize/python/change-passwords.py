@@ -42,6 +42,7 @@ def main():
     # Set passwords.
     if single_pass:
         # Use same password.
+        system("echo 'Setting password envars to single password ...'")
         os.environ["APP_PASS"] = single_pass
         os.environ["DB_PASS"] = single_pass
         os.environ["INVOICENINJA_PASS"] = single_pass
@@ -91,7 +92,10 @@ def main():
                 "Tools page 'admin' password",
                 "Please enter password for tools page 'admin' access.")
 
+        system("echo 'Setting password envars using different passwords ...'")
+
     # Change system and db passwords first.
+    system("echo 'Updating the appliance passwords ...'")
 
     # Webmin password.
     system("python %s/bin/initialize/python/webmin.py" % formavid)
@@ -115,6 +119,8 @@ def main():
 
     # Tools password.
     system("python %s/bin/initialize/python/tools.py" % formavid)
+
+    system("echo 'Finished updating the appliance passwords.'")
 
 if __name__ == "__main__":
     main()

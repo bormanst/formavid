@@ -33,6 +33,7 @@ def main():
             "Please enter password for tools page 'admin' access.")
 
     # apache2 htdbm password
+    system("echo 'Updating Admin Tools apache2 password ...'")
     directory = "/usr/local/apache2/passwd/admintools"
     if not os.path.isdir(directory): system("mkdir -p %s" % directory)
     directory = "".join([directory, '/passwords.dbm'])

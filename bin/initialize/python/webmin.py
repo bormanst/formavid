@@ -31,9 +31,11 @@ def main():
             "Please enter password for Webmin 'root' access and system account.")
 
     # Set system root password.
+    system("echo 'Updating system root password ...'")
     system("echo %s:%s | chpasswd" % (username, password))
 
     # Set webmin root password.
+    system("echo 'Updating Webmin root password ...'")
     system("/usr/share/webmin/changepass.pl /etc/webmin %s %s" % (username, password))
 
 if __name__ == "__main__":

@@ -69,13 +69,16 @@ def main():
     con = ""
     try:
         pwd.getpwnam('admin')
+        system("echo 'Updating system admin password ...'")
         system("echo admin:%s | chpasswd" % password)
         # Get db conection.
         con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
         # Get db cursor.
         cur = con.cursor()
         # Update mariaDB user passwords.
+        system("echo 'Updating MariaDb admin password ...'")
         cur.execute('SET PASSWORD FOR admin@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
+        system("echo 'Updating MariaDb drupal8 password ...'")
         cur.execute('SET PASSWORD FOR drupal8@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
         # Cycle through /var/www/drupal8/sites.
         sites_dir = "/".join([drupaldir, 'sites'])
@@ -87,8 +90,10 @@ def main():
                     # Show which site.
                     system("echo 'Updating: %s'" % site)
                     # Update site db access password.
+                    system("echo 'Updating MariaDb password in Drupal8 settings.php files ...'")
                     system('sed -i "s/\'password\' =>\(.*\)/\'password\' => \'%s\',/" %s/sites/%s/settings.php' % (password, drupaldir, site))
                     # Update site admin password.
+                    system("echo 'Updating Drupal8 admin password for sites access ...'")
                     system('drupal --root=%s --uri="http://%s" user:password:reset admin %s' % (drupaldir, site, password))
                     # Clear site cache.
                     system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
@@ -111,6 +116,7 @@ def main():
             # Check cssadmin exists with exception if not.
             pwd.getpwnam('cssadmin')
             # Change cssadmin password.
+            system("echo 'Updating system cssadmin password ...'")
             system("echo cssadmin:%s | chpasswd" % password)
             system("echo 'Update password for cssadmin has completed.'")
         except KeyError:

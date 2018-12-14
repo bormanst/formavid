@@ -50,10 +50,12 @@ def main():
     sitename = get_sitename(domain)
 
     # Set envars.
+    system("echo 'Setting required envars ...'")
     os.environ["DOMAIN"] = domain
     os.environ["SITETITLE"] = sitetitle
 
     # Update system files.
+    system("echo 'Updating FormaVid default envars ...'")
     old_file = "/etc/formavid/default_envars"
     system("sed -i 's/%s/%s/g' %s" % (default_domain, domain, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
@@ -61,6 +63,7 @@ def main():
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
     # Update admin tools.
+    system("echo 'Updating FormaVid admin pages and tools ...'")
     new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
     old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
@@ -71,23 +74,27 @@ def main():
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
     # Update apache2 files.
+    system("echo 'Updating Apache2 status.conf file ...'")
     old_file = "/etc/apache2/mods-available/status.conf"
     system("sed -i 's/%s/%s/g' %s" % (default_sitename, sitename, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
 
     # Update invoiceninja files.
+    system("echo 'Updating Imvoice Ninja apache.conf file ...'")
     old_file = "/etc/invoiceninja/apache.conf"
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     old_file = "/var/www/invoiceninja/.env"
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
     # Update postfix files.
+    system("echo 'Updating Postfix virtual file ...'")
     old_file = "/etc/postfix/virtual"
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     system("postconf -e myhostname=%s" % hostname)
     system("postconf -e smtpd_banner='$myhostname ESMTP'")
 
     # Update roundup files.
+    system("echo 'Updating Roundup support tracker apache.conf file ...'")
     old_file = "/etc/roundup/support/apache.conf"
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     old_file = "/etc/roundup/support/tracker-config.ini"

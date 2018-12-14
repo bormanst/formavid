@@ -105,6 +105,7 @@ def main():
 
     # set password
     # m.execute('update mysql.user set authentication_string=PASSWORD(\"%s\") where User=\"%s\"; flush privileges;' % (escape_chars(password), username))
+    system("echo 'Updating MariaDb root password ...'")
     m.execute('SET PASSWORD FOR root@localhost = PASSWORD("%s"); flush privileges;' % escape_chars(password))
 
     # edge case: update DEBIAN_CNF

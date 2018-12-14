@@ -44,6 +44,7 @@ def main():
                 # Show which site.
                 system("echo 'Updating: %s'" % site)
                 # Update solr access password.
+                system("echo 'Updating drupal8 account password for Solr access ...'")
                 system("drush -r %s -l http://%s config:set -y search_api.server.%s_solr_server backend_config.connector_config.password %s" % (drupaldir, baseUri, get_sitename(site), solrnew))
                 # Clear site cache.
                 system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))

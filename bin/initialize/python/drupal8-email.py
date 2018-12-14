@@ -54,6 +54,7 @@ def main():
                 # Show which site.
                 system("echo 'Updating: %s'" % site)
                 # Update email.
+                system("echo 'Updating Drupal8 admin email address ...'")
                 system('drush -r %s -l https://%s sql:query "UPDATE users_field_data SET mail=\'%s\' WHERE name=\'admin\';"' % (drupaldir, site, email))
                 # Clear site cache.
                 system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir, site))
