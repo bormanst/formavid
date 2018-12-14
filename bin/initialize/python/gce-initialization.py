@@ -69,14 +69,14 @@ def main():
 
     # update appliance with user selected values
     script = "/".join([scripts_dir, "initialize/python/change-hostname.py"])
-    output = subprocess.check_output(script, shell=True)
+    output = subprocess.check_output(script)
     subvals = ast.literal_eval(output.decode("ascii"))
     if subvals[0]: os.environ["DOMAIN"] = subvals[0]
     if subvals[1]: os.environ["SITETITLE"] = subvals[1]
     if subvals[2]: os.environ["APP_EMAIL"] = subvals[2]
 
     script = "/".join([scripts_dir, "initialize/python/change-passwords.py"])
-    output = subprocess.check_output(script, shell=True)
+    output = subprocess.check_output(script)
     subvals = ast.literal_eval(output.decode("ascii"))
     if subvals[0]: os.environ["APP_PASS"] = subvals[0]
     if subvals[1]: os.environ["DB_PASS"] = subvals[1]
