@@ -10,8 +10,10 @@ Perform GCE initialization to update passwords and domain info.
 
 """
 
+import ast
 import os
 import string
+import subprocess
 
 from local_methods import *
 
@@ -32,9 +34,11 @@ def main():
     single_pass = ''.join(choice(alphabet) for i in range(16))
 
     # Set envars.
+    os.environ["APP_EMAIL"] = ""
     os.environ["APP_PASS"] = ""
     os.environ["DB_PASS"] = ""
     os.environ["DOMAIN"] = ""
+    os.environ["FORMAVID"] = "/usr/local/formavid"
     os.environ["INVOICENINJA_PASS"] = ""
     os.environ["ROUNDUP_PASS"] = ""
     os.environ["SINGLE_PASS"] = single_pass
@@ -60,9 +64,18 @@ def main():
 
     # update appliance with user selected values
     script = "/".join([scripts_dir, "initialize/python/change-hostname.py"])
-    system(script)
+    output = subprocess.check_output(script, shell=True)
+    subvals = ast.literal_eval(output.decode("ascii"))
+    if subvals[0]: os.environ["DOMAIN"] = subvals[0]
+    if subvals[1]: os.environ["SITETITLE"] = subvals[1]
+    if subvals[2]: os.environ["APP_EMAIL"] = subvals[2]
+
     script = "/".join([scripts_dir, "initialize/python/change-passwords.py"])
-    system(script)
+    output = subprocess.check_output(script, shell=True)
+    subvals = ast.literal_eval(output.decode("ascii"))
+    if subvals[0]: os.environ["APP_PASS"] = subvals[0]
+    if subvals[1]: os.environ["DB_PASS"] = subvals[1]
+    if subvals[2]: os.environ["SOLR_NEW"] = subvals[2]
 
     # create initial stack
     script = "/".join([scripts_dir, "deploy/python/create-drupal-stack.py"])

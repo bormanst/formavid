@@ -10,6 +10,7 @@ Change hostname for appliance.
 
 """
 
+import fnmatch
 import os
 import string
 
@@ -21,6 +22,14 @@ DEFAULT_DOMAIN = "www.examplesitename.com"
 DEFAULT_TITLE = "Example Site Name"
 
 def main():
+    # Check default apache admin conf.
+    old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
+    if not os.path.exists(old_file):
+        system("echo ''")
+        system("echo 'The default hostname has already been updated.'")
+        system("echo ''")
+        quit()
+
     # Assign common dialog header.
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
@@ -48,11 +57,8 @@ def main():
     hostname = get_hostname(domain)
     # Get sitename.
     sitename = get_sitename(domain)
-
-    # Set envars.
-    system("echo 'Setting required envars ...'")
-    os.environ["DOMAIN"] = domain
-    os.environ["SITETITLE"] = sitetitle
+    # Set admin email.
+    app_email = '@'.join(["admin", hostname])
 
     # Update system files.
     system("echo 'Updating FormaVid default envars ...'")
@@ -64,12 +70,11 @@ def main():
 
     # Update admin tools.
     system("echo 'Updating FormaVid admin pages and tools ...'")
-    system("a2dissite zzz-admin.%s.conf" % default_sitename)
-    new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
-    old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
+    system("a2dissite %s" % old_file)
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
+    new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
     system("mv %s %s" % (old_file, new_file))
-    system("a2ensite zzz-admin.%s.conf" % sitename)
+    system("a2ensite %s" % new_file)
     old_file = "/var/www/admin/*.php"
     system("sed -i 's/%s/%s/g' %s" % (default_sitename, sitename, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
@@ -103,5 +108,9 @@ def main():
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
+    # Make envars available to parent.
+    print([domain, sitetitle, app_email])
+
 if __name__ == "__main__":
     main()
+
