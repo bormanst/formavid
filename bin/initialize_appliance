@@ -70,7 +70,11 @@ rm -rf /var/www/html
 # enable apache2 confs
 a2ensite invoiceninja
 a2ensite support
-a2ensite zzz-admin.examplesitenamecom
+SITE=/etc/apache2/sites-available/zzz-admin.examplesitenamecom.conf
+if [ -f ${SITE} ]; then
+  # enable default admin
+  a2ensite zzz-admin.examplesitenamecom
+fi
 
 # restart apache2
 systemctl restart apache2

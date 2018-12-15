@@ -26,6 +26,21 @@ def main():
     formavid = "/usr/local/formavid"
     if os.environ.get("FORMAVID"): formavid = os.environ.get("FORMAVID")
 
+    # Check use singl password.
+    single_pass = os.environ.get("SINGLE_PASS")
+
+    # Set passwords.
+    if single_pass and not single_pass == "None":
+        # Use same password.
+        system("echo 'Setting password envars to single password ...'")
+        os.environ["APP_PASS"] = single_pass
+        os.environ["DB_PASS"] = single_pass
+        os.environ["INVOICENINJA_PASS"] = single_pass
+        os.environ["ROUNDUP_PASS"] = single_pass
+        os.environ["SOLR_NEW"] = single_pass
+        os.environ["TOOLS_PASS"] = single_pass
+        os.environ["WEBMIN_PASS"] = single_pass
+
     # Change system and db passwords first.
     system("echo 'Updating the appliance passwords ...'")
 
