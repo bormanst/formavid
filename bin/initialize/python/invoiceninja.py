@@ -76,10 +76,9 @@ def main():
         system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
         system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
         # Set apache2 htdbm password.
-        system("echo 'Updating Invoice Ninja .env file MariaDb and Postfix passwords ...'")
+        system("echo 'Updating Apache2 invoiceninja password for setup access ...'")
         directory = "/usr/local/apache2/passwd/invoiceninja"
         if os.path.isdir(directory): system("rm -rf %s" % directory)
-        system("echo 'Updating Apache2 invoiceninja password for setup access ...'")
         system("mkdir -p %s" % directory)
         directory = "".join([directory, '/passwords.dbm'])
         command = " ".join(['htdbm -bc', directory, username, apachepass])

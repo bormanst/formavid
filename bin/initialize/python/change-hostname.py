@@ -39,18 +39,26 @@ def main():
         system("echo ''")
         quit()
 
-    # Get domain.
-    domain = d.get_input(
-        "Set Base Appliance Domain",
-        "Please enter the domain to be used for this appliance.",
-        DEFAULT_DOMAIN)
+    # Set envars.
+    domain = os.environ.get("DOMAIN")
+    sitetitle = os.environ.get("SITETITLE")
 
-    # Get site title.
-    sitetitle = d.get_input(
-        "Set Base Appliance Site Title",
-        "Please enter the site title to be used for this appliance.",
-        DEFAULT_TITLE)
-    
+    # Check domain.
+    if not domain or domain == "None":
+        # Get domain.
+        domain = d.get_input(
+            "Set Base Appliance Domain",
+            "Please enter the domain to be used for this appliance.",
+            DEFAULT_DOMAIN)
+
+    # Check site title.
+    if not sitetitle or sitetitle == "None":
+        # Get site title.
+        sitetitle = d.get_input(
+            "Set Base Appliance Site Title",
+            "Please enter the site title to be used for this appliance.",
+            DEFAULT_TITLE)
+
     # Format domain.
     domain = format_domain(domain)
     # Get hostname.
@@ -71,11 +79,11 @@ def main():
     # Update admin tools.
     system("echo 'Updating FormaVid admin pages and tools ...'")
     old_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % default_sitename
-    system("a2dissite %s" % old_file)
+    system("a2dissite zzz-admin.%s" % default_sitename)
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
     system("mv %s %s" % (old_file, new_file))
-    system("a2ensite %s" % new_file)
+    system("a2ensite zzz-admin.%s" % sitename)
     old_file = "/var/www/admin/*.php"
     system("sed -i 's/%s/%s/g' %s" % (default_sitename, sitename, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
@@ -109,9 +117,5 @@ def main():
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
-    # Make envars available to parent.
-    print([domain, sitetitle, app_email])
-
 if __name__ == "__main__":
     main()
-

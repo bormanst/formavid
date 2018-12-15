@@ -57,11 +57,42 @@ export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 MESSSAGE="$( date ) Initializing appliance ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# enable stunnel4 services
+sed -i "s|ENABLED=0|ENABLED=1|" /etc/default/stunnel4
+systemctl restart stunnel4
+
+# disable apache2 default
+a2dissite 000-default
+
+# remove GCE init info
+rm -rf /var/www/html
+
+# enable apache2 confs
+a2ensite invoiceninja
+a2ensite support
+a2ensite zzz-admin.examplesitenamecom
+
+# restart apache2
+systemctl restart apache2
+
 # set envars by input
 . ${FORMAVID}/bin/deploy/shell/set_envars
 
 # set passwords by input
+. ${FORMAVID}/bin/deploy/shell/get_passwords
+
+# set hostname
+${FORMAVID}/bin/initialize/python/change-hostname.py
+
+# set passwords
 ${FORMAVID}/bin/initialize/python/change-passwords.py
+
+# check create initial stack
+SITES=/var/www/drupal8/prod/web/sites/sites.php
+if [ ! -f ${SITES} ]; then
+  # create drupal stack
+  ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
+fi
 
 # regen ssh keys
 ${FORMAVID}/bin/initialize/shell/regen_sshkeys

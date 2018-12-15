@@ -44,14 +44,14 @@ def main():
     update_cssadmin = False
 
     # Check password.
-    if not password:
+    if not password or password == "None":
         restart_apache = True
         password = d.get_password(
             "Drupal8/MariaDb/System 'admin' password",
             "Please enter password for 'admin' account.")
 
     # Check dbpass.
-    if not dbpass:
+    if not dbpass or dbpass == "None":
         dbpass = d.get_password(
             "Current MariaDb 'root' password",
             "Please enter current MariaDb 'root' password for db access.")
@@ -118,7 +118,6 @@ def main():
             # Change cssadmin password.
             system("echo 'Updating system cssadmin password ...'")
             system("echo cssadmin:%s | chpasswd" % password)
-            system("echo 'Update password for cssadmin has completed.'")
         except KeyError:
             # Error cssadmin.
             system("")
