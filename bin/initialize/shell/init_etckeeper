@@ -9,17 +9,22 @@ LOG=/var/log/formavid/deploy_appliance.log
 
 MESSSAGE="$( date ) Initializing etckeeper ..."
 echo ${MESSSAGE} | tee -a ${LOG}
+echo ""
 
 # uninit etckeeper
 etckeeper uninit -f > /dev/null 2>&1
+echo ""
 
 # initialize etckeeper
 etckeeper init >/dev/null
+echo ""
 
 # initial commit
 etckeeper commit "initial commit" >/dev/null
+echo ""
 
 MESSSAGE="$( date ) Initialized and committed etckeeper ..."
 echo ${MESSSAGE} | tee -a ${LOG}
+echo ""
 
 exit 0

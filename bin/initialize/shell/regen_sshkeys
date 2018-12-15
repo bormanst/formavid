@@ -9,17 +9,22 @@ LOG=/var/log/formavid/deploy_appliance.log
 
 MESSSAGE="$( date ) Regenerating SSH cryptographic keys ..."
 echo ${MESSSAGE} | tee -a ${LOG}
+echo ""
 
 # remove existing ssh keys and generate new ones
 rm -f /etc/ssh/*_key{,.pub}
+echo ""
 
 # reconfigure openssh-server
 dpkg-reconfigure openssh-server
+echo ""
 
 # ssh daemon needs to be restarted for changes to take effect
 systemctl restart ssh
+echo ""
 
 MESSSAGE="$( date ) Cryptographic keys regenerated and SSH server restarted."
 echo ${MESSSAGE} | tee -a ${LOG}
+echo ""
 
 exit 0
