@@ -50,7 +50,7 @@ cat > ${WELCOME} <<EOF
 For security reasons the appliance passwords were randomly seeded by a custom GCE startup script.
 Most services have also been disabled to prevent tampering while user generated values are implemented.
 This is NOT an optimal solution and requires the user instantiated initialization process to be completed.
-It is, therefore, imperative to complete the initialization process as soon as possible.
+Therefore, it is imperative to complete the initialization process as soon as possible.
 </p>
 <p>
 To complete the initialization, a script is provided to automate the process.
@@ -66,13 +66,13 @@ Change to the FormaVid scripts directory and run the initialization script: cd /
 After the script is finished, the appliance should reboot automatically and everything should be in order.
 </p>
 <p>
-Base Drupal8 site: https://hostname.com <br />
-Admin tool pages: https://admin.hostname.com <br />
-Invoice Ninja: https://billing.hostname.com <br />
-Roundup support tracker: https://support.hostname.com/support/ <br />
-Shell-in-a-box: https://hostname.com:12320 <br />
-Webmin: https://hostname.com:12321 <br />
-Adminer: https://hostname.com:12322
+Base Drupal8 site [admin:app_pass] - <b>https://hostname.com</b> <br />
+Admin tool pages [admin:tools_pass] - <b>https://admin.hostname.com</b> <br />
+Invoice Ninja setup [invoiceninja:invoiceninja_pass] - <b>https://billing.hostname.com</b> <br />
+Roundup support tracker [admin:roundup_pass] - <b>https://support.hostname.com/support/</b> <br />
+Shell-in-a-box [root:app_pass,admin:app_pass,cssadmin:app_pass] - <b>https://hostname.com:12320</b> <br />
+Webmin [root:app_pass] - <b>https://hostname.com:12321</b> <br />
+Adminer [admin:app_pass,drupal8:app_pass,invoiceninja:invoiceninja_pass,roundup:roundup_pass] - <b>https://hostname.com:12322</b>
 </p>
 <p>
 Note: To enable SSL, a Certbot script is available in the /usr/local/formavid/applications/certbot directory but it must be manually configured and run.
@@ -112,10 +112,10 @@ All code and scripts are hosted on GitHub at <a href="https://github.com/bormans
 The default environment variables used to build the appliance are copied to and referenced from the /etc/formavid directory in case the project is re-cloned into the /usr/local/formavid directory.
 </p>
 <p>
-Remember, this page will be deleted after initialization is completed, so please bookmark any of the desired links on this page for future reference.
+Reminder: this page will be deleted after initialization is completed, so please bookmark any of the desired links on this page for future reference.
 </p>
 <p>
-Thank you for using the FormaVid Small Business Appliance and please remember, if profitable, to <a href="https://formavid.org/download" alt="donate or contribute">donate or contribute</a> to all of the projects used throughout the appliance. The open source community relies your support.
+Thank you for using the FormaVid Small Business Appliance and please remember, if profitable, to <a href="https://formavid.org/download" alt="donate or contribute">donate or contribute</a> to all of the projects used throughout the appliance. The open source community relies on your support.
 </p>
 </body></html>
 EOF
