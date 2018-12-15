@@ -49,13 +49,13 @@ def main():
             quit()
 
     # Check solrold.
-    if not solrold:
+    if not solrold or solrold == "None":
         solrold = d.get_password(
             "Old Solr 'admin' password",
             "Please enter OLD password for Solr access.")
 
     # Check solrnew.
-    if not solrnew:
+    if not solrnew or solrnew == "None":
         restart_solr = True
         solrnew = d.get_password(
             "New Solr 'admin' password",

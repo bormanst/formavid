@@ -29,6 +29,10 @@ fi
 # confirm initialization
 echo ""
 echo ""
+echo "This script is primarily designed to initialize a new GCE instance."
+echo "Most of the subscripts can be run individually but may require modification."
+echo ""
+echo ""
 echo "WARNING! You are about to initialize the appliance."
 echo "WARNING! This includes resetting passwords, ssh keys, and etckeeper."
 echo "WARNING! Each script can be run individually as well, refer to script."
@@ -38,6 +42,11 @@ echo ""
 echo "WARNING! The appliance will automatically reboot!"
 echo "WARNING! Save any work prior to running this script."
 echo "WARNING! Please notify other users if applicable."
+echo ""
+echo "Note: This script assumes the old Solr password is 'F0rm4V1d'."
+echo "Note: Modify SOLR_OLD if it is different or the Solr update will fail"
+echo "Note: and Drupal8 Solr access will fail as well. Please see the Solr build"
+echo "Note: script in the applications dir to reset it to SolrRocks if needed."
 echo ""
 read -p "Continue with initialization and reboot (y/n)?" CHOICE
 case "${CHOICE^^}" in
@@ -89,6 +98,8 @@ systemctl restart apache2
 ${FORMAVID}/bin/initialize/python/change-hostname.py
 
 # set passwords
+export SYNC_CSSADMIN="True"
+export SOLR_OLD="F0rm4V1d"
 ${FORMAVID}/bin/initialize/python/change-passwords.py
 
 # check create initial stack
