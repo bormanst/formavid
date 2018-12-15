@@ -610,8 +610,6 @@ def main():
     system("echo ''")
     system("echo 'Default site setup for %s is complete.'" % sitetitle)
     system("echo ''")
-    system("echo 'Please validate %s configurations by viewing the drupal admin status reports.'" % sitetitle)
-    system("echo ''")
     system("echo ''")
 
     # Log end.
