@@ -118,8 +118,8 @@ Initial configuration: */etc/roundup/support/tracker-config.ini*
 Invoice Ninja - Invoicing system
 =================================
 
-`Invoice Ninja`_ is a web based invoicing system that is 100% open source, and supported 
-by a growing community of developers around the world. A suite of features to invoice, 
+`Invoice Ninja`_ is a web based invoicing system that is 100% open source, and supported
+by a growing community of developers around the world. A suite of features to invoice,
 track-time, and to get paid.
 
 - Invoice Ninja configurations:
@@ -153,6 +153,7 @@ Credentials *(passwords required for initialization)*
 
 -  Webmin, Webshell, SSH, MariaDB, Adminer: username **root**
 -  Drupal 8, Roundup: username **admin**
+-  Invoice Ninja setup: username **invoiceninja**
 -  ProFTPD: username **cssadmin**
 -  BorgBackup: repository passphrase
 
