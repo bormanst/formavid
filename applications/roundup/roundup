@@ -98,10 +98,13 @@ if [ $(grep -c "^${DB_USER}:" /etc/passwd) -eq 0 ];  then
     useradd -U -m -r -s /bin/bash ${DB_USER}
 fi
 
+# check exists
 HOME="/home/${DB_USER}/.local"
 if [ ! -d "${HOME}" ]; then
+    # set version
+    VERSION="1.6.0"
     # install roundup to user home
-    su - ${DB_USER} -c "pip install ${PACKAGE} --user"
+    su - ${DB_USER} -c "pip install ${PACKAGE}==${VERSION} --user"
     # set home access perms
     chmod -R 0775 ${HOME}
     # add symlinks
@@ -116,7 +119,7 @@ if [ ! -d "${HOME}" ]; then
     ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
     TARGET=/lib/python2.7
     ln -sf ${HOME}${TARGET}/site-packages/roundup ${LOCAL}${TARGET}/dist-packages/roundup
-    ln -sf ${HOME}${TARGET}/site-packages/roundup-1.5.1.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-1.5.1.dist-info
+    ln -sf ${HOME}${TARGET}/site-packages/roundup-${VERSION}.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-${VERSION}.dist-info
 fi
 
 # tracker creation
