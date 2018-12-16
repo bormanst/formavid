@@ -215,6 +215,14 @@ def main():
     # Get sitename.
     sitename = get_sitename(domain)
 
+    # Check hostname already exists.
+    pathFile = "/".join([drupaldir,"web/sites",hostname])
+    if os.path.exists(pathFile):
+        # Log error.
+        logging.info('Selected domain already has drupal8 site: %s - Check sites/%s directory.' % (datetime.datetime.now(),hostname))
+        logging.info('Site stack creation for %s has been cancelled.' % hostname)
+        quit()
+
     # Get site title.
     if not sitetitle or sitetitle == "None":
         sitetitle = d.get_input(
