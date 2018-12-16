@@ -34,7 +34,7 @@ def main():
             "Please enter password for Roundup 'admin' and MariaDb account.")
 
     if not dbpass:
-        dbpass = d.get_input(
+        dbpass = d.get_password(
             "MariaDb 'root' password",
             "Please enter password for MariaDb 'root' account.")
 
