@@ -56,13 +56,6 @@ export LOG=${FORMAVID_LOGS}/deploy_appliance.log
 MESSSAGE="$( date ) Starting site stack creation ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
-# get default envars
-DEFAULT_ENVARS=/etc/formavid/default_envars
-if [ -f "${DEFAULT_ENVARS}" ]; then . /etc/formavid/default_envars; fi
-
-# update envars
-. ${FORMAVID}/bin/deploy/shell/set_envars
-
 # create site stack
 ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
 
