@@ -181,6 +181,16 @@
     <li><a href="https://doxfer.webmin.com/Webmin/Modules" title="Webmin Modules">Webmin Modules</a></li>
   </ul>
 </div>
+<div>
+  <h3><a href="https://xdebug.org/" title="Xdebug"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/xdebug.png"/><br><br>Xdebug</a></h3><br>
+  <ul>
+    <li><a href="https://xdebug.org/docs/" title="Xdebug Documentation">Xdebug Documentation</a></li>
+    <li><a href="https://xdebug.org/docs/faq" title="Xdebug FAQs">Xdebug FAQs</a></li>
+    <li><a href="https://xdebug.org/docs/all_settings" title="Xdebug Settings">Xdebug Settings</a></li>
+    <li><a href="https://xdebug.org/docs/all_functions" title="Xdebug Functions">Xdebug Functions</a></li>
+    <li><a href="https://atom.io/packages/php-debug" title="Xdebug and Atom">Xdebug and Atom</a></li>
+  </ul>
+</div>
 <br>
 <div>
 <p>
