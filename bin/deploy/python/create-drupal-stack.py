@@ -81,7 +81,7 @@ GULP_WATCH_SCSS_SCRIPT = """
 // #########################################################
 var watch = require('gulp-watch');
 
-gulp.task('watch-scss', ['clean:css'], function () {
+gulp.task('watch-scss', ['watch:css'], function () {
   return gulp.src(sassFiles)
     .pipe(watch(sassFiles))
     .pipe(sass(options.sass).on('error', sass.logError))
