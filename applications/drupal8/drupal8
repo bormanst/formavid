@@ -292,6 +292,19 @@ chmod +x ${CRON_DRUPAL}
 # configure apache
 a2enmod rewrite
 
+# apply extras
+if [ -d "${OVERLAY_DIR}" ]; then
+    # apply spy_watch custom module
+    EXTRA_DIR=${PROJECT_DIR}/web/modules/custom
+    mkdir -p ${EXTRA_DIR}
+    cp -rf ${OVERLAY_DIR}${EXTRA_DIR}/spy_watch ${EXTRA_DIR}
+    chown -R admin:adm ${EXTRA_DIR}
+    MESSSAGE="Applied spy_watch module for ${EXTRA_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}

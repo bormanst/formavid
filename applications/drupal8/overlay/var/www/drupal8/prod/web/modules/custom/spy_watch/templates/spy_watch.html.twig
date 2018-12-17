@@ -1,0 +1,25 @@
+{#
+* Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+* You should have received LICENSE.txt, a copy of the
+* GNU General Public License, along with this program.
+* If not, see <https://www.gnu.org/licenses/>.
+#}
+
+{#
+/**
+ * @file
+ * Default theme implementation to print Spy Watch text.
+ *
+ * Available variables:
+ *   - source_text
+ *
+ * @see template_preprocess_spy_watch()
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="spy_watch">
+{% for item in source_text %}
+  <p>{{ item }}</p>
+{% endfor %}
+</div>

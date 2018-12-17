@@ -1,0 +1,10 @@
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+spy_watch.form:
+  title: 'Spy Watch settings'
+  description: 'Configure settings for the Spy Watch module.'
+  route_name: spy_watch.form
+  parent: 'system.admin_config_development'

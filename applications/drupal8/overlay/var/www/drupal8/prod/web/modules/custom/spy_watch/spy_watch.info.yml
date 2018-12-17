@@ -1,0 +1,11 @@
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+name: Spy Watch
+type: module
+description: 'Sets and displays gulp watch state for theme development.'
+package: Development
+core: 8.x
+configure: spy_watch.form
