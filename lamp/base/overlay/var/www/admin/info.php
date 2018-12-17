@@ -23,6 +23,7 @@
     <li><a href="/trouble.php" title="Trouble Info">Trouble Info</a></li>
     <li><a href="/maintenance.php" title="Maintenance Info">Maintenance Info</a></li>
     <li><a href="/structure.php" title="Appliance Structure Info">Appliance Structure Info</a></li>
+    <li><a href="https://github.com/bormanst/formavid/blob/master/INSTALL.txt" title="Customizing Build Scripts">Customizing Build Scripts</a></li>
     <li><a href="http://formavid.org" title="FormaVid Home">FormaVid Home</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
     <li><a href="http://formavid.org/download" title="FormaVid Donate">FormaVid <b><i>Donate</i></b></a></li>
