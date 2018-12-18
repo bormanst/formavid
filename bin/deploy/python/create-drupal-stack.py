@@ -490,7 +490,8 @@ def main():
     # Drupal - set site theme permissions.
     system("chmod -R 0644 %s/web/themes/%s/logo.svg" % (drupaldir,sitename))
     system("chown -R cssadmin:cssadmin %s/web/themes/%s" % (drupaldir,sitename))
-    system("chmod -R 775 %s/web/themes/%s" % (drupaldir,sitename))
+    system("chmod -R 0775 %s/web/themes/%s" % (drupaldir,sitename))
+    system("chmod -R 0777 %s/web/themes/%s/styleguide" % (drupaldir,sitename))
     system("chown -R www-data:www-data %s/web/themes/%s/styleguide" % (drupaldir,sitename))
 
     # Set path to solr configs.
