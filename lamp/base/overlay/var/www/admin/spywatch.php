@@ -11,7 +11,7 @@
 <title>Spy Watch Info</title>
 </head>
 <body>
-<h1 align="center">Spy Watch</h1>
+<h1 align="center">Spy Watch Info</h1>
 <div>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/spywatch.png"/><br><br>Spy Watch</h3></div><br>
   <h3>Theme gulp watch state information.</h3>
