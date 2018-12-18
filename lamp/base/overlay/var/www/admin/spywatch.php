@@ -16,7 +16,7 @@
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/spywatch.png"/><br><br>Spy Watch</h3></div><br>
   <h3>Theme gulp watch state information.</h3>
   <p>Unpack in the <em>modules/custom</em> folder and enable in <strong>/admin/modules</strong>.</p>
-  <p>Last, visit <strong>spy_watch/set_watch/state/route/nid</strong> where:</p>
+  <p>Last, visit <strong>/spy_watch/set_watch/state/route/nid</strong> where:</p>
   <ul>
     <li><em>state</em> is the desired gulp <em>watch state</em></li>
     <li><em>route</em> is the <em>current page</em> to return to</li>

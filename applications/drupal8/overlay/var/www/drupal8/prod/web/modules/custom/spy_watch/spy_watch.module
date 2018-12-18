@@ -19,7 +19,7 @@ function spy_watch_help($route_name, RouteMatchInterface $route_match) {
         <h2>Theme gulp watch state information.</h2>
         <h3>Instructions</h3>
         <p>Unpack in the <em>modules/custom</em> folder and enable in <strong>/admin/modules</strong>.</p>
-        <p>Last, visit <strong>spy_watch/set_watch/state/route/nid</strong> where:</p>
+        <p>Last, visit <strong>/spy_watch/set_watch/state/route/nid</strong> where:</p>
         <ul>
           <li><em>state</em> is the desired gulp <em>watch state</em></li>
           <li><em>route</em> is the <em>current page</em> to return to</li>

@@ -18,7 +18,7 @@ installation) and enable in `/admin/modules`.
 
 Then, visit `/admin/config/development/spy_watch` to configure Spy Watch.
 
-Last, visit `spy_watch/set_watch/state/route/nid` where:
+Last, visit `/spy_watch/set_watch/state/route/nid` where:
 - *state* is the desired gulp watch state
 - *route* is the route of current page to return to
 - *nid* is the node id of current page if it is content related, otherwise, -1
