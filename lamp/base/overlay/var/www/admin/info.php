@@ -58,14 +58,11 @@
   <ul>
     <li><a href="/drupal.php" title="Drupal Local Info">Drupal Local Info</a></li>
     <li><a href="https://drupal.org/documentation" title="Drupal Documentation">Drupal Documentation</a></li>
+    <li><a href="https://www.drupal.org/8/faq" title="Drupal FAQs">Drupal FAQs</a></li>
+    <li><a href="https://www.drupal.org/docs/8/configuration-management/managing-your-sites-configuration" title="Drupal Configuration">Drupal Configuration</a></li>
     <li><a href="https://drupal.org/project/apachesolr" title="Drupal Solr Module">Drupal Solr Module</a></li>
     <li><a href="https://drupal.org/project/zen" title="Drupal Zen Theme">Drupal Zen Theme</a></li>
     <li><a href="https://www.drupal.org/requirements/php" title="Drupal php Requirements">Drupal php Requirements</a></li>
-    <li><a href="https://gulpjs.org/getting-started" title="Gulp Getting Started">Gulp Getting Started</a></li>
-    <li><a href="https://gulpjs.org/faq" title="Gulp FAQ">Gulp FAQ</a></li>
-    <li><a href="https://gulpjs.org/cli" title="Gulp CLI">Gulp CLI</a></li>
-    <li><a href="https://gulpjs.org/api" title="Gulp API">Gulp API</a></li>
-    <li><a href="https://gulpjs.org/recipes#recipes" title="Gulp Recipes">Gulp Recipes</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
@@ -170,6 +167,20 @@
     <li><a href="https://lucene.apache.org/solr/community.html" title="Apache Solr Community">Apache Solr Community</a></li>
     <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
     <li><a href="https://www.apache.org/foundation/contributing.html" title="Apache Solr Donate">Apache Solr <b><i>Donate</i></b></a></li>
+  </ul>
+</div>
+<div>
+  <h3><a href="/spywatch.php" title="Spy Watch"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/spywatch.png"/><br><br>Spy Watch</a></h3><br>
+  <ul>
+    <li><a href="/spywatch.php" title="Spy Watch Documentation">Spy Watch Documentation</a></li>
+    <li><a href="https://www.drupal.org/docs/user_guide/en/understanding-modules.html" title="Drupal Module Documentation">Drupal Module Documentation</a></li>
+    <li><a href="https://www.drupal.org/docs/8/theming" title="Theming Drupal 8">Theming Drupal 8</a></li>
+    <li><a href="https://gulpjs.org/getting-started" title="Gulp Getting Started">Gulp Getting Started</a></li>
+    <li><a href="https://gulpjs.org/faq" title="Gulp FAQ">Gulp FAQ</a></li>
+    <li><a href="https://gulpjs.org/cli" title="Gulp CLI">Gulp CLI</a></li>
+    <li><a href="https://gulpjs.org/api" title="Gulp API">Gulp API</a></li>
+    <li><a href="https://gulpjs.org/recipes#recipes" title="Gulp Recipes">Gulp Recipes</a></li>
+    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
