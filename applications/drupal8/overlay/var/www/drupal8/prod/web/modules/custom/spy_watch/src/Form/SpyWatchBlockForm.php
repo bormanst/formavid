@@ -93,7 +93,7 @@ class SpyWatchBlockForm extends FormBase {
     $form['watchlist'] = [
       '#type' => 'details',
       '#title' => t('<b>Set Watch State</b>'),
-      '#prefix' => "<br/><img width='14px' height='14px' src='/themes/moddevcom/images-source/$watchIndicator'/>&nbsp;&nbsp;$watchText",
+      '#prefix' => "<br/><img width='14px' height='14px' src='/modules/custom/spy_watch/images-source/$watchIndicator'/>&nbsp;&nbsp;$watchText",
       '#open' => FALSE,
     ];
 
