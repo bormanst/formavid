@@ -172,7 +172,7 @@
 <div>
   <h3><a href="/spywatch.php" title="Spy Watch"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/spywatch.png"/><br><br>Spy Watch</a></h3><br>
   <ul>
-    <li><a href="/spywatch.php" title="Spy Watch Documentation">Spy Watch Documentation</a></li>
+    <li><a href="/spywatch.php" title="Spy Watch Info">Spy Watch Info</a></li>
     <li><a href="https://www.drupal.org/docs/user_guide/en/understanding-modules.html" title="Drupal Module Documentation">Drupal Module Documentation</a></li>
     <li><a href="https://www.drupal.org/docs/8/theming" title="Theming Drupal 8">Theming Drupal 8</a></li>
     <li><a href="https://gulpjs.org/getting-started" title="Gulp Getting Started">Gulp Getting Started</a></li>
