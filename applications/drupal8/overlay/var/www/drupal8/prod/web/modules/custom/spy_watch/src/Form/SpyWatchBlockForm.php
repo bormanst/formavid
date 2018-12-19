@@ -59,7 +59,7 @@ class SpyWatchBlockForm extends FormBase {
     $watchSCSS = "Watching SCSS Only";
     $watchOffState = "Disable Watch";
     $watchAllState = "Watch All (30 second delay)";
-    $watchSCSSState = "Watch SCSS Only (15 second delay)";
+    $watchSCSSState = "Watch SCSS Only (30 second delay)";
 
     // Initialize watch vars.
     $watchState = 0;
