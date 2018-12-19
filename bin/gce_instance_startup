@@ -12,7 +12,7 @@ echo "WARNING! Do NOT manually run this script as it here for reference only."
 echo "WARNING! This script is only to be used by GCE when starting a new image."
 echo "WARNING! Running it manually will corrupt an already initialized appliance."
 echo "WARNING! If it is accidentally run, the random password MAY be available"
-echo "WARNING! on a index.html page using the ip address of the appliance."
+echo "WARNING! on an index.html page using the ip address of the appliance."
 echo ""
 echo ""
 
