@@ -81,15 +81,7 @@ GULP_WATCH_SCSS_SCRIPT = """
 // #########################################################
 var watch = require('gulp-watch');
 
-gulp.task('watch-scss', ['watch:css'], function () {
-  return gulp.src(sassFiles)
-    .pipe(watch(sassFiles))
-    .pipe(sass(options.sass).on('error', sass.logError))
-    .pipe($.autoprefixer(options.autoprefixer))
-    .pipe($.rename({dirname: ''}))
-    .pipe($.size({showFiles: true}))
-    .pipe(gulp.dest(options.theme.css));
-});
+gulp.task('watch-scss', ['watch:css']);
 """
 
 HTACCESS = """
