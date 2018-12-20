@@ -60,8 +60,9 @@ def main():
     system("python %s/bin/initialize/python/roundup.py" % formavid)
 
     # Solr password.
+    solr_install = os.environ.get("SOLR_INSTALL")
     solrold = os.environ.get("SOLR_OLD")
-    if solrold and not solrold == "None":
+    if solr_install and solr_install == "True" and solrold and not solrold == "None":
         system("python %s/bin/initialize/python/solr.py" % formavid)
 
     # Tools password.
