@@ -116,6 +116,8 @@ def main():
     old_file = "/etc/roundup/support/tracker-config.ini"
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
+    old_file = "/var/www/support/html/page.html"
+    system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
 
 if __name__ == "__main__":
     main()
