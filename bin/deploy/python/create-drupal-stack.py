@@ -79,7 +79,7 @@ GULP_WATCH_SCSS_SCRIPT = """
 // will re-compile some _scss files but not all. Some like
 // those in components/init require the normal gulp watch.
 // #########################################################
-gulp.task(\"watch-scss\", [\"watch:css\", \"lint:sass\"]);
+gulp.task('watch-scss', ['watch:css', 'lint:sass']);
 """
 
 HTACCESS = """
