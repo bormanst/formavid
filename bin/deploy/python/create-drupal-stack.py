@@ -478,11 +478,10 @@ def main():
     system("echo 'Gulp ready to run locally within theme directory.'")
 
     # Drupal - set site theme permissions.
-    system("chmod -R 0644 %s/web/themes/%s/logo.svg" % (drupaldir,sitename))
     system("chown -R cssadmin:cssadmin %s/web/themes/%s" % (drupaldir,sitename))
-    system("chmod -R 0775 %s/web/themes/%s" % (drupaldir,sitename))
-    system("chmod -R 0777 %s/web/themes/%s/styleguide" % (drupaldir,sitename))
-    system("chown -R www-data:www-data %s/web/themes/%s/styleguide" % (drupaldir,sitename))
+    system("find %s/web/themes/%s -type d -name \* -exec chmod 0755 {} \;" % (drupaldir,sitename))
+    system("find %s/web/themes/%s/components/asset-builds -type d -name \* -exec chmod 0777 {} \;" % (drupaldir,sitename))
+    system("chmod 0777 %s/web/themes/%s/styleguide" % (drupaldir,sitename))
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
