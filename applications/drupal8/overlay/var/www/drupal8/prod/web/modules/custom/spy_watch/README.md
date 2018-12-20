@@ -33,7 +33,7 @@ The *Watch SCSS Only* option is a custom gulp watch that catches only SCSS chang
 
 Remember to disable watches when theming is finished to avoid wasting cpu resources. They do NOT terminate on their own.
 
-Also, of note, is that only one *Watch* is active, at any given time, for the selected theme. The controller will disable any current watch prior to activating a new one, including any watches that were started in a terminal. This avoids redundancy that would otherwise waste cpu resources. Watches that are set on other themes are NOT affected.
+Also, of note, is that only one *Watch* is active, at any given time, for the selected theme. The controller will disable any current watch prior to activating a new one. This avoids redundancy that would otherwise waste cpu resources. Watches that are set on other themes are NOT affected.
 
 
 Attention
@@ -49,5 +49,3 @@ If the theme remains broken, it can be properly debugged using a terminal and ex
 
 `gulp -f /var/www/drupal8/prod/web/themes/{theme to watch}/gulpfile.js watch`
 `gulp -f /var/www/drupal8/prod/web/themes/{theme to watch}/gulpfile.js watch-scss`
-
-Note: www-data must be the system owner of the styleguide directory or Spy Watch will fail. Manually running a gulp watch from the terminal may require temporarily changing the styleguide directory permissions. Please remember to set them back to www-data.

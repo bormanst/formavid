@@ -74,10 +74,10 @@ SOLR_TEXT = """Solr search can be used as a replacement for core content search 
 
 GULP_WATCH_SCSS_SCRIPT = """
 // #########################################################
-// ONLY watches for changed scss files, not _scss files.
-// Editing of components/base/base.scss, add/delete a space,
-// will re-compile some _scss files but not all. Some like
-// those in components/init require the normal gulp watch.
+// ONLY watches for changed scss files.
+// JS files and the style guide require the regular gulp
+// watch to compile any updates. It is recommended to run
+// the regular watch after theming is completed.
 // #########################################################
 gulp.task('watch-scss', ['watch:css', 'lint:sass']);
 """

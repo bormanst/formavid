@@ -86,7 +86,7 @@ class SpyWatchController extends ControllerBase {
           case 0:
             // Set scss-only.
             shell_exec($watchscss);
-            sleep(30);
+            sleep(20);
             break;
           // Currently full-watch.
           case 2:
@@ -94,7 +94,7 @@ class SpyWatchController extends ControllerBase {
             posix_kill($watchAllPID, $sigterm);
             // Set scss-only.
             shell_exec($watchscss);
-            sleep(30);
+            sleep(20);
             break;
           default:
             break;
