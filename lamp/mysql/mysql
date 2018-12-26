@@ -50,11 +50,14 @@ MESSSAGE="Setting root password for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 /usr/bin/mysqladmin -u root password ${DB_PASS}
 
-# enable db socket access
-MESSSAGE="Enabling db socket access for ${PACKAGE} ..."
-echo ${MESSSAGE} | tee -a ${LOG}
+# check for mariadb
 CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
-sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
+if [ -f "${CONF}" ]; then
+    # enable db socket access
+    MESSSAGE="Enabling db socket access for ${PACKAGE} ..."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    sed -i '/\[mariadb\]/aplugin-load-add = auth_socket.so' ${CONF}
+fi
 
 # restart service
 MESSSAGE="Restarting service for ${PACKAGE} ..."
