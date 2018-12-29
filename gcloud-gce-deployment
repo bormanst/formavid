@@ -53,16 +53,20 @@ if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
 fi
 
 # Get account to use.
-set ${GCS_ACCOUNT:=user@gmail.com}
-echo ""
-read -p "Please enter GCS user account [${GCS_ACCOUNT}]:" GCS_ACCOUNT
+GCS_ACCOUNT=""
+until [[ ${#GCS_ACCOUNT} -ge 4 && "${GCS_ACCOUNT}" == *[@]* && "${GCS_ACCOUNT}" == *[.]* ]]; do
+  echo ""
+  read -p "Please enter GCS user account [user@gmail.com]:" GCS_ACCOUNT
+done
+# Force lowercase.
 GCS_ACCOUNT="${GCS_ACCOUNT,,}"
 
 # Get DOMAIN.
-set ${DOMAIN:=www.examplesitename.com}
-echo ""
-read -p "Please enter domain for the appliance [${DOMAIN}]:" DOMAIN
-
+DOMAIN=""
+until [[ ${#DOMAIN} -ge 3 && "${DOMAIN}" == *[.]* ]]; do
+  echo ""
+  read -p "Please enter domain for the appliance [www.examplesitename.com]:" DOMAIN
+done
 # Force lowercase.
 DOMAIN="${DOMAIN,,}"
 
@@ -130,7 +134,6 @@ done
 # Set remaining vars.
 set ${GCS_FOLDER:="${GCS_PROJECT_ID}"}
 set ${GCS_NAME:="FormaVid Appliance"}
-set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
 set ${GCE_TEMPLATE:="f1-micro-template"}
 set ${GCS_BUCKET_TYPE:="regional"}
 set ${GCS_BUCKET:="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"}
@@ -206,6 +209,17 @@ if ! ( gcloud --project=${GCS_PROJECT_ID} compute instance-templates describe ${
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-ro,storage-full
 fi
 
+# Get GCE_INSTANCE.
+set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
+
+GCE_INSTANCE=""
+until [[ ${#GCE_INSTANCE} -ge 1 ]]; do
+  echo ""
+  read -p "Please enter unique GCE instance ID to append to Project ID [${GCS_PROJECT_ID}-{UNIQUE}]:" GCE_INSTANCE
+done
+# Force lowercase.
+GCE_INSTANCE="${GCS_PROJECT_ID}-${GCE_INSTANCE,,}"
+
 # Check GCE_INSTANCE exists.
 DATA=`gcloud --project=${GCS_PROJECT_ID} compute instances list --format="value(NAME)"`
 DATA=`echo ${DATA} | sed 's/\s/|/g'`
@@ -216,7 +230,7 @@ if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
     exit 0
 else
     # Create GCE instance.
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --zone=${GCE_ZONE} --source-instance-template ${GCE_TEMPLATE}
 fi
 
 # Check storage json api enabled.
@@ -249,70 +263,6 @@ if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
 else
     # Create bucket.
     gsutil -q mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
-fi
-
-# Get/format FIREWALL_NAMES.
-FIREWALL_ALLOWS=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(ALLOW)"`
-FIREWALL_ALLOWS=`echo ${FIREWALL_ALLOWS} | sed 's/\s/|/g'`
-
-# Get/format FIREWALL_NAMES.
-FIREWALL_NAMES=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(NAME)"`
-FIREWALL_NAMES=`echo ${FIREWALL_NAMES} | sed 's/\s/|/g'`
-
-# Add firewall rules to GCE.
-NAME=default-allow-http
-ALLOW="tcp:80"
-PRIORITY="1000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=default-allow-https
-ALLOW="tcp:443"
-PRIORITY="1000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=ftp
-ALLOW="tcp:21"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=imap
-ALLOW="tcp:143"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=smtp
-ALLOW="tcp:587"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=imaps
-ALLOW="tcp:993"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=shellinabox
-ALLOW="tcp:12320"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=webmin
-ALLOW="tcp:12321"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-fi
-NAME=adminer
-ALLOW="tcp:12322"
-PRIORITY="50000"
-if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
 fi
 
 # Finished: deploy appliance.
@@ -356,37 +306,30 @@ case "${CHOICE^^}" in
   * ) SOLR_INSTALL="False";;
 esac
 
-# Solr: check open firewall
-if [ "${SOLR_INSTALL}" == "True" ] ; then
-    NAME=solr
-    ALLOW="tcp:8983"
-    PRIORITY="50000"
-    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
-        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
-    fi
-fi
-
-# get default password
+# Get default password.
 PASSWORD=""
 PASSWORD_LENGTH=8
 printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed."
-# loop until valid password/check
+# Loop until valid password/check.
 until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
-    # notify password restrictions
+    # Notify password restrictions.
     printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
-    # get password
+    # Get password.
     read -p "Please enter default password for appliance:" -s PASSWORD
     printf "\n"
-    # confirm password
+    # Confirm password.
     read -p "Please confirm default password for appliance:" -s CHECK
-    # check passwords match
+    # Check passwords match.
     if [ ! "${PASSWORD}" == "${CHECK}" ]; then
-        # blank password
+        # Blank password.
         PASSWORD=""
-        # notify passwords do not match
+        # Notify passwords do not match.
         printf "\n\n\n***Passwords do not match***\n\n"
     fi
 done
+
+# Set firewall rules.
+. gcloud-vpc-firewall
 
 # Get USER.
 USER=${GCS_ACCOUNT%@*}

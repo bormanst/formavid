@@ -1,0 +1,151 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+echo ""
+echo ""
+echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
+echo "This program is free software: you can redistribute it and/or modify"
+echo "it under the terms of the GNU General Public License as published by"
+echo "the Free Software Foundation, either version 3 of the License, or"
+echo "(at your option) any later version."
+echo ""
+echo "This program is distributed in the hope that it will be useful,"
+echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
+echo "GNU General Public License for more details."
+echo ""
+echo "You should have received a copy of the GNU General Public License"
+echo "along with this program. If not, see <https://www.gnu.org/licenses/>."
+echo ""
+echo ""
+
+# Create an environment variable for the correct distribution.
+export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+
+# Check for Cloud SDK apt list.
+if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
+    # Add the Cloud SDK distribution URI as a package source.
+    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    # Import the Google Cloud public key.
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+    # Update and install Python 2.7 and the Cloud SDK.
+    apt-get update
+    apt-get install -y python2.7 google-cloud-sdk
+fi
+
+# Get account to use.
+if [ -z ${GCS_ACCOUNT} ]; then GCS_ACCOUNT=""; fi
+# Verify format account.
+until [[ ${#GCS_ACCOUNT} -ge 4 && "${GCS_ACCOUNT}" == *[@]* && "${GCS_ACCOUNT}" == *[.]* ]]; do
+  echo ""
+  read -p "Please enter GCS user account [user@gmail.com]:" GCS_ACCOUNT
+done
+# Force lowercase.
+GCS_ACCOUNT="${GCS_ACCOUNT,,}"
+
+# Project IDs must be between 6 and 30 characters.
+GCS_PROJECT_ID_MIN=6
+GCS_PROJECT_ID_MAX=30
+
+# Get GCS_PROJECT_ID.
+if [ -z ${GCS_PROJECT_ID} ]; then GCS_PROJECT_ID=""; fi
+# Verify format GCS_PROJECT_ID.
+until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le ${GCS_PROJECT_ID_MAX} && ! ( "${GCS_PROJECT_ID}" =~ [A-Z] ) && "${GCS_PROJECT_ID}" =~ ^[a-z] && "${GCS_PROJECT_ID}" == *[a-z0-9\-]* ]]; do
+    # notify GCS_PROJECT_ID restrictions.
+    printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n\n"
+    # get GCS_PROJECT_ID
+    read -p "Please enter a Project Id to use:" GCS_PROJECT_ID
+    printf "\n"
+    # Check GCS_PROJECT_ID exists.
+    if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+        printf "\nProject Id currently exists.\n"
+        read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+        case "${CHOICE^^}" in
+          Y|YES ) break;;
+          * ) GCS_PROJECT_ID="";;
+        esac
+    fi
+done
+
+# Get/format FIREWALL_NAMES.
+FIREWALL_ALLOWS=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(ALLOW)"`
+FIREWALL_ALLOWS=`echo ${FIREWALL_ALLOWS} | sed 's/\s/|/g'`
+
+# Get/format FIREWALL_NAMES.
+FIREWALL_NAMES=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(NAME)"`
+FIREWALL_NAMES=`echo ${FIREWALL_NAMES} | sed 's/\s/|/g'`
+
+# Add firewall rules to GCE.
+NAME=default-allow-http
+ALLOW="tcp:80"
+PRIORITY="1000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=default-allow-https
+ALLOW="tcp:443"
+PRIORITY="1000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=ftp
+ALLOW="tcp:21"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=imap
+ALLOW="tcp:143"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=smtp
+ALLOW="tcp:587"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=imaps
+ALLOW="tcp:993"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=shellinabox
+ALLOW="tcp:12320"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=webmin
+ALLOW="tcp:12321"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+NAME=adminer
+ALLOW="tcp:12322"
+PRIORITY="50000"
+if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+fi
+
+# Load default envars if exist.
+DEFAULT_ENVARS=/etc/formavid/default_envars
+if [ -f "${DEFAULT_ENVARS}" ] then . ${DEFAULT_ENVARS}; fi
+
+# Solr: check open firewall.
+if [ "${SOLR_INSTALL}" == "True" ] ; then
+    NAME=solr
+    ALLOW="tcp:8983"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+fi
+
+exit 0
