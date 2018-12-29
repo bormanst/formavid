@@ -415,7 +415,7 @@ if [ -n "${APP_EMAIL}" ]; then
         echo ${MESSSAGE} >> ${LOG}
         # check drupal default/default.settings.php exits
         FILE=${PROJECT_DIR}/web/sites/default/default.settings.php
-        if [ -f "${FILE}" ]; then
+        if [ -f "${FILE}" ] && [ "${CREATE_DRUPAL_STACK}" == "True" ]; then
             # create base site
             ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
         fi

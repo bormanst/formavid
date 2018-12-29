@@ -328,6 +328,19 @@ until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${P
     fi
 done
 
+# Create initial stack ask.
+echo ""
+echo "The required information has been gathered to create the main drupal site."
+echo "It is recommended to deploy the initial drupal stack during appliance creation"
+echo "but customizations can be made prior to manually running the python script"
+echo "create-drupal-stack.py for the initial stack creation."
+echo ""
+read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) CREATE_DRUPAL_STACK="True";;
+  * ) CREATE_DRUPAL_STACK="False";;
+esac
+
 # Firewall: ask update.
 echo ""
 echo "Do you wish to open the default VPC firewall ports for the applaince?"
@@ -355,7 +368,7 @@ if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi
 USER=${GCS_ACCOUNT%@*}
 
 # Commands to deploy.
-COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${PASSWORD}"
+COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
 
 # Remote deploy.
 gcloud compute ssh ${USER}@${GCE_INSTANCE} --command="${COMMANDS}"
