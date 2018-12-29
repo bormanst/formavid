@@ -250,6 +250,7 @@ DATA=`gsutil ls -p ${GCS_PROJECT_ID}`
 DATA=`echo ${DATA} | sed 's/\s/|/g'`
 GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
 if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
+    echo ""
     echo "The storage bucket of ${GCS_BUCKET} already exists."
     echo "If the borgbackup directory exists, it needs manual backup and removal."
     echo ""
@@ -287,7 +288,7 @@ echo ""
 read -p "Please enter title for the appliance [${SITETITLE}]:" SITETITLE
 
 # Get APP_EMAIL.
-APP_EMAIL=`echo "${DOMAIN,,}" | sed 's/www.//'`
+APP_EMAIL=`echo "${DOMAIN}" | sed 's/www\.//'`
 APP_EMAIL="admin@${APP_EMAIL}"
 echo ""
 echo "Please enter admin email for the appliance."
@@ -309,28 +310,6 @@ case "${CHOICE^^}" in
   Y|YES ) SOLR_INSTALL="True";;
   * ) SOLR_INSTALL="False";;
 esac
-
-# Get default password.
-PASSWORD=""
-PASSWORD_LENGTH=8
-printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed."
-# Loop until valid password/check.
-until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
-    # Notify password restrictions.
-    printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
-    # Get password.
-    read -p "Please enter default password for appliance:" -s PASSWORD
-    printf "\n"
-    # Confirm password.
-    read -p "Please confirm default password for appliance:" -s CHECK
-    # Check passwords match.
-    if [ ! "${PASSWORD}" == "${CHECK}" ]; then
-        # Blank password.
-        PASSWORD=""
-        # Notify passwords do not match.
-        printf "\n\n\n***Passwords do not match***\n\n"
-    fi
-done
 
 # Create initial stack ask.
 echo ""
@@ -357,13 +336,35 @@ echo "so as not to open a port that may have been intentionally closed."
 echo ""
 echo "The script gcloud-vpc-firewall may be run at a later time or the"
 echo "firewall can be manually configured using the console "
-echo "https://console.cloud.google.com/networking/firewalls/list?project= ."
+echo "https://console.cloud.google.com/networking/firewalls/list?project="
 echo ""
-eread -p "Update firewall (y/n)?" CHOICE
+read -p "Update firewall (y/n)?" CHOICE
 case "${CHOICE^^}" in
   Y|YES ) FIREWALL_UPDATE="True";;
   * ) FIREWALL_UPDATE="False";;
 esac
+
+# Get default password.
+PASSWORD=""
+PASSWORD_LENGTH=8
+printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed."
+# Loop until valid password/check.
+until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
+    # Notify password restrictions.
+    printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
+    # Get password.
+    read -p "Please enter default password for appliance:" -s PASSWORD
+    printf "\n"
+    # Confirm password.
+    read -p "Please confirm default password for appliance:" -s CHECK
+    # Check passwords match.
+    if [ ! "${PASSWORD}" == "${CHECK}" ]; then
+        # Blank password.
+        PASSWORD=""
+        # Notify passwords do not match.
+        printf "\n\n\n***Passwords do not match***\n\n"
+    fi
+done
 
 # Set firewall rules.
 if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi

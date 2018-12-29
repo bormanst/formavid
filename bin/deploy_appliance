@@ -309,31 +309,75 @@ if [ -n "${APP_EMAIL}" ]; then
     echo ${MESSSAGE} >> ${LOG}
     # restart stunnel4
     DEPENDS=stunnel4
-    systemctl start ${DEPENDS} && sleep 10
-    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+    MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
+    systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then
+        systemctl restart ${DEPENDS}
+        MESSSAGE="$( date ) Service ${DEPENDS} has been restarted."
+    fi
+    echo ""
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
 
     # restart shellinabox - depends on stunnel4
     DEPENDS=shellinabox
-    systemctl start ${DEPENDS} && sleep 10
-    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+    MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
+    systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then
+        systemctl restart ${DEPENDS}
+        MESSSAGE="$( date ) Service ${DEPENDS} has been restarted."
+    fi
+    echo ""
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
 
     # check webmin exits
     FILE=/etc/webmin/config
     if [ -f "${FILE}" ]; then
         # restart webmin - depends on stunnel4
         DEPENDS=webmin
-        systemctl start ${DEPENDS} && sleep 10
-        if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+        MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
+        systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
+        if (systemctl -q is-active ${DEPENDS}); then
+            systemctl restart ${DEPENDS}
+            MESSSAGE="$( date ) Service ${DEPENDS} has been restarted."
+        fi
+        echo ""
+        echo "#############################################"
+        echo "#"
+        echo "# ${MESSSAGE}"
+        echo "#"
+        echo "#############################################"
+        echo ${MESSSAGE} >> ${LOG}
     fi
 
     # restart apache2
     DEPENDS=apache2
-    systemctl start ${DEPENDS} && sleep 10
-    if (systemctl -q is-active ${DEPENDS}); then systemctl restart ${DEPENDS}; fi
+    MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
+    systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
+    if (systemctl -q is-active ${DEPENDS}); then
+        systemctl restart ${DEPENDS}
+        MESSSAGE="$( date ) Service ${DEPENDS} has been restarted."
+    fi
+    echo ""
+    echo "#############################################"
+    echo "#"
+    echo "# ${MESSSAGE}"
+    echo "#"
+    echo "#############################################"
+    echo ${MESSSAGE} >> ${LOG}
 
     # secure mysql installation
     DEPENDS=mysql
-    systemctl start ${DEPENDS} && sleep 10
+    systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
     if (systemctl -q is-active ${DEPENDS}); then
         # secure mysql
         echo ""
@@ -370,7 +414,7 @@ if [ -n "${APP_EMAIL}" ]; then
     else
         # no service
         echo ""
-        MESSSAGE="$( date ) Failed to secure mysql. Service was not active."
+        MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
         echo "#############################################"
         echo "#"
         echo "# ${MESSSAGE}"
