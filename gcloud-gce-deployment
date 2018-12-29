@@ -328,8 +328,28 @@ until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${P
     fi
 done
 
+# Firewall: ask update.
+echo ""
+echo "Do you wish to open the default VPC firewall ports for the applaince?"
+echo "Otherwise, the firewall will not be updated and as result some of the"
+echo "appliance services may not be reachable in the expected fashion."
+echo ""
+echo "If the project firewall has already been configured then skip this step."
+echo "In that case, it is recommended to manually adjust the firewall as needed"
+echo "so as not to open a port that may have been intentionally closed."
+echo ""
+echo "The script gcloud-vpc-firewall may be run at a later time or the"
+echo "firewall can be manually configured using the console "
+echo "https://console.cloud.google.com/networking/firewalls/list?project= ."
+echo ""
+eread -p "Update firewall (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) FIREWALL_UPDATE="True";;
+  * ) FIREWALL_UPDATE="False";;
+esac
+
 # Set firewall rules.
-. gcloud-vpc-firewall
+if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi
 
 # Get USER.
 USER=${GCS_ACCOUNT%@*}
