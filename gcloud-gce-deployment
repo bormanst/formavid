@@ -251,11 +251,15 @@ DATA=`echo ${DATA} | sed 's/\s/|/g'`
 GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
 if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
     echo "The storage bucket of ${GCS_BUCKET} already exists."
-    echo "If the borgbackup directory exists, it needs to be deleted prior to appliance deployment."
-    echo "Billing needs to be enabled to create a regional backup bucket."
+    echo "If the borgbackup directory exists, it needs manual backup and removal."
+    echo ""
+    echo "WARNING!!! It is important to backup prior to removing an archive."
+    echo "WARNING!!! If borgbackup directory exists, ensure a backup job is not"
+    echo "WARNING!!! running and disable any cron related entries."
+    echo ""
     echo "Use the GCS user account ${GCS_ACCOUNT} for access."
     echo ""
-    read -p "Billing has been enabled (y/n)?" CHOICE
+    read -p "Bucket directory ${GCS_BUCKET}/borgbackup can be created (y/n)?" CHOICE
     case "${CHOICE^^}" in
       Y|YES ) :;;
       * ) exit 0;;
