@@ -53,6 +53,10 @@ a2enmod cgi
 a2enmod rewrite
 a2enmod ssl
 
+# update default ssl conf
+CONF=/etc/ssl/formavid.cnf
+sed -i "/^commonName/acommonName = ${APP_HOSTNAME}" ${CONF}
+
 # get ssl cert
 PRIVATE=/etc/ssl/private
 openssl dhparam -out ${PRIVATE}/dhparams.pem 2048 > /dev/null 2>&1
