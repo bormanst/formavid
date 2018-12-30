@@ -365,6 +365,7 @@ until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${P
         printf "\n\n\n***Passwords do not match***\n\n"
     fi
 done
+printf "\n\n"
 
 # Set firewall rules.
 if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi
