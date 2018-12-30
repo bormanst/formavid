@@ -75,6 +75,8 @@ def main():
     system("sed -i 's/%s/%s/g' %s" % (default_sitetitle, sitetitle, old_file))
     old_file = "/etc/hosts"
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
+    old_file = "/etc/ssl/formavid.cnf"
+    system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
 
     # Update admin tools.
     system("echo 'Updating FormaVid admin pages and tools ...'")

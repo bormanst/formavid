@@ -55,7 +55,7 @@ a2enmod ssl
 
 # update default ssl conf
 CONF=/etc/ssl/formavid.cnf
-sed -i "/^commonName/acommonName = ${APP_HOSTNAME}" ${CONF}
+sed -i "s/^commonName.*/commonName = ${APP_HOSTNAME}/g" ${CONF}
 
 # get ssl cert
 PRIVATE=/etc/ssl/private

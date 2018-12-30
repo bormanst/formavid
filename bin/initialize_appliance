@@ -120,6 +120,11 @@ fi
 ${FORMAVID}/bin/initialize/shell/regen_sshkeys
 echo ""
 
+# regen ssl certs
+/usr/local/bin/make-ssl-cert --default --force-overwrite
+update-ca-certificates
+echo ""
+
 # initialize etckeeper
 ${FORMAVID}/bin/initialize/shell/init_etckeeper
 echo ""
