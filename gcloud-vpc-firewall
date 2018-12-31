@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
@@ -136,7 +136,7 @@ fi
 
 # Load default envars if exist.
 DEFAULT_ENVARS=/etc/formavid/default_envars
-if [ -f "${DEFAULT_ENVARS}" ] then . ${DEFAULT_ENVARS}; fi
+if [ -f "${DEFAULT_ENVARS}" ]; then . ${DEFAULT_ENVARS}; fi
 
 # Solr: check open firewall.
 if [ "${SOLR_INSTALL}" == "True" ] ; then
@@ -147,5 +147,3 @@ if [ "${SOLR_INSTALL}" == "True" ] ; then
         gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
     fi
 fi
-
-exit 0
