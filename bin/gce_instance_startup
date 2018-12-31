@@ -19,7 +19,7 @@ echo ""
 # check already run
 SITES=/var/www/drupal8/prod/web/sites/sites.php
 BLOCKING_FILE=/etc/formavid/do_not_delete_this_file
-if [ ! -f ${BLOCKING_FILE} ] && [ ! -f ${SITES} ]; then
+if [ -f ${BLOCKING_FILE} ] || [ -f ${SITES} ]; then exit 0; fi
 
 # export envars
 export SINGLE_PASS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
@@ -134,7 +134,5 @@ systemctl restart apache2
 # create blocking file
 echo "The absence of this file causes the GCE start-up script to reset passwords to a random one, which may result in a 'lock-out' condition." > ${BLOCKING_FILE}
 chmod 0444 ${BLOCKING_FILE}
-
-fi
 
 exit 0
