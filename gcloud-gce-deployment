@@ -4,23 +4,21 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-echo ""
-echo ""
-echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
-echo "This program is free software: you can redistribute it and/or modify"
-echo "it under the terms of the GNU General Public License as published by"
-echo "the Free Software Foundation, either version 3 of the License, or"
-echo "(at your option) any later version."
-echo ""
-echo "This program is distributed in the hope that it will be useful,"
-echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
-echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the"
-echo "GNU General Public License for more details."
-echo ""
-echo "You should have received a copy of the GNU General Public License"
-echo "along with this program. If not, see <https://www.gnu.org/licenses/>."
-echo ""
-echo ""
+printf "\n\n\n"
+printf "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>\n"
+printf "This program is free software: you can redistribute it and/or modify\n"
+printf "it under the terms of the GNU General Public License as published by\n"
+printf "the Free Software Foundation, either version 3 of the License, or\n"
+printf "(at your option) any later version.\n"
+printf "\n"
+printf "This program is distributed in the hope that it will be useful,\n"
+printf "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+printf "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
+printf "GNU General Public License for more details.\n"
+printf "\n"
+printf "You should have received a copy of the GNU General Public License\n"
+printf "along with this program. If not, see <https://www.gnu.org/licenses/>.\n"
+printf "\n\n"
 
 # Recommended: link/command
 # 1) Install Python 2.7 (available via apt for most systems): https://www.python.org/download/releases/2.7/
@@ -55,23 +53,127 @@ fi
 # Get account to use.
 GCS_ACCOUNT=""
 until [[ ${#GCS_ACCOUNT} -ge 4 && "${GCS_ACCOUNT}" == *[@]* && "${GCS_ACCOUNT}" == *[.]* ]]; do
-  echo ""
+  printf "\n"
   read -p "Please enter GCS user account [user@gmail.com]:" GCS_ACCOUNT
 done
+printf "\n"
 # Force lowercase.
 GCS_ACCOUNT="${GCS_ACCOUNT,,}"
 
 # Get DOMAIN.
 DOMAIN=""
 until [[ ${#DOMAIN} -ge 3 && "${DOMAIN}" == *[.]* ]]; do
-  echo ""
+  printf "\n"
   read -p "Please enter domain for the appliance [www.examplesitename.com]:" DOMAIN
 done
+printf "\n"
 # Force lowercase.
 DOMAIN="${DOMAIN,,}"
 
 # Set DOMAIN_NO_PERIODS.
 DOMAIN_NO_PERIODS=`echo ${DOMAIN} | sed 's/\.//g'`
+
+# Finished: deploy appliance.
+printf "\n"
+read -p "Deploy the appliance after GCE instance is created (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) DEPLOY_APPLIANCE="True";;
+  * ) DEPLOY_APPLIANCE="False";;
+esac
+printf "\n"
+
+if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
+    # Get SITETITLE.
+    set ${SITETITLE:="Example Site Name"}
+    printf "\n"
+    read -p "Please enter title for the appliance [${SITETITLE}]:" SITETITLE
+    printf "\n"
+
+    # Get APP_EMAIL.
+    APP_EMAIL=`echo "${DOMAIN}" | sed 's/www\.//'`
+    APP_EMAIL="admin@${APP_EMAIL}"
+
+    printf "\n"
+    printf "Please enter admin email for the appliance.\n\n"
+    read -p "Or press enter to select the default of [${APP_EMAIL}]:" OPTION
+    if [[ ! -z "${OPTION// }" ]]; then APP_EMAIL=${OPTION}; fi
+    printf "\n"
+    printf "Admin email for the appliance set to ${APP_EMAIL}.\n"
+    printf "\n"
+
+    # Solr: ask install.
+    printf "\n"
+    printf "Do you wish to install the Solr search server?\n"
+    printf "Although Drupal has built-in search capabilities,\n"
+    printf "Solr is a more robust search solution that requires a JVM.\n"
+    printf "It is not recommended for a f1-micro instance, but it will run.\n"
+    printf "Solr can always be activated at a later time if desired.\n"
+    printf "\n"
+    read -p "Install Solr (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) SOLR_INSTALL="True";;
+      * ) SOLR_INSTALL="False";;
+    esac
+    printf "\n"
+
+    # Create initial stack ask.
+    printf "\n"
+    printf "The required information has been gathered to create the main drupal site.\n"
+    printf "It is recommended to deploy the initial drupal stack during appliance creation\n"
+    printf "but customizations can be made prior to manually running the python script\n"
+    printf "create-drupal-stack.py for the initial stack creation.\n"
+    printf "\n"
+    read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) CREATE_DRUPAL_STACK="True";;
+      * ) CREATE_DRUPAL_STACK="False";;
+    esac
+    printf "\n"
+
+    # Get default password.
+    PASSWORD=""
+    PASSWORD_LENGTH=8
+    printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed.\n"
+    # Loop until valid password/check.
+    until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
+        # Notify password restrictions.
+        printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
+        # Get password.
+        read -p "Please enter default password for appliance:" -s PASSWORD
+        printf "\n"
+        # Confirm password.
+        read -p "Please confirm default password for appliance:" -s CHECK
+        # Check passwords match.
+        if [ ! "${PASSWORD}" == "${CHECK}" ]; then
+            # Blank password.
+            PASSWORD=""
+            # Notify passwords do not match.
+            printf "\n\n\n***Passwords do not match***\n\n"
+        fi
+    done
+    printf "\n\n"
+fi
+
+# Firewall: ask update.
+printf "\n"
+printf "Do you wish to open the default VPC firewall ports for the applaince?\n"
+printf "Otherwise, the firewall will not be updated and as result some of the\n"
+printf "appliance services may not be reachable in the expected fashion.\n"
+printf "\n"
+printf "If the project firewall has already been configured then skip this step.\n"
+printf "In that case, it is recommended to manually adjust the firewall as needed\n"
+printf "so as not to open a port that may have been intentionally closed.\n"
+printf "\n"
+printf "The script gcloud-vpc-firewall may be run at a later time or the\n"
+printf "firewall can be manually configured using the console\n"
+printf "https://console.cloud.google.com/networking/firewalls/list?project= \n"
+printf "\n"
+read -p "Update firewall (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) FIREWALL_UPDATE="True";;
+  * ) FIREWALL_UPDATE="False";;
+esac
+printf "\n"
 
 # Project IDs must be between 6 and 30 characters.
 GCS_PROJECT_ID_MIN=6
@@ -92,13 +194,14 @@ if [ ${RSIZE} -ge 6 ]; then
     # Set example GCS_PROJECT_ID.
     GCS_PROJECT_ID="${DOMAIN_NO_PERIODS}-${RANDOM_EXT}"
     # Notify user.
-    printf "\nProject Id must be unique and is NOT re-usable even if the project is deleted.\nA random Project Id, based on domain, has been generated.\nIt still has to pass a uniqueness test within gcloud.\n\n"
+    printf "\nProject Id must be unique and is NOT re-usable even if the project is deleted.\nA random Project Id, based on domain, has been generated.\nIt still has to pass a uniqueness test within gcloud.\n"
     # Prompt user.
     read -p "Is the Project Id of ${GCS_PROJECT_ID} alright to use (y/n)?" CHOICE
     case "${CHOICE^^}" in
       Y|YES ) :;;
       * ) GCS_PROJECT_ID="";;
     esac
+    printf "\n"
 fi
 
 # Check GCS_PROJECT_ID exists.
@@ -111,12 +214,13 @@ if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
       Y|YES ) :;;
       * ) GCS_PROJECT_ID="";;
     esac
+    printf "\n"
 fi
 
 # Verify format GCS_PROJECT_ID.
 until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le ${GCS_PROJECT_ID_MAX} && ! ( "${GCS_PROJECT_ID}" =~ [A-Z] ) && "${GCS_PROJECT_ID}" =~ ^[a-z] && "${GCS_PROJECT_ID}" == *[a-z0-9\-]* ]]; do
     # notify GCS_PROJECT_ID restrictions.
-    printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n\n"
+    printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n"
     # get GCS_PROJECT_ID
     read -p "Please enter a Project Id to use:" GCS_PROJECT_ID
     printf "\n"
@@ -128,6 +232,7 @@ until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le 
           Y|YES ) break;;
           * ) GCS_PROJECT_ID="";;
         esac
+        printf "\n"
     fi
 done
 
@@ -145,21 +250,20 @@ if [[ ! ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
 fi
 
 # Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}.
-echo ""
-echo ""
-echo ""
-echo "Billing needs to be enabled to create a regional backup bucket."
-echo "Use the GCS user account ${GCS_ACCOUNT} for access."
-echo "Please enable billing for project at:"
-echo "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}"
-echo "If the 'Enable billing' option does not appear then it is already enabled."
-echo "Manage billing accounts at https://console.cloud.google.com/billing"
-echo ""
+printf "\n\n\n"
+printf "Billing needs to be enabled to create a regional backup bucket.\n"
+printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
+printf "Please enable billing for project at:\n"
+printf "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}\n"
+printf "If the 'Enable billing' option does not appear then it is already enabled.\n"
+printf "Manage billing accounts at https://console.cloud.google.com/billing\n"
+printf "\n"
 read -p "Billing has been enabled for project ${GCS_PROJECT_ID} (y/n)?" CHOICE
 case "${CHOICE^^}" in
   Y|YES ) :;;
   * ) exit 0;;
 esac
+printf "\n"
 
 # Select GCE_REGION.
 GCE_REGION=""
@@ -173,6 +277,7 @@ select option in "${OPTIONS[@]}"; do
         break
     fi
 done
+printf "\n"
 
 # Select GCE_ZONE.
 GCE_ZONE=""
@@ -186,12 +291,11 @@ select option in "${OPTIONS[@]}"; do
         break
     fi
 done
+printf "\n"
 
-echo ""
-echo ""
-echo "GCE region:zone set to ${GCE_REGION}:${GCE_ZONE}."
-echo ""
-echo ""
+printf "\n\n"
+printf "GCE region:zone set to ${GCE_REGION}:${GCE_ZONE}."
+printf "\n\n"
 
 # Update metadata.
 gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
@@ -200,9 +304,10 @@ gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute proj
 printf '1\n1\n1\n' | gcloud --account=${GCS_ACCOUNT} init --console-only
 
 # Ensure default project.
-echo ""
-echo "Setting default project to ${GCS_PROJECT_ID}."
+printf "\n"
+printf "Setting default project to ${GCS_PROJECT_ID}."
 gcloud config set core/project ${GCS_PROJECT_ID}
+printf "\n"
 
 # Create GCE template.
 if ! ( gcloud --project=${GCS_PROJECT_ID} compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
@@ -214,9 +319,10 @@ set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
 
 GCE_INSTANCE=""
 until [[ ${#GCE_INSTANCE} -ge 1 ]]; do
-  echo ""
+  printf "\n"
   read -p "Please enter unique GCE instance ID to append to Project ID [${GCS_PROJECT_ID}-{UNIQUE}]:" GCE_INSTANCE
 done
+printf "\n"
 # Force lowercase.
 GCE_INSTANCE="${GCS_PROJECT_ID}-${GCE_INSTANCE,,}"
 
@@ -225,8 +331,8 @@ DATA=`gcloud --project=${GCS_PROJECT_ID} compute instances list --format="value(
 DATA=`echo ${DATA} | sed 's/\s/|/g'`
 if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
     # Notify user of problem.
-    echo "The instance of ${GCE_INSTANCE} already exists."
-    echo "Deployment terminated."
+    printf "The instance of ${GCE_INSTANCE} already exists."
+    printf "Deployment terminated."
     exit 0
 else
     # Create GCE instance.
@@ -239,7 +345,7 @@ DATA=`echo ${DATA} | sed 's/\s/|/g'`
 GCE_API="storage-api.googleapis.com"
 if [[ ${GCE_API} =~ ^${DATA}$ ]]; then
     # Notify user of problem.
-    echo "The API ${GCE_API} is already enabled."
+    printf "The API ${GCE_API} is already enabled.\n"
 else
     # Enable storage json api.
     gcloud --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} services enable ${GCE_API}
@@ -250,133 +356,50 @@ DATA=`gsutil ls -p ${GCS_PROJECT_ID}`
 DATA=`echo ${DATA} | sed 's/\s/|/g'`
 GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
 if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
-    echo ""
-    echo "The storage bucket of ${GCS_BUCKET} already exists."
-    echo "If the borgbackup directory exists, it needs manual backup and removal."
-    echo ""
-    echo "WARNING!!! It is important to backup prior to removing an archive."
-    echo "WARNING!!! If borgbackup directory exists, ensure a backup job is not"
-    echo "WARNING!!! running and disable any cron related entries."
-    echo ""
-    echo "Use the GCS user account ${GCS_ACCOUNT} for access."
-    echo ""
+    printf "\n"
+    printf "The storage bucket of ${GCS_BUCKET} already exists.\n"
+    printf "If the borgbackup directory exists, it needs manual backup and removal.\n"
+    printf "\n"
+    printf "WARNING!!! It is important to backup prior to removing an archive.\n"
+    printf "WARNING!!! If borgbackup directory exists, ensure a backup job is not\n"
+    printf "WARNING!!! running and disable any cron related entries.\n"
+    printf "\n"
+    printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
+    printf "\n"
     read -p "Bucket directory ${GCS_BUCKET}/borgbackup can be created (y/n)?" CHOICE
     case "${CHOICE^^}" in
       Y|YES ) :;;
       * ) exit 0;;
     esac
+    printf "\n"
 else
     # Create bucket.
     gsutil -q mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
 fi
 
-# Finished: deploy appliance.
-echo ""
-echo ""
-echo ""
-echo "Everything should be ready to deploy the appliance."
-echo ""
-read -p "Deploy the appliance now (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) :;;
-  * ) exit 0;;
-esac
-
-# Get SITETITLE.
-set ${SITETITLE:="Example Site Name"}
-echo ""
-read -p "Please enter title for the appliance [${SITETITLE}]:" SITETITLE
-
-# Get APP_EMAIL.
-APP_EMAIL=`echo "${DOMAIN}" | sed 's/www\.//'`
-APP_EMAIL="admin@${APP_EMAIL}"
-echo ""
-echo "Please enter admin email for the appliance."
-read -p "Or press enter to select the default of [${APP_EMAIL}]:" OPTION
-if [[ ! -z "${OPTION// }" ]]; then APP_EMAIL=${OPTION}; fi
-echo ""
-echo "Admin email for the appliance set to ${APP_EMAIL}."
-
-# Solr: ask install.
-echo ""
-echo "Do you wish to install the Solr search server?"
-echo "Although Drupal has built-in search capabilities,"
-echo "Solr is a more robust search solution that requires a JVM."
-echo "It is not recommended for a f1-micro instance, but it will run."
-echo "Solr can always be activated at a later time if desired."
-echo ""
-read -p "Install Solr (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) SOLR_INSTALL="True";;
-  * ) SOLR_INSTALL="False";;
-esac
-
-# Create initial stack ask.
-echo ""
-echo "The required information has been gathered to create the main drupal site."
-echo "It is recommended to deploy the initial drupal stack during appliance creation"
-echo "but customizations can be made prior to manually running the python script"
-echo "create-drupal-stack.py for the initial stack creation."
-echo ""
-read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) CREATE_DRUPAL_STACK="True";;
-  * ) CREATE_DRUPAL_STACK="False";;
-esac
-
-# Firewall: ask update.
-echo ""
-echo "Do you wish to open the default VPC firewall ports for the applaince?"
-echo "Otherwise, the firewall will not be updated and as result some of the"
-echo "appliance services may not be reachable in the expected fashion."
-echo ""
-echo "If the project firewall has already been configured then skip this step."
-echo "In that case, it is recommended to manually adjust the firewall as needed"
-echo "so as not to open a port that may have been intentionally closed."
-echo ""
-echo "The script gcloud-vpc-firewall may be run at a later time or the"
-echo "firewall can be manually configured using the console "
-echo "https://console.cloud.google.com/networking/firewalls/list?project="
-echo ""
-read -p "Update firewall (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) FIREWALL_UPDATE="True";;
-  * ) FIREWALL_UPDATE="False";;
-esac
-
-# Get default password.
-PASSWORD=""
-PASSWORD_LENGTH=8
-printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed."
-# Loop until valid password/check.
-until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
-    # Notify password restrictions.
-    printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
-    # Get password.
-    read -p "Please enter default password for appliance:" -s PASSWORD
-    printf "\n"
-    # Confirm password.
-    read -p "Please confirm default password for appliance:" -s CHECK
-    # Check passwords match.
-    if [ ! "${PASSWORD}" == "${CHECK}" ]; then
-        # Blank password.
-        PASSWORD=""
-        # Notify passwords do not match.
-        printf "\n\n\n***Passwords do not match***\n\n"
-    fi
-done
-printf "\n\n"
-
 # Set firewall rules.
 if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi
 
-# Get USER.
-USER=${GCS_ACCOUNT%@*}
-
-# Commands to deploy.
-COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
-
-# Remote deploy.
-gcloud compute ssh ${USER}@${GCE_INSTANCE} --command="${COMMANDS}"
+# Check deploy.
+if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
+    # Get USER.
+    USER=${GCS_ACCOUNT%@*}
+    # Commands to deploy.
+    COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
+    # Remote deploy.
+    gcloud compute ssh ${USER}@${GCE_INSTANCE} --zone=${GCE_ZONE} --command="${COMMANDS}"
+    # Add startup script to metadata.
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances add-metadata ${GCE_INSTANCE} --zone=${GCE_ZONE} --metadata-from-file startup-script=bin/gce_instance_startup
+    # Wipe any relics.
+    RELIC=${USER}
+    COMMANDS="if [ \$(grep -c '^${RELIC}:' /etc/passwd) -ne 0 ]; then sudo deluser --force --remove-home ${RELIC}; fi"
+    COMMANDS="${COMMANDS} && ""if [ \$(grep -c '^${RELIC}:' /etc/group) -ne 0 ]; then sudo groupdel ${RELIC}; fi"
+    RELIC=`whoami`
+    if [ "${RELIC}" != "root" ]; then
+        COMMANDS="${COMMANDS} && ""if [ \$(grep -c '^${RELIC}:' /etc/passwd) -ne 0 ]; then sudo deluser --force --remove-home ${RELIC}; fi"
+        COMMANDS="${COMMANDS} && ""if [ \$(grep -c '^${RELIC}:' /etc/group) -ne 0 ]; then sudo groupdel ${RELIC}; fi"
+    fi
+    gcloud compute ssh admin@${GCE_INSTANCE} --zone=${GCE_ZONE} --command="${COMMANDS}"
+fi
 
 exit 0
