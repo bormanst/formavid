@@ -73,12 +73,33 @@ DOMAIN="${DOMAIN,,}"
 # Set DOMAIN_NO_PERIODS.
 DOMAIN_NO_PERIODS=`echo ${DOMAIN} | sed 's/\.//g'`
 
-# Finished: deploy appliance.
+# Ask deploy appliance.
 printf "\n"
 read -p "Deploy the appliance after GCE instance is created (y/n)?" CHOICE
 case "${CHOICE^^}" in
   Y|YES ) DEPLOY_APPLIANCE="True";;
   * ) DEPLOY_APPLIANCE="False";;
+esac
+printf "\n"
+
+# Firewall: ask update.
+printf "\n"
+printf "Do you wish to open the default VPC firewall ports for the applaince?\n"
+printf "Otherwise, the firewall will not be updated and as result some of the\n"
+printf "appliance services may not be reachable in the expected fashion.\n"
+printf "\n"
+printf "If the project firewall has already been configured then skip this step.\n"
+printf "In that case, it is recommended to manually adjust the firewall as needed\n"
+printf "so as not to open a port that may have been intentionally closed.\n"
+printf "\n"
+printf "The script gcloud-vpc-firewall may be run at a later time or the\n"
+printf "firewall can be manually configured using the console\n"
+printf "https://console.cloud.google.com/networking/firewalls/list?project= \n"
+printf "\n"
+read -p "Update firewall (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) FIREWALL_UPDATE="True";;
+  * ) FIREWALL_UPDATE="False";;
 esac
 printf "\n"
 
@@ -104,14 +125,14 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     # BorgBackup: ask install.
     printf "\n"
     printf "Do you wish to configure BorgBackup server?\n"
-    printf "The appliance can utileze GCE Snapshots, as well as, BorgBackup.\n"
+    printf "The appliance can utilize GCE Snapshots, as well as, BorgBackup.\n"
     printf "It is best practice to use both when financially viable.\n"
     printf "Be aware that archiving applications like BorgBackup can cause\n"
-    printf "egress limits to be exceeeded and incur assoicated costs. Depending\n"
-    printf "on usage, there can be addtional costs associed with storage.\n"
+    printf "egress limits to be exceeded and incur usage costs. Depending\n"
+    printf "on usage, there can be addtional costs associated with storage.\n"
     printf "\n"
-    printf "It can be configured at a later time by setting the associated\n"
-    printf "default_envars value to True and running the deploy_appliance script.\n"
+    printf "It can be configured at a later time by setting the default_envars\n"
+    printf "value to True and running the deploy_appliance script again.\n"
     printf "\n"
     read -p "Configure BorgBackup (y/n)?" CHOICE
     case "${CHOICE^^}" in
@@ -172,27 +193,6 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     esac
     printf "\n"
 fi
-
-# Firewall: ask update.
-printf "\n"
-printf "Do you wish to open the default VPC firewall ports for the applaince?\n"
-printf "Otherwise, the firewall will not be updated and as result some of the\n"
-printf "appliance services may not be reachable in the expected fashion.\n"
-printf "\n"
-printf "If the project firewall has already been configured then skip this step.\n"
-printf "In that case, it is recommended to manually adjust the firewall as needed\n"
-printf "so as not to open a port that may have been intentionally closed.\n"
-printf "\n"
-printf "The script gcloud-vpc-firewall may be run at a later time or the\n"
-printf "firewall can be manually configured using the console\n"
-printf "https://console.cloud.google.com/networking/firewalls/list?project= \n"
-printf "\n"
-read -p "Update firewall (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) FIREWALL_UPDATE="True";;
-  * ) FIREWALL_UPDATE="False";;
-esac
-printf "\n"
 
 # Project IDs must be between 6 and 30 characters.
 GCS_PROJECT_ID_MIN=6
@@ -267,22 +267,6 @@ if [[ ! ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
     # Try to create project:
     gcloud --quiet --account=${GCS_ACCOUNT} projects create ${GCS_PROJECT_ID} --folder=${GCS_FOLDER} --no-enable-cloud-apis --name=${GCS_NAME} --set-as-default
 fi
-
-# Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}.
-printf "\n\n\n"
-printf "Billing needs to be enabled to create a regional backup bucket.\n"
-printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
-printf "Please enable billing for project at:\n"
-printf "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}\n"
-printf "If the 'Enable billing' option does not appear then it is already enabled.\n"
-printf "Manage billing accounts at https://console.cloud.google.com/billing\n"
-printf "\n"
-read -p "Billing has been enabled for project ${GCS_PROJECT_ID} (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) :;;
-  * ) exit 0;;
-esac
-printf "\n"
 
 # Select GCE_REGION.
 GCE_REGION=""
@@ -360,6 +344,21 @@ fi
 
 # Check configure borgbackup.
 if [ "${CONFIGURE_BORGBACKUP}" == "True" ]; then
+    # Enable billing: https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}.
+    printf "\n\n\n"
+    printf "Billing needs to be enabled to create a regional backup bucket.\n"
+    printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
+    printf "Please enable billing for project at:\n"
+    printf "https://console.cloud.google.com/storage/browser?project=${GCS_PROJECT_ID}\n"
+    printf "If the 'Enable billing' option does not appear then it is already enabled.\n"
+    printf "Manage billing accounts at https://console.cloud.google.com/billing\n"
+    printf "\n"
+    read -p "Billing has been enabled for project ${GCS_PROJECT_ID} (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) :;;
+      * ) exit 0;;
+    esac
+    printf "\n"
     # Check storage json api enabled.
     DATA=`gcloud --project=${GCS_PROJECT_ID} services list --format="value(NAME)"`
     DATA=`echo ${DATA} | sed 's/\s/|/g'`
