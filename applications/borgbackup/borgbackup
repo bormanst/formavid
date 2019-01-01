@@ -10,6 +10,20 @@ ionice -c2 -n7 -p$$
 PACKAGE=borgbackup
 
 # check install
+if [ "${CONFIGURE_BORGBACKUP}" != "True" ]; then
+    MESSSAGE="The default_envars value CONFIGURE_BORGBACKUP is set to False. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "the default_envars file will need to be manually configured."
+    echo "It should be located in the /etc/formavid directory."
+    echo "Please review script for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# check install
 if [ "${GCS_BUCKET}" == "None" ] && [ "${GCS_PROJECT_ID}" == "None" ]; then
     MESSSAGE="default_envars:GCS_BUCKET and GCS_PROJECT_ID are both set to 'None'. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}

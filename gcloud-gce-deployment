@@ -101,6 +101,25 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     printf "Admin email for the appliance set to ${APP_EMAIL}.\n"
     printf "\n"
 
+    # BorgBackup: ask install.
+    printf "\n"
+    printf "Do you wish to configure BorgBackup server?\n"
+    printf "The appliance can utileze GCE Snapshots, as well as, BorgBackup.\n"
+    printf "It is best practice to use both when financially viable.\n"
+    printf "Be aware that archiving applications like BorgBackup can cause\n"
+    printf "egress limits to be exceeeded and incur assoicated costs. Depending\n"
+    printf "on usage, there can be addtional costs associed with storage.\n"
+    printf "\n"
+    printf "It can be configured at a later time by setting the associated\n"
+    printf "default_envars value to True and running the deploy_appliance script.\n"
+    printf "\n"
+    read -p "Configure BorgBackup (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) CONFIGURE_BORGBACKUP="True";;
+      * ) CONFIGURE_BORGBACKUP="False";;
+    esac
+    printf "\n"
+
     # Solr: ask install.
     printf "\n"
     printf "Do you wish to install the Solr search server?\n"
@@ -113,20 +132,6 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     case "${CHOICE^^}" in
       Y|YES ) SOLR_INSTALL="True";;
       * ) SOLR_INSTALL="False";;
-    esac
-    printf "\n"
-
-    # Create initial stack ask.
-    printf "\n"
-    printf "The required information has been gathered to create the main drupal site.\n"
-    printf "It is recommended to deploy the initial drupal stack during appliance creation\n"
-    printf "but customizations can be made prior to manually running the python script\n"
-    printf "create-drupal-stack.py for the initial stack creation.\n"
-    printf "\n"
-    read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
-    case "${CHOICE^^}" in
-      Y|YES ) CREATE_DRUPAL_STACK="True";;
-      * ) CREATE_DRUPAL_STACK="False";;
     esac
     printf "\n"
 
@@ -152,6 +157,20 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
         fi
     done
     printf "\n\n"
+
+    # Create initial stack ask.
+    printf "\n"
+    printf "The required information has been gathered to create the main drupal site.\n"
+    printf "It is recommended to deploy the initial drupal stack during appliance creation\n"
+    printf "but customizations can be made prior to manually running the python script\n"
+    printf "create-drupal-stack.py for the initial stack creation.\n"
+    printf "\n"
+    read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) CREATE_DRUPAL_STACK="True";;
+      * ) CREATE_DRUPAL_STACK="False";;
+    esac
+    printf "\n"
 fi
 
 # Firewall: ask update.
@@ -339,42 +358,44 @@ else
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --zone=${GCE_ZONE} --source-instance-template ${GCE_TEMPLATE}
 fi
 
-# Check storage json api enabled.
-DATA=`gcloud --project=${GCS_PROJECT_ID} services list --format="value(NAME)"`
-DATA=`echo ${DATA} | sed 's/\s/|/g'`
-GCE_API="storage-api.googleapis.com"
-if [[ ${GCE_API} =~ ^${DATA}$ ]]; then
-    # Notify user of problem.
-    printf "The API ${GCE_API} is already enabled.\n"
-else
-    # Enable storage json api.
-    gcloud --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} services enable ${GCE_API}
-fi
-
-# Check GCS_BUCKET exists.
-DATA=`gsutil ls -p ${GCS_PROJECT_ID}`
-DATA=`echo ${DATA} | sed 's/\s/|/g'`
-GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
-if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
-    printf "\n"
-    printf "The storage bucket of ${GCS_BUCKET} already exists.\n"
-    printf "If the borgbackup directory exists, it needs manual backup and removal.\n"
-    printf "\n"
-    printf "WARNING!!! It is important to backup prior to removing an archive.\n"
-    printf "WARNING!!! If borgbackup directory exists, ensure a backup job is not\n"
-    printf "WARNING!!! running and disable any cron related entries.\n"
-    printf "\n"
-    printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
-    printf "\n"
-    read -p "Bucket directory ${GCS_BUCKET}/borgbackup can be created (y/n)?" CHOICE
-    case "${CHOICE^^}" in
-      Y|YES ) :;;
-      * ) exit 0;;
-    esac
-    printf "\n"
-else
-    # Create bucket.
-    gsutil -q mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
+# Check configure borgbackup.
+if [ "${CONFIGURE_BORGBACKUP}" == "True" ]; then
+    # Check storage json api enabled.
+    DATA=`gcloud --project=${GCS_PROJECT_ID} services list --format="value(NAME)"`
+    DATA=`echo ${DATA} | sed 's/\s/|/g'`
+    GCE_API="storage-api.googleapis.com"
+    if [[ ${GCE_API} =~ ^${DATA}$ ]]; then
+        # Notify user of problem.
+        printf "The API ${GCE_API} is already enabled.\n"
+    else
+        # Enable storage json api.
+        gcloud --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} services enable ${GCE_API}
+    fi
+    # Check GCS_BUCKET exists.
+    DATA=`gsutil ls -p ${GCS_PROJECT_ID}`
+    DATA=`echo ${DATA} | sed 's/\s/|/g'`
+    GCS_BUCKET_URL="gs://${GCS_BUCKET}/"
+    if [[ ${GCS_BUCKET_URL} =~ ^${DATA}$ ]]; then
+        printf "\n"
+        printf "The storage bucket of ${GCS_BUCKET} already exists.\n"
+        printf "If the borgbackup directory exists, it needs manual backup and removal.\n"
+        printf "\n"
+        printf "WARNING!!! It is important to backup prior to removing an archive.\n"
+        printf "WARNING!!! If borgbackup directory exists, ensure a backup job is not\n"
+        printf "WARNING!!! running and disable any cron related entries.\n"
+        printf "\n"
+        printf "Use the GCS user account ${GCS_ACCOUNT} for access.\n"
+        printf "\n"
+        read -p "Bucket directory ${GCS_BUCKET}/borgbackup can be created (y/n)?" CHOICE
+        case "${CHOICE^^}" in
+          Y|YES ) :;;
+          * ) exit 0;;
+        esac
+        printf "\n"
+    else
+        # Create bucket.
+        gsutil -q mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
+    fi
 fi
 
 # Set firewall rules.
@@ -385,7 +406,7 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     # Get USER.
     USER=${GCS_ACCOUNT%@*}
     # Commands to deploy.
-    COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
+    COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${CONFIGURE_BORGBACKUP} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
     # Remote deploy.
     gcloud compute ssh ${USER}@${GCE_INSTANCE} --zone=${GCE_ZONE} --command="${COMMANDS}"
     # Add startup script to metadata.
