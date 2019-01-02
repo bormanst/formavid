@@ -22,14 +22,11 @@ BLOCKING_FILE=/etc/formavid/do_not_delete_this_file
 if [ -f ${BLOCKING_FILE} ] || [ -f ${SITES} ]; then exit 0; fi
 
 # export envars
-export SINGLE_PASS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
+export SINGLE_PASS=`openssl rand -base64 8 | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
 export SYNC_CSSADMIN="True"
 
-# set dir containing init scripts
-SCRIPTS_DIR=/usr/local/formavid/bin
-
 # wipe default passwords with random as security precaution
-${SCRIPTS_DIR}/initialize/python/change-passwords.py
+/usr/local/formavid/bin/initialize/python/change-passwords.py
 
 # disable stunnel4 services
 sed -i "s|ENABLED=1|ENABLED=0|" /etc/default/stunnel4
@@ -43,6 +40,7 @@ a2dissite zzz-admin.examplesitenamecom
 WEBROOT=/var/www/html
 mkdir -p ${WEBROOT}
 WELCOME=${WEBROOT}/index.html
+rm -f ${WELCOME}
 
 cat > ${WELCOME} <<EOF
 <html><body><h1>Important information regarding initialization of this FormaVid Appliance</h1>
