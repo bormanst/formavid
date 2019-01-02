@@ -15,7 +15,7 @@ if [ "${CONFIGURE_BORGBACKUP}" != "True" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
-    echo "the default_envars file will need to be manually configured."
+    echo "The default_envars file will need to be manually configured."
     echo "It should be located in the /etc/formavid directory."
     echo "Please review script for further details."
     echo ""
