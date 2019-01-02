@@ -409,7 +409,11 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     # Remote deploy.
     gcloud compute ssh ${USER}@${GCE_INSTANCE} --zone=${GCE_ZONE} --command="${COMMANDS}"
     # Add startup script to metadata.
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances add-metadata ${GCE_INSTANCE} --zone=${GCE_ZONE} --metadata-from-file startup-script=bin/gce_instance_startup
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances add-metadata ${GCE_INSTANCE} --zone=${GCE_ZONE} --metadata startup-script='#!/bin/bash -e
+    SCRIPT=/usr/local/formavid/bin/gce_instance_startup
+    if [ -f "${SCRIPT}" ] && [ -x "${SCRIPT}" ]; then ${SCRIPT}; fi
+    exit 0'
+    
     # Wipe any relics.
     RELIC=${USER}
     COMMANDS="if [ \$(grep -c '^${RELIC}:' /etc/passwd) -ne 0 ]; then sudo deluser --force --remove-home ${RELIC}; fi"
