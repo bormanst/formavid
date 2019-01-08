@@ -84,7 +84,7 @@ def main():
     system("a2dissite zzz-admin.%s" % default_sitename)
     system("sed -i 's/%s/%s/g' %s" % (default_hostname, hostname, old_file))
     new_file = "/etc/apache2/sites-available/zzz-admin.%s.conf" % sitename
-    system("mv %s %s" % (old_file, new_file))
+    system("mv -f %s %s" % (old_file, new_file))
     system("a2ensite zzz-admin.%s" % sitename)
     old_file = "/var/www/admin/*.php"
     system("sed -i 's/%s/%s/g' %s" % (default_sitename, sitename, old_file))
