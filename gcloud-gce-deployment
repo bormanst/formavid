@@ -255,6 +255,15 @@ until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le 
     fi
 done
 
+GCE_INSTANCE=""
+until [[ ${#GCE_INSTANCE} -ge 1 ]]; do
+  printf "\n"
+  read -p "Please enter unique GCE instanceID to append to Project ID [${GCS_PROJECT_ID}-instanceID]:" GCE_INSTANCE
+done
+printf "\n"
+# Force lowercase.
+GCE_INSTANCE="${GCS_PROJECT_ID}-${GCE_INSTANCE,,}"
+
 # Set remaining vars.
 set ${GCS_FOLDER:="${GCS_PROJECT_ID}"}
 set ${GCS_NAME:="FormaVid Appliance"}
@@ -316,18 +325,6 @@ printf "\n"
 if ! ( gcloud --project=${GCS_PROJECT_ID} compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-ro,storage-full
 fi
-
-# Get GCE_INSTANCE.
-set ${GCE_INSTANCE:="${GCS_PROJECT_ID}-1"}
-
-GCE_INSTANCE=""
-until [[ ${#GCE_INSTANCE} -ge 1 ]]; do
-  printf "\n"
-  read -p "Please enter unique GCE instance ID to append to Project ID [${GCS_PROJECT_ID}-{UNIQUE}]:" GCE_INSTANCE
-done
-printf "\n"
-# Force lowercase.
-GCE_INSTANCE="${GCS_PROJECT_ID}-${GCE_INSTANCE,,}"
 
 # Check GCE_INSTANCE exists.
 DATA=`gcloud --project=${GCS_PROJECT_ID} compute instances list --format="value(NAME)"`
@@ -413,7 +410,7 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     SCRIPT=/usr/local/formavid/bin/gce_instance_startup
     if [ -f "${SCRIPT}" ] && [ -x "${SCRIPT}" ]; then ${SCRIPT}; fi
     exit 0'
-    
+
     # Wipe any relics.
     RELIC=${USER}
     COMMANDS="if [ \$(grep -c '^${RELIC}:' /etc/passwd) -ne 0 ]; then sudo deluser --force --remove-home ${RELIC}; fi"
