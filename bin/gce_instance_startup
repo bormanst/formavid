@@ -28,6 +28,26 @@ export SYNC_CSSADMIN="True"
 # wipe default passwords with random as security precaution
 /usr/local/formavid/bin/initialize/python/change-passwords.py
 
+# reset solr password to default 'SolrRocks'
+FILE=/var/lib/solr/data/security.json
+if [ -f "${FILE}" ]; then
+rm -f ${FILE}
+cat > ${FILE} <<EOF
+{
+    "authentication":{
+        "blockUnknown": true,
+        "class":"solr.BasicAuthPlugin",
+        "credentials":{"admin":"IV0EHq1OnNrj6gvRCwvFwTrZ1+z1oBbnQdiVC3otuq0= Ndd7LKvVBAaZIF0QAVi1ekCfAJXr1GGfLtRUXhgrF8c=", "drupal8":"IV0EHq1OnNrj6gvRCwvFwTrZ1+z1oBbnQdiVC3otuq0= Ndd7LKvVBAaZIF0QAVi1ekCfAJXr1GGfLtRUXhgrF8c="}
+    },
+    "authorization":{
+        "class":"solr.RuleBasedAuthorizationPlugin",
+        "permissions":[{"name":"security-edit", "role":"admin"},{"name":"read","role":"*"},{"name":"schema-read","role":"*"},{"name":"config-read","role":"*"},{"name":"collection-admin-read","role":"*"},{"name":"metrics-read","role":"*"},{"name":"core-admin-read","role":"*"}],
+        "user-role":{"admin":"admin", "drupal8":"dev"}
+    }
+}
+EOF
+fi
+
 # disable stunnel4 services
 sed -i "s|ENABLED=1|ENABLED=0|" /etc/default/stunnel4
 systemctl stop stunnel4
