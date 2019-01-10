@@ -46,6 +46,8 @@ cat > ${FILE} <<EOF
     }
 }
 EOF
+# set owner to solr
+chown solr:solr ${FILE}
 fi
 
 # disable stunnel4 services
