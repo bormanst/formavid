@@ -405,12 +405,6 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     COMMANDS="sudo apt-get update && sudo apt-get install -y git && sudo git clone https://github.com/bormanst/formavid /usr/local/formavid && sudo /usr/local/formavid/bin/deploy_appliance ${DOMAIN} \"${SITETITLE}\" ${APP_EMAIL} ${GCS_PROJECT_ID} ${GCE_REGION} ${GCS_BUCKET_TYPE} ${GCS_BUCKET} ${CONFIGURE_BORGBACKUP} ${SOLR_INSTALL} ${CREATE_DRUPAL_STACK} ${PASSWORD}"
     # Remote deploy.
     gcloud compute ssh ${USER}@${GCE_INSTANCE} --zone=${GCE_ZONE} --command="${COMMANDS}"
-    # Add startup script to metadata.
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances add-metadata ${GCE_INSTANCE} --zone=${GCE_ZONE} --metadata startup-script='#!/bin/bash -e
-    SCRIPT=/usr/local/formavid/bin/gce_instance_startup
-    if [ -f "${SCRIPT}" ] && [ -x "${SCRIPT}" ]; then ${SCRIPT}; fi
-    exit 0'
-
     # Wipe any relics.
     RELIC=${USER}
     COMMANDS="if [ \$(grep -c '^${RELIC}:' /etc/passwd) -ne 0 ]; then sudo deluser --force --remove-home ${RELIC}; fi"
