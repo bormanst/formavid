@@ -470,7 +470,7 @@ def main():
 
     # Set local gulp for SASS.
     system("echo ''")
-    system("echo 'Setting up local Gulp for %s theme ...'" % sitetitle)
+    system("echo 'Setting up local Gulp for %s theme ...'" % sitename)
     system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
     system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/web/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
     system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
