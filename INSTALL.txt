@@ -71,9 +71,12 @@ of overlays to apply, but be careful as the overlays will clobber (overwrite)
 the corresponding files on the base distribution. Overlays should be applied by
 the corresponding configuration script.
 
-Removal of components is as simple as removing the corresponding directory. The
-directory can be deleted or just moved to another location outside of the lamp
-or applications directories.
+Removal of components, prior to deployment, is as simple as removing the
+corresponding directory. The directory can be deleted or just moved to another
+location outside of the lamp or applications directories. If a component has
+already been deployed, then removal becomes a manual task. While the specific
+deployment script can be used as a guide for removal, it may not contain all
+subsequent modifications. Please refer to the app specific documentation.
 
 The deploy_appliance script is designed to be re-run to install new or
 previously skipped components without affecting already installed components.
