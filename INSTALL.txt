@@ -76,7 +76,8 @@ corresponding directory. The directory can be deleted or just moved to another
 location outside of the lamp or applications directories. If a component has
 already been deployed, then removal becomes a manual task. While the specific
 deployment script can be used as a guide for removal, it may not contain all
-subsequent modifications. Please refer to the app specific documentation.
+subsequent modifications. Please refer to the application specific documentation
+and remember to backup any data and configurations files.
 
 The deploy_appliance script is designed to be re-run to install new or
 previously skipped components without affecting already installed components.
