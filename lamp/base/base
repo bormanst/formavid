@@ -61,6 +61,7 @@ fi
 if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then
     useradd -U -m -s /bin/bash cssadmin
     echo cssadmin:${APP_PASS} | chpasswd
+    sleep 5
     echo "cd ${PROJECT_DIR}/web/themes" >> /home/cssadmin/.bashrc
 fi
 
