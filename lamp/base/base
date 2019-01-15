@@ -58,20 +58,10 @@ if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
 fi
 
 # create cssadmin user
-USER=cssadmin
-if [ $(grep -c '^${USER}:' /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash ${USER}
-    echo ${USER}:${APP_PASS} | chpasswd
-    # friendly mkdir
-    HOME=/home/${USER}
-    mkdir -p ${HOME}
-    BASHRC=${HOME}/.bashrc
-    # force skel bashrc
-    cp -fp /etc/skel/.bashrc ${BASHRC}
-    # set default dir
-    echo "cd ${PROJECT_DIR}/web/themes" >> ${BASHRC}
-    # set owner
-    chown -R ${USER}:${USER} ${HOME}
+if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then
+    useradd -U -m -s /bin/bash cssadmin
+    echo cssadmin:${APP_PASS} | chpasswd
+    echo "cd ${PROJECT_DIR}/web/themes" >> /home/cssadmin/.bashrc
 fi
 
 # tools: add hosts entry
