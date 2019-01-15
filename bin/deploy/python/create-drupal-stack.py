@@ -8,6 +8,8 @@
 
 Create drupal stack
 
+Requirements: run as root
+
 Option:
     --apass=        unless provided, will ask interactively
     --dbpass=       unless provided, will ask interactively
