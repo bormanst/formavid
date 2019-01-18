@@ -288,17 +288,17 @@ ln -sf ${FILE} /etc/cron.daily/${PACKAGE}
 # logrotate file
 MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
+
 FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
 
-/var/log/gcloud-snapshot/*.log /var/log/gcloud-snapshot/*.log.* {
-        compress
-        delaycompress
-        weekly
-        missingok
-        rotate 1
+/var/log/gcloud-snapshot/* {
+        daily
         ifempty
+        missingok
+        nocompress
+        rotate 0
 }
 EOF
 
