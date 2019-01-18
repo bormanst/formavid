@@ -1,6 +1,6 @@
-formavid (15.1.01) stable; urgency=low
+formavid (15.1.02) stable; urgency=low
 
-  * Drupal updated to 8.6.5.
+  * Drupal updated to 8.6.7.
 
   * Major component versions:
 
@@ -8,10 +8,10 @@ formavid (15.1.01) stable; urgency=low
     apache2         2.4.25
     borgbackup      1.0.9
     dovecot         2.2.27
-    drupal          8.6.5 (upstream archive)
+    drupal          8.6.7 (upstream archive)
     drush           9.5.2 (upstream archive)
     fail2ban        0.9.6
-    invoiceninja    4.5.7 (upstream archive)
+    invoiceninja    4.5.8 (upstream archive)
     mariadb         10.1.37
     php             7.0.33
     proftpd         1.35
@@ -19,7 +19,30 @@ formavid (15.1.01) stable; urgency=low
     roundup         1.6.0 (upstream archive)
     solr (optional) 7.6.0 (upstream archive)
 
- -- Sean Borman <bormanst@gmail.com>  Tue, Jan 8 17:38:12 -0500
+ -- Sean Borman <bormanst@gmail.com>  Fri, 18 Jan 2019 03:30:43 -0500
+
+ formavid (15.1.01) stable; urgency=low
+
+   * Drupal updated to 8.6.5.
+
+   * Major component versions:
+
+     adminer         4.2.5
+     apache2         2.4.25
+     borgbackup      1.0.9
+     dovecot         2.2.27
+     drupal          8.6.5 (upstream archive)
+     drush           9.5.2 (upstream archive)
+     fail2ban        0.9.6
+     invoiceninja    4.5.7 (upstream archive)
+     mariadb         10.1.37
+     php             7.0.33
+     proftpd         1.35
+     postfix         3.1.8
+     roundup         1.6.0 (upstream archive)
+     solr (optional) 7.6.0 (upstream archive)
+
+  -- Sean Borman <bormanst@gmail.com>  Tue, Jan 8 17:38:12 -0500
 
 formavid (15.1.0) stable; urgency=low
 
