@@ -77,8 +77,11 @@ WEB_ROOT=${PROJECT_DIR}/web
 # can add more domains that have DNS entries
 # certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -d DOMAIN-2 ... -d DOMAIN-N
 # can add more webroots
-# certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
-certbot certonly --cert-name ${APP_HOSTNAME} --webroot --agree-tos -m ${APP_EMAIL} -n -w ${WEB_ROOT} -d ${APP_HOSTNAME}
+# certbot certonly --cert-name ${APP_HOSTNAME} --webroot --agree-tos -m ${APP_EMAIL} -n -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
+# --standalone method does not have dir perm issues that --webroot does
+# need to stop apache2 for --standalone
+systemctl stop apache2
+certbot certonly --cert-name ${APP_HOSTNAME} --standalone --preferred-challenges http --agree-tos -m ${APP_EMAIL} -n -d ${APP_HOSTNAME}
 
 # update ssl.conf
 CONF=/etc/apache2/mods-available/ssl.conf
@@ -95,9 +98,9 @@ sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP
 
 # update stunnel
 CONF=/etc/stunnel/stunnel.conf
-sed -i '/^\s*cert\ =\ /s/^/;\ /g' {CONF}
-sed -i "/^; cert =/a cert = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" {CONF}
-sed -i "/^; cert =/a key = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" {CONF}
+sed -i '/^\s*cert\ =\ /s/^/;\ /g' ${CONF}
+sed -i "/^; cert =/a cert = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
+sed -i "/^; cert =/a key = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
 
 # restart stunnel
 systemctl restart stunnel4
