@@ -74,11 +74,11 @@ echo ${MESSSAGE} | tee -a ${LOG}
 WEB_ROOT=${PROJECT_DIR}/web
 
 # get cert
-# can add more domains
+# can add more domains that have DNS entries
 # certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -d DOMAIN-2 ... -d DOMAIN-N
 # can add more webroots
 # certbot certonly --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
-certbot certonly --max-log-backups 100 --webroot -w ${WEB_ROOT} -d ${APP_HOSTNAME}
+certbot certonly --cert-name ${APP_HOSTNAME} --webroot --agree-tos -m ${APP_EMAIL} -n -w ${WEB_ROOT} -d ${APP_HOSTNAME}
 
 # update ssl.conf
 CONF=/etc/apache2/mods-available/ssl.conf
@@ -106,22 +106,21 @@ systemctl restart stunnel4
 systemctl restart apache2
 
 # logrotate file for letsencrypt
-# MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
-# echo ${MESSSAGE} | tee -a ${LOG}
+MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 
-# FILE=/etc/logrotate.d/letsencrypt
-# cat > ${FILE} <<EOF
+FILE=/etc/logrotate.d/letsencrypt
+cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
 
-# /var/log/letsencrypt/letsencrypt.* {
-#         rotate 7
-#         compress
-#         delaycompress
-#         ifempty
-#         missingok
-#         daily
-# }
-# EOF
+/var/log/letsencrypt/* {
+        daily
+        ifempty
+        missingok
+        nocompress
+        rotate 0
+ }
+EOF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
