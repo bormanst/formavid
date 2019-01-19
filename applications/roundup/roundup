@@ -192,7 +192,7 @@ if [ -f "${DRUPAL_SCRIPT}" ]; then
     sed -i "/<body/r /etc/formavid/templates/sites-template/header.txt" ${FILE}
     sed -i "s/sedtoolname/Support/g" ${FILE}
     sed -i "s/sedbrsize/48px/g" ${FILE}
-    sed -i "s/\/images\/logo.svg/@@file\/theme\/logo.svg/g" ${FILE}
+    sed -i "s/theme\/logo.svg/@@file\/theme\/logo.svg/g" ${FILE}
 fi
 
 # apache2: create conf
