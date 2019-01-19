@@ -30,11 +30,9 @@ printf "\n\n"
 # 7) Select GCE_ZONE: gcloud compute zones list
 # 8) Update metadata: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
 # 9) Update gcloud: gcloud --quiet --account=${GCS_ACCOUNT} init --console-only
-# 10) Create template: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,storage-full
+# 10) Create template: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type ${GCE_TYPE} --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-rw,storage-full
 # 11) Create GCE instance: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
 # 12) Create bucket: gsutil mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
-
-# RSA_KEY_PASS=(created during gsutil install)
 
 # Create an environment variable for the correct distribution.
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
@@ -256,7 +254,8 @@ GCE_INSTANCE="${GCS_PROJECT_ID}-${GCE_INSTANCE,,}"
 # Set remaining vars.
 set ${GCS_FOLDER:="${GCS_PROJECT_ID}"}
 set ${GCS_NAME:="FormaVid Appliance"}
-set ${GCE_TEMPLATE:="f1-micro-template"}
+set ${GCE_TYPE:="f1-micro"}
+set ${GCE_TEMPLATE:="${GCE_TYPE}-template"}
 set ${GCS_BUCKET_TYPE:="regional"}
 set ${GCS_BUCKET:="${GCS_PROJECT_ID}-backup-${GCS_BUCKET_TYPE}"}
 
@@ -312,7 +311,7 @@ printf "\n"
 
 # Create GCE template.
 if ! ( gcloud --project=${GCS_PROJECT_ID} compute instance-templates describe ${GCE_TEMPLATE} >/dev/null 2>&1 ); then
-    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type f1-micro --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-ro,storage-full
+    gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instance-templates create ${GCE_TEMPLATE} --machine-type ${GCE_TYPE} --image-family debian-9 --image-project debian-cloud --boot-disk-size 10GB --tags=http-server,https-server --scopes=default,compute-rw,storage-full
 fi
 
 # Check GCE_INSTANCE exists.
