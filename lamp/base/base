@@ -52,7 +52,7 @@ echo ${MESSSAGE} | tee -a ${LOG}
 
 # create admin
 if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
-    useradd -g adm -m -s /bin/bash admin
+    useradd -U -m -s /bin/bash admin
     echo admin:${APP_PASS} | chpasswd
     usermod -aG sudo admin
 fi

@@ -552,7 +552,7 @@ def main():
         system("echo \"%s\" >  %s/web/sites/%s/files/private/.htaccess" % (HTACCESS,drupaldir,baseUri))
         system("chmod 0444 %s/web/sites/%s/files/private/.htaccess" % (drupaldir,baseUri))
         # Set admin owner all.
-        system("chown -R admin:adm %s/web/sites/%s" % (drupaldir,baseUri))
+        system("chown -R admin:admin %s/web/sites/%s" % (drupaldir,baseUri))
         # Set individual perms.
         system("mkdir -p %s/web/sites/%s/files/css" % (drupaldir,baseUri))
         system("chmod 0775 %s/web/sites/%s/files/css" % (drupaldir,baseUri))
@@ -581,8 +581,8 @@ def main():
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
     # Set admin owner for sites/themes.
-    system("chown admin:adm %s/web/sites" % drupaldir)
-    system("chown admin:adm %s/web/sites/sites.php" % drupaldir)
+    system("chown admin:admin %s/web/sites" % drupaldir)
+    system("chown admin:admin %s/web/sites/sites.php" % drupaldir)
     system("chown cssadmin:cssadmin %s/web/themes" % drupaldir)
 
     # Check formavid logo.

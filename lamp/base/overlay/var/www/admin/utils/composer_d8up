@@ -62,7 +62,7 @@ LOG=/var/log/formavid/update_drupal.log
 touch ${LOG}
 
 # set log perms
-chown admin:adm ${LOG}
+chown admin:admin ${LOG}
 chmod 0644 ${LOG}
 
 # start updates

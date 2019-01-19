@@ -189,7 +189,7 @@ EOF
 # set permissions
 MESSSAGE="Setting perms for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-chown -R admin:adm ${APP_DIR}
+chown -R admin:admin ${APP_DIR}
 chmod -R 755 ${APP_DIR}/storage
 chown www-data:www-data ${APP_DIR}/.env
 chown -R www-data:www-data ${APP_DIR}/storage

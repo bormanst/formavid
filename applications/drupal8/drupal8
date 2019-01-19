@@ -90,13 +90,13 @@ phpdismod xdebug
 mkdir -p ${APP_DIR}
 
 # set admin owner
-chown admin:adm ${APP_DIR}
+chown admin:admin ${APP_DIR}
 
 # apply composer files
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then
     cp -f ${OVERLAY_DIR}${APP_DIR}/composer.* ${APP_DIR}
-    chown admin:adm ${APP_DIR}/composer.*
+    chown admin:admin ${APP_DIR}/composer.*
     MESSSAGE="Applied composer files for ${APP_DIR}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
@@ -122,7 +122,7 @@ su - admin -c "${COMMAND}"
 # apply composer files
 if [ -d "${OVERLAY_DIR}" ]; then
     cp -f ${OVERLAY_DIR}${PROJECT_DIR}/composer.* ${PROJECT_DIR}
-    chown admin:adm ${PROJECT_DIR}/composer.*
+    chown admin:admin ${PROJECT_DIR}/composer.*
     MESSSAGE="Applied composer files for ${PROJECT_DIR}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
@@ -161,7 +161,7 @@ su - admin -c "${COMMAND}"
 # apply chain overlays
 if [ -d "${OVERLAY_DIR}" ]; then
     cp -f ${OVERLAY_DIR}${PROJECT_DIR}/console/chain/* ${PROJECT_DIR}/console/chain
-    chown admin:adm ${PROJECT_DIR}/console/chain/*
+    chown admin:admin ${PROJECT_DIR}/console/chain/*
     MESSSAGE="Applied console chain files for ${PROJECT_DIR}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
@@ -298,7 +298,7 @@ if [ -d "${OVERLAY_DIR}" ]; then
     EXTRA_DIR=${PROJECT_DIR}/web/modules/custom
     mkdir -p ${EXTRA_DIR}
     cp -rf ${OVERLAY_DIR}${EXTRA_DIR}/spy_watch ${EXTRA_DIR}
-    chown -R admin:adm ${EXTRA_DIR}
+    chown -R admin:admin ${EXTRA_DIR}
     MESSSAGE="Applied spy_watch module for ${EXTRA_DIR}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
