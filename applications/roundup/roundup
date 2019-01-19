@@ -181,28 +181,18 @@ sed -i "s;Roundup docs</a>;Roundup docs</a>\n    (<a href=\"/support/docs\" i18n
 # give apache2 db access
 chown -R www-data:www-data ${APP_DIR}/db
 
-# set drupal theme dir
-THEME_DIR=${PROJECT_DIR}/web/themes/system
-
-# set theme alias
-ALIAS_THEME=""
-ALIAS_THEME_CSS=""
+# set theme
 if [ -f "${DRUPAL_SCRIPT}" ]; then
     MESSSAGE="Applying system theme for ${PACKAGE} ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    # update aliases
-    ALIAS_THEME="Alias /${TRACKER}/theme ${THEME_DIR}"
-    ALIAS_THEME_CSS="Alias /${TRACKER}/theme/css ${THEME_DIR}/components/asset-builds/css"
     # apply theme
     FILE=${APP_DIR}/html/page.html
-    sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/images\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${FILE}
-    sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"/support/theme/css/header.css\" \/>" ${FILE}
+    sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/theme\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${FILE}
+    sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"@@file/theme/components/asset-builds/css/header.css\" \/>" ${FILE}
     sed -i "/<body/r /etc/formavid/templates/sites-template/header.txt" ${FILE}
     sed -i "s/sedtoolname/Support/g" ${FILE}
     sed -i "s/sedbrsize/48px/g" ${FILE}
-    sed -i "s/\/images\/logo.svg/@@file\/images\/logo.svg/g" ${FILE}
-    # create images dir: logo symlinked in create-drupal-stack.py
-    mkdir -p ${APP_DIR}/html/images
+    sed -i "s/\/images\/logo.svg/@@file\/theme\/logo.svg/g" ${FILE}
 fi
 
 # apache2: create conf
@@ -219,8 +209,6 @@ cat > ${CONF} <<EOF
     CustomLog \${APACHE_LOG_DIR}/access.log combined
     RedirectMatch ^/$ /${TRACKER}/
     PythonOptimize On
-    ${ALIAS_THEME}
-    ${ALIAS_THEME_CSS}
     Alias /${TRACKER}/docs ${APP_DIR}/docs/html
     AliasMatch ^/${TRACKER}/@@file/(.*) ${APP_DIR}/html/\$1
     AliasMatch ^/${TRACKER}/(?!@@file/)(.*) ${APP_DIR}/dummy.py/\$1

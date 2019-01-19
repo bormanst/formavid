@@ -465,10 +465,16 @@ def main():
         system("echo ''")
         system("echo 'Symlinking system theme to %s theme ...'" % sitename)
         system("echo ''")
-        firstTheme = "%s/web/themes/%s" % (drupaldir,sitename)
+        lnTheme = "%s/web/themes/%s" % (drupaldir,sitename)
         sysTheme = "%s/web/themes/system" % (drupaldir)
         system("rm -f %s" % sysTheme)
-        system("ln -s %s %s" % (firstTheme,sysTheme))
+        system("ln -s %s %s" % (lnTheme,sysTheme))
+        # Symlink system theme to admin pages.
+        lnTheme = "/var/www/admin/theme"
+        system("ln -s %s %s" % (sysTheme,lnTheme))
+        # Symlink system theme to support pages.
+        lnTheme = "/var/www/support/html/theme"
+        system("ln -s %s %s" % (sysTheme,lnTheme))
 
     # Set local gulp for SASS.
     system("echo ''")
