@@ -12,7 +12,7 @@
 Debian 9 or compatible base distro via ssh:
 
 apt-get update && apt-get install -y git
-git clone https://github.com/bormanst/formavid /usr/local
+git clone https://github.com/bormanst/formavid /usr/local/formavid
 cd /usr/local/formavid
 ./install
 
@@ -31,7 +31,7 @@ Stretch. The scripts are well documented and relatively easy to read and edit.
 Google GCE Debian 9 image via local bash:
 
 apt-get update && apt-get install -y git
-git clone https://github.com/bormanst/formavid /usr/local
+git clone https://github.com/bormanst/formavid /usr/local/formavid
 cd /usr/local/formavid
 ./gcloud-gce-deployment
 
