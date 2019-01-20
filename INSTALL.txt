@@ -43,14 +43,15 @@ Minor or dependent applications are located in applications directory.
 
 The main deployment script, deploy_appliance, is located in the bin directory.
 The deploy_appliance script has some key components:
--Loads default envars located in bin/deploy/shell/default_envars.
+-Loads default envars located in /etc/formavid/default_envars.
 -Sets envars accordingly.
 -Gets passwords to use for install.
--Searches lamp directory for and installs all apt packages.
--Searches applications directory for and installs all apt packages.
+-Searches lamp directory for, and installs, all apt packages.
+-Searches applications directory for, and installs, all apt packages.
 -Searches lamp directory for configuration files and overlays to apply.
 -Searches applications directory for configuration files and overlays to apply.
 -Initializes etckeeper.
+-Creates initial drupal stack.
 -Logs deployment information.
 
 The deployment format allows for the addition, removal, or custom configuration
