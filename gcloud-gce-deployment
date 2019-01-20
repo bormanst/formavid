@@ -325,7 +325,7 @@ if [[ ${GCE_INSTANCE} =~ ^${DATA}$ ]]; then
 else
     # Create GCE instance.
     gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --zone=${GCE_ZONE} --source-instance-template ${GCE_TEMPLATE}
-    # update local ssh acces to instances
+    # update local ssh access to instances
     gcloud compute config-ssh
 fi
 
