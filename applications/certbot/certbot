@@ -15,6 +15,10 @@ if [ "${CERTBOT_INSTALL}" != "True" ]; then
     exit 0
 fi
 
+# notify post-install PACKAGE
+MESSSAGE="The script ${PACKAGE} cannot run in parallel so it should be run post-install."
+echo ${MESSSAGE} | tee -a ${LOG}
+
 # check install
 # log check
 MESSSAGE="Checking dependencies for ${PACKAGE} ..."
@@ -121,7 +125,7 @@ cat > ${FILE} <<EOF
         missingok
         nocompress
         rotate 0
- }
+}
 EOF
 
 # log completed
