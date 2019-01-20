@@ -91,7 +91,7 @@ sed -i "s|^\(\s*ServerSignature\s\+\).*$|\1Off|g" ${CONF}
 # update status.conf: in reverse order
 CONF=/etc/apache2/mods-available/status.conf
 sed -i "/Require ip/a\                Substitute 's|<body>|<body><header class=\"header\" role=\"banner\"><div id=\"block-${SITENAME}-branding\" class=\"block block-system block-system-branding-block\"><a href=\"/\" title=\"Home\" rel=\"home\" class=\"site-logo\"><img src=\"/theme/logo.svg\" alt=\"Home\" /></a><div class=\"site-name\"><a href=\"/\" title=\"Home\" rel=\"home\">${SITETITLE} Admin</a></div><br style=\"line-height: 33px;\" /></div></header>|i'" ${CONF}
-sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"shortcut icon\" href=\"/theme/favicon.ico\" type=\"image/vnd.microsoft.icon\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"theme/css/header.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"theme/css/base.css\" />|i'" ${CONF}
+sed -i "/Require ip/a\                Substitute 's|<head>|<head><link rel=\"shortcut icon\" href=\"/theme/favicon.ico\" type=\"image/vnd.microsoft.icon\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"/theme/components/asset-builds/css/header.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"/theme/components/asset-builds/css/base.css\" />|i'" ${CONF}
 sed -i "/Require ip/a\                Deny from all" ${CONF}
 sed -i "/Require ip/a\                Order deny,allow" ${CONF}
 
