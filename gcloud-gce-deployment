@@ -385,7 +385,78 @@ if [ "${CONFIGURE_BORGBACKUP}" == "True" ]; then
 fi
 
 # Set firewall rules.
-if [ "${FIREWALL_UPDATE}" == "True" ] ; then . gcloud-vpc-firewall; fi
+if [ "${FIREWALL_UPDATE}" == "True" ] ; then
+    # Get/format FIREWALL_NAMES.
+    FIREWALL_ALLOWS=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(ALLOW)"`
+    FIREWALL_ALLOWS=`echo ${FIREWALL_ALLOWS} | sed 's/\s/|/g'`
+    # Get/format FIREWALL_NAMES.
+    FIREWALL_NAMES=`gcloud --project=${GCS_PROJECT_ID} compute firewall-rules list --format="value(NAME)"`
+    FIREWALL_NAMES=`echo ${FIREWALL_NAMES} | sed 's/\s/|/g'`
+    # Add firewall rules to GCE.
+    NAME=default-allow-http
+    ALLOW="tcp:80"
+    PRIORITY="1000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=default-allow-https
+    ALLOW="tcp:443"
+    PRIORITY="1000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=ftp
+    ALLOW="tcp:21"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=imap
+    ALLOW="tcp:143"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=smtp
+    ALLOW="tcp:587"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=imaps
+    ALLOW="tcp:993"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=shellinabox
+    ALLOW="tcp:12320"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=webmin
+    ALLOW="tcp:12321"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    NAME=adminer
+    ALLOW="tcp:12322"
+    PRIORITY="50000"
+    if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+        gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+    fi
+    # Solr: check open firewall.
+    if [ "${SOLR_INSTALL}" == "True" ] ; then
+        NAME=solr
+        ALLOW="tcp:8983"
+        PRIORITY="50000"
+        if [[ ! ${NAME} =~ ^${FIREWALL_NAMES}$ && ! ${ALLOW} =~ ^${FIREWALL_ALLOWS}$ ]]; then
+            gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute firewall-rules create ${NAME} --allow=${ALLOW} --description=${NAME} --direction='INGRESS' --network='default' --priority=${PRIORITY} --source-ranges='0.0.0.0/0'
+        fi
+    fi
+fi
 
 # Ask deploy appliance.
 printf "\n"
@@ -432,22 +503,31 @@ fi
 
 printf "\n\n\n"
 printf "Post install manual configuration considerations:\n\n"
-printf "Cloud Console is located at https://console.cloud.google.com/compute/instances?project=${GCS_PROJECT_ID}\n\n"
+printf "Cloud Console is located at:\n"
+printf "https://console.cloud.google.com/compute/instances?project=${GCS_PROJECT_ID}\n\n"
 printf "Cloud Console - Instance edit: Resize instance type if desired.\n"
 printf "Cloud Console - Instance edit: Enable instance 'delete protection' if desired.\n"
 printf "Cloud Console - Instance edit: Enable instance static ip address if desired.\n"
 printf "Cloud Console - Disable any unused firewall entries in GCE project firewall.\n"
 printf "Bash (admin sudo) - Disable any unused services: systemctl disable servicename\n"
-printf "Bash (admin sudo) - Add any addtional sites: /usr/local/formavid/bin/deploy/python/create-drupal-stack.py\n"
+printf "Bash (admin sudo) - Add any addtional sites:\n"
+printf "    /usr/local/formavid/bin/deploy/python/create-drupal-stack.py\n"
 printf "Update DNS entries at hosting service.\n"
 printf "Bash (admin sudo) - Activate Certbot (optional):\n"
 printf "    Set: /etc/formavid/default_envars/CERTBOT_INSTALL=\"True\"\n"
 printf "    Set: /etc/formavid/default_envars/CREATE_DRUPAL_STACK=\"False\"\n"
-printf "    Add domains and subdomains (optional): /usr/local/formavid/applications/certbot/certbot/\"certbot certonly ... -d domain(s)\"\n"
-printf "    If hacking local /etc/hosts for subdomain access then update DNS with temporary entries at hosting service.\n"
+printf "    Add domains and subdomains (optional):\n"
+printf "        Modify /usr/local/formavid/applications/certbot/certbot\n"
+printf "        Append domain(s) to command line \"certbot certonly ... -d domain\"\n"
+printf "    If hacking local /etc/hosts for subdomain access then\n"
+printf "        update DNS with temporary entries at hosting service.\n"
 printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
-printf "    If hacking local /etc/hosts for subdomain access then remove temporary DNS entries at hosting service.\n"
-printf "    Set redirects (optional): Update drupal apache2 entries in /etc/apache2/sites-available/ with http to https redirects - In section <VirtualHost *:80> replace DocumentRoot line with RedirectPermanent / \"https://sitedomain/\"\n"
+printf "    If hacking local /etc/hosts for subdomain access then\n"
+printf "        remove temporary DNS entries at hosting service.\n"
+printf "    Set redirects (optional): Update drupal apache2 entries in\n"
+printf "        /etc/apache2/sites-available with http to https redirects.\n"
+printf "        In section <VirtualHost *:80> replace DocumentRoot line\n"
+printf "        with RedirectPermanent / \"https://sitedomain/\"\n"
 printf "Webmin - Disable any associated appliance firewall entries.\n"
 printf "Bash (admin sudo) - Activate BorgBackup (optional).\n"
 printf "    Set: /etc/formavid/default_envars/CONFIGURE_BORGBACKUP=\"True\"\n"
