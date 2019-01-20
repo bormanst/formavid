@@ -141,7 +141,7 @@ Additional Features
 - `Postfix`_ MTA (bound to localhost) to allow sending of email (e.g.,
   password recovery).
 - `ProFTPD`_ ftp server (listening on port 21).
-- SSH server (listening on port 22).
+- `OpenSSH`_ SSH server (listening on port 22).
 - `Webmin`_ (listening on port 12321) with modules for configuring
   Apache2, Dovecot, Fail2ban, PHP, ProFTPD, MariaDB and Postfix.
 - `Webshell`_ (listening on port 12320).
@@ -165,6 +165,7 @@ Credentials *(passwords required for initialization)*
 .. _Drupal: https://www.drupal.org/
 .. _Fail2ban: https://www.fail2ban.org/
 .. _MariaDB: https://mariadb.org/
+.. _OpenSSH: https://www.openssh.com/
 .. _Postfix: https://www.postfix.org/
 .. _ProFTPD: https://www.proftpd.org/
 .. _Roundup: https://roundup.sourceforge.net/
