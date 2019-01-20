@@ -430,4 +430,29 @@ if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
     fi
 fi
 
+printf "\n\n\n"
+printf "Post install manual configuration considerations:\n\n"
+printf "Cloud Console is located at https://console.cloud.google.com/compute/instances?project=${GCS_PROJECT_ID}\n\n"
+printf "Cloud Console - Instance edit: Resize instance type if desired.\n"
+printf "Cloud Console - Instance edit: Enable instance 'delete protection' if desired.\n"
+printf "Cloud Console - Instance edit: Enable instance static ip address if desired.\n"
+printf "Cloud Console - Disable any unused firewall entries in GCE project firewall.\n"
+printf "Bash (admin sudo) - Disable any unused services: systemctl disable servicename\n"
+printf "Bash (admin sudo) - Add any addtional sites: /usr/local/formavid/bin/deploy/python/create-drupal-stack.py\n"
+printf "Update DNS entries at hosting service.\n"
+printf "Bash (admin sudo) - Activate Certbot (optional):\n"
+printf "    Set: /etc/formavid/default_envars/CERTBOT_INSTALL=\"True\"\n"
+printf "    Set: /etc/formavid/default_envars/CREATE_DRUPAL_STACK=\"False\"\n"
+printf "    Add domains and subdomains (optional): /usr/local/formavid/applications/certbot/certbot/\"certbot certonly ... -d domain(s)\"\n"
+printf "    If hacking local /etc/hosts for subdomain access then update DNS with temporary entries at hosting service.\n"
+printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
+printf "    If hacking local /etc/hosts for subdomain access then remove temporary DNS entries at hosting service.\n"
+printf "    Set redirects (optional): Update drupal apache2 entries in /etc/apache2/sites-available/ with http to https redirects - In section <VirtualHost *:80> replace DocumentRoot line with RedirectPermanent / \"https://sitedomain/\"\n"
+printf "Webmin - Disable any associated appliance firewall entries.\n"
+printf "Bash (admin sudo) - Activate BorgBackup (optional).\n"
+printf "    Set: /etc/formavid/default_envars/CONFIGURE_BORGBACKUP=\"True\"\n"
+printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
+printf "Cloud Console - Verify snapshot.\n"
+printf "\n\n"
+
 exit 0
