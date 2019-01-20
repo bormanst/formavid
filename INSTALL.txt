@@ -3,25 +3,42 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
+
+
 ***The deployment requires root permissions so run as root or sudo.***
 
-Debian 9 or compatible base distro:
-The install bash script will deploy the appliance onto a compatible base distro
-that uses standard locations, Systemd, and the bash shell. It is assumed that a
-"base distro" has only core utilities and a ssh server installed - no desktop,
-other servers, or applications. However, if the distro has a component already
-installed, such as apache or mysql, then the install script should automatically
-skip installing the corresponding component; the triggers depend on standard
-locations and Systemd. Please review and modify the available scripts before
-deploying on something other than Debian 9 Stretch. The scripts are well
-documented and relatively easy to read and edit.
 
-Google GCE Debian 9 image:
-The gcloud-gce-deployment script is meant to be run from a local bash client
+
+Debian 9 or compatible base distro via ssh:
+
+apt-get update && apt-get install -y git
+git clone https://github.com/bormanst/formavid /usr/local
+cd /usr/local/formavid
+./install
+
+The install script is meant to be run from a bash client on the HOST and will
+deploy the appliance onto a compatible base distro that uses standard locations,
+Systemd, and the bash shell. It is assumed that a "base distro" has only core
+utilities and a ssh server installed - no desktop, other servers, or applications.
+However, if the distro has a component already installed, such as apache or mysql,
+then the install script should automatically skip installing the corresponding
+component; the triggers depend on standard locations and Systemd. Please review
+and modify the available scripts before deploying on something other than Debian 9
+Stretch. The scripts are well documented and relatively easy to read and edit.
+
+
+
+Google GCE Debian 9 image via local bash:
+
+apt-get update && apt-get install -y git
+git clone https://github.com/bormanst/formavid /usr/local
+cd /usr/local/formavid
+./gcloud-gce-deployment
+
+The gcloud-gce-deployment script is meant to be run from a LOCAL bash client
 using the google-cloud-sdk. It will prompt for information to create a template,
 a GCE instance using the template, a regional storage bucket, and adds the
-required firewall rules. After the environment is configured it will ask if the
-appliance should be deployed. Selecting deployment will install the FormaVid git
+required firewall rules. Selecting deployment will install the FormaVid git
 repository onto the newly created instance and then run the deploy_appliance
 script for a standard install. Note that the gcloud-gce-deployment script will
 modify the default gcloud environment on the client, if it was previously used.
@@ -36,6 +53,10 @@ https://cloud.google.com/compute/docs/instances/preventing-accidental-vm-deletio
 and https://cloud.google.com/storage/docs/access-control/ for more information.
 Depending on use case, it may be useful to retain the external ip address:
 https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address
+
+
+
+General information:
 
 Install and initialization scripts are located in bin directory.
 Base lamp components, along with solr, are located in lamp directory.
