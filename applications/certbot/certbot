@@ -61,6 +61,10 @@ fi
 MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# create log files
+PACKAGE_LOG_DIR=/var/log/letsencrypt
+mkdir -p ${PACKAGE_LOG_DIR}
+
 # apply overlay
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then
@@ -119,7 +123,7 @@ FILE=/etc/logrotate.d/letsencrypt
 cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
 
-/var/log/letsencrypt/* {
+${PACKAGE_LOG_DIR}/* {
         daily
         ifempty
         missingok
