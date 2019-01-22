@@ -284,7 +284,7 @@ done < <(cd ${PROJECT_DIR}/web/sites/; find *.* -maxdepth 0 -type d -print0)
 # Run cron on the sites.
 len=\${#sites[*]}
 for((i=0; i<\$len; i++)); do
-    su www-data -s /bin/bash -c "/usr/local/bin/drush -r ${APP_DIR} --uri=http://\${sites[\${i}]} --quiet cron"
+    su www-data -s /bin/bash -c "/usr/local/bin/drush --root=${PROJECT_DIR} --uri=http://\${sites[\${i}]} --quiet cron"
 done
 EOF
 chmod +x ${CRON_DRUPAL}
