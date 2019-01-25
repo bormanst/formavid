@@ -295,10 +295,11 @@ cat > ${FILE} <<EOF
 
 ${PACKAGE_LOG_DIR}/* {
         daily
-        ifempty
         missingok
-        nocompress
-        rotate 0
+        rotate 7
+        compress
+        delaycompress
+        notifempty
 }
 EOF
 
