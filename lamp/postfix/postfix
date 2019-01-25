@@ -33,10 +33,6 @@ fi
 MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
-# Use Maildir format.
-postconf -e "home_mailbox = Maildir/"
-postfix reload
-
 # apply overlay
 OVERLAY_DIR=$1/overlay
 if [ -d "${OVERLAY_DIR}" ]; then
@@ -46,6 +42,9 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
     echo ""
 fi
+
+# Use Maildir format.
+postconf -e "home_mailbox = Maildir/"
 
 # create virtual map
 touch /etc/postfix/virtual
@@ -59,13 +58,34 @@ newaliases
 # post virtual map
 postmap /etc/postfix/virtual
 postconf -e 'virtual_alias_maps = hash:/etc/postfix/virtual'
-postconf -e 'smtpd_tls_CAfile = /etc/ssl/certs/cacert.org.pem'
-postfix reload
 
-# harden postfix banner
-postconf -e inet_interfaces=localhost
-postconf -e myhostname=${APP_HOSTNAME}
+# harden postfix and dovecot
 postconf -e smtpd_banner='$myhostname ESMTP'
+postconf -e "home_mailbox = Maildir/"
+postconf -e "virtual_alias_maps = hash:/etc/postfix/virtual"
+postconf -e "myhostname = ${APP_HOSTNAME}"
+postconf -e "local_recipient_maps = proxy:unix:passwd.byname $alias_maps"
+postconf -e "smtpd_tls_protocols = !SSLv2, !SSLv3"
+postconf -e "smtpd_sasl_type = dovecot"
+postconf -e "smtpd_sasl_path = private/auth"
+postconf -e "smtpd_sasl_local_domain ="
+postconf -e "smtpd_sasl_security_options = noanonymous"
+postconf -e "broken_sasl_auth_clients = yes"
+postconf -e "smtpd_sasl_auth_enable = yes"
+postconf -e "smtpd_recipient_restrictions = permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination,reject_invalid_hostname,reject_non_fqdn_hostname,reject_non_fqdn_sender,reject_non_fqdn_recipient,reject_unknown_sender_domain,reject_rbl_client sbl.spamhaus.org,reject_rbl_client cbl.abuseat.org"
+postconf -e "smtpd_relay_restrictions = permit_mynetworks,permit_sasl_authenticated,reject_unauth_destination"
+postconf -e "smtp_tls_security_level = may"
+postconf -e "smtpd_tls_security_level = may"
+postconf -e "smtp_tls_note_starttls_offer = yes"
+postconf -e "smtpd_tls_loglevel = 1"
+postconf -e "smtpd_tls_received_header = yes"
+postconf -e "smtpd_helo_required = yes"
+postconf -e "smtpd_helo_restrictions = reject_non_fqdn_helo_hostname,reject_invalid_helo_hostname,reject_unknown_helo_hostname"
+postconf -e "disable_vrfy_command = yes"
+postconf -e "smtpd_delay_reject = yes"
+
+# reload configs
+postfix reload
 
 # start service
 systemctl restart ${PACKAGE}

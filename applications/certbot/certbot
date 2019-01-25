@@ -115,6 +115,19 @@ systemctl restart stunnel4
 # restart apache
 systemctl restart apache2
 
+# update postfix
+postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem"
+postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem"
+postconf -e "smtpd_tls_CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem"
+postfix reload
+
+# update dovecot
+CONF=/etc/dovecot/conf.d/10-ssl.conf
+if [ -f "${CONF}" ]; then
+    sed -i "s/^ssl_cert =\(.*\)/ssl_cert = <\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/fullchain.pem/" ${CONF}
+    sed -i "s/^ssl_key =\(.*\)/ssl_key = <\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/privkey.pem/" ${CONF}
+fi
+
 # logrotate file for letsencrypt
 MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
