@@ -560,6 +560,7 @@ cat > ${FILE} <<EOF
         compress
         delaycompress
         notifempty
+        create 640 root adm
 }
 EOF
 

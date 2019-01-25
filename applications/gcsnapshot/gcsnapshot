@@ -300,6 +300,7 @@ ${PACKAGE_LOG_DIR}/*.log {
         compress
         delaycompress
         notifempty
+        create 640 root adm
 }
 EOF
 
