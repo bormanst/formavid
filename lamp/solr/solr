@@ -114,11 +114,11 @@ cat > ${FILE} <<EOF
 # Logrotate file for solr
 
 /var/log/solr/*.log {
-        compress
-    delaycompress
-        weekly
+        daily
         missingok
-        rotate 5
+        rotate 7
+        compress
+        delaycompress
         notifempty
 }
 EOF
