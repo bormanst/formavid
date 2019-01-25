@@ -136,7 +136,7 @@ FILE=/etc/logrotate.d/letsencrypt
 cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
 
-${PACKAGE_LOG_DIR}/* {
+${PACKAGE_LOG_DIR}/*.log {
         daily
         missingok
         rotate 7

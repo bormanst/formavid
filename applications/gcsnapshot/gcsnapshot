@@ -293,7 +293,7 @@ FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
 
-${PACKAGE_LOG_DIR}/* {
+${PACKAGE_LOG_DIR}/*.log {
         daily
         missingok
         rotate 7
