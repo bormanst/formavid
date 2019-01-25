@@ -137,9 +137,9 @@ cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
 
 ${PACKAGE_LOG_DIR}/*.log {
-        daily
+        weekly
         missingok
-        rotate 7
+        rotate 4
         compress
         delaycompress
         notifempty
