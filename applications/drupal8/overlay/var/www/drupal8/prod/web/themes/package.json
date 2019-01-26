@@ -6,16 +6,16 @@
   "repository": {},
   "devDependencies": {
     "breakpoint-sass": "^2.7",
-    "browser-sync": "^2.24",
+    "browser-sync": "^2.26",
     "chroma-sass": "^1.2",
     "del": "^3.0",
-    "eslint": "^5.10",
+    "eslint": "^5.12",
     "gulp": "^3.9",
     "gulp-autoprefixer": "^6.0",
     "gulp-eslint": "^5.0",
     "gulp-if": "^2.0",
     "gulp-load-plugins": "^1.5",
-    "gulp-rename": "^1.3",
+    "gulp-rename": "^1.4",
     "gulp-replace": "^1.0",
     "gulp-sass": "^4.0",
     "gulp-sass-lint": "^1.4",
@@ -36,15 +36,15 @@
     "test": "gulp"
   },
   "dependencies": {
-    "eslint-config-airbnb": "^17.0",
+    "eslint-config-airbnb": "^17.1",
     "eslint-config-airbnb-standard": "^2.1",
-    "eslint-config-prettier": "^3.3.0",
-    "eslint-plugin-import": "^2.12",
-    "eslint-plugin-jsx-a11y": "^6.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "eslint-plugin-react": "^7.9",
-    "gulp-watch": "^5.0.1",
-    "prettier": "^1.15.3"
+    "eslint-config-prettier": "^3.6",
+    "eslint-plugin-import": "^2.15",
+    "eslint-plugin-jsx-a11y": "^6.2",
+    "eslint-plugin-prettier": "^3.0",
+    "eslint-plugin-react": "^7.12",
+    "gulp-watch": "^5.0",
+    "prettier": "^1.16"
   }
 }
 
