@@ -28,8 +28,9 @@ elif [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     MESSSAGE="Skipping package install for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
-    # install latest
-    export APTGETS="python-certbot-apache python-certbot-apache-doc"
+    # install backport to get version 0.28 as letsencrypt no longer supports TLS-SNI-01
+    # https://community.letsencrypt.org/t/how-to-stop-using-tls-sni-01-with-certbot/83210
+    apt-get install -yq python-certbot-apache python-certbot-apache-doc -t stretch-backports
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
