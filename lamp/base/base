@@ -51,17 +51,19 @@ MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${A
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # create admin
-if [ $(grep -c '^admin:' /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash admin
-    echo admin:${APP_PASS} | chpasswd
-    usermod -aG sudo admin
+USER=admin
+if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
+    useradd -U -m -s /bin/bash ${USER}
+    echo ${USER}:${APP_PASS} | chpasswd
+    usermod -aG sudo ${USER}
 fi
 
 # create cssadmin user
-if [ $(grep -c '^cssadmin:' /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash cssadmin
-    echo cssadmin:${APP_PASS} | chpasswd
-    echo "cd ${PROJECT_DIR}/web/themes" >> /home/cssadmin/.bashrc
+USER=cssadmin
+if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
+    useradd -U -m -s /bin/bash ${USER}
+    echo ${USER}:${APP_PASS} | chpasswd
+    echo "cd ${PROJECT_DIR}/web/themes" >> /home/${USER}/.bashrc
 fi
 
 # tools: add hosts entry
