@@ -86,11 +86,11 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
     CustomLog \${APACHE_LOG_DIR}/access.log combined
     Alias /adminer/static /usr/share/adminer/adminer/static
     Alias /externals /usr/share/adminer/externals
-    Alias /editor   /usr/share/adminer/editor
+    Alias /editor /usr/share/adminer/editor
     DocumentRoot /usr/share/adminer/adminer
     <Directory /usr/share/adminer/adminer>
         Options +FollowSymLinks
-        <IfModule mod_php5.c>
+        <IfModule mod_php7.c>
             AddType application/x-httpd-php .php
             php_flag magic_quotes_gpc Off
             php_flag track_vars On
@@ -100,7 +100,7 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
     </Directory>
     <Directory /usr/share/adminer/editor>
         Options +FollowSymLinks
-        <IfModule mod_php5.c>
+        <IfModule mod_php7.c>
             AddType application/x-httpd-php .php
             php_flag magic_quotes_gpc Off
             php_flag track_vars On
