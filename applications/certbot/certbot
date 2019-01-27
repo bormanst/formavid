@@ -83,12 +83,12 @@ WEB_ROOT=${PROJECT_DIR}/web
 
 # get cert
 # can add more webroots and domains that have DNS entries
-# certbot certonly --cert-name ${APP_HOSTNAME} --webroot --agree-tos -m ${APP_EMAIL} -n -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
+# certbot certonly --cert-name ${APP_HOSTNAME} --webroot --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -w ${WEB_ROOT} -d ${APP_HOSTNAME} -w /var/www/admin -d admin.${APP_HOSTNAME}
 # --standalone method does not have dir perm issues that --webroot does
 # need to stop apache2 for --standalone
 # --apache uses apache2 plugin
-# certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} -n -d ${APP_HOSTNAME} -d admin.${APP_HOSTNAME} -d billing.${APP_HOSTNAME} -d support.${APP_HOSTNAME}
-certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} -n -d ${APP_HOSTNAME}
+# certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME} -d admin.${APP_HOSTNAME} -d billing.${APP_HOSTNAME} -d support.${APP_HOSTNAME}
+certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME}
 
 # update ssl.conf
 CONF=/etc/apache2/mods-available/ssl.conf
@@ -136,23 +136,23 @@ if [ -f "${CONF}" ]; then
 fi
 
 # logrotate file for letsencrypt
-MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-
-FILE=/etc/logrotate.d/letsencrypt
-cat > ${FILE} <<EOF
+# MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
+# echo ${MESSSAGE} | tee -a ${LOG}
+# 
+# FILE=/etc/logrotate.d/letsencrypt
+# cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
-
-${PACKAGE_LOG_DIR}/*.log {
-        weekly
-        missingok
-        rotate 4
-        compress
-        delaycompress
-        notifempty
-        create 640 root adm
-}
-EOF
+# 
+# ${PACKAGE_LOG_DIR}/*.log {
+#         weekly
+#         missingok
+#         rotate 4
+#         compress
+#         delaycompress
+#         notifempty
+#         create 640 root adm
+# }
+# EOF
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
