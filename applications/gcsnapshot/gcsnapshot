@@ -76,7 +76,7 @@ cat > ${FILE} <<EOF
 export PATH=\$PATH:/usr/local/bin/:/usr/bin
 
 # set log
-export LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
+export LOG=${PACKAGE_LOG_DIR}/${PACKAGE}.log
 
 # set days to keep
 OLDER_THAN=7
@@ -293,7 +293,7 @@ FILE=${APP_DIR}/${PACKAGE}-logrotate
 cat > ${FILE} <<EOF
 # Logrotate file for ${PACKAGE}
 
-${PACKAGE_LOG_DIR}/*.log {
+${PACKAGE_LOG_DIR}/${PACKAGE}.log {
         weekly
         missingok
         rotate 4
