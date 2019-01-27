@@ -148,6 +148,7 @@ maxretry  = 1
 [stunnel]
 enabled   = true
 banaction = iptables-allports
+logpath = /var/lib/stunnel4/*.log
 maxretry  = 3
-port      = 12320,12321
+port      = 12321
 
