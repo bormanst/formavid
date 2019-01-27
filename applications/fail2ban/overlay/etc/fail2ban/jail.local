@@ -4,11 +4,9 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 [DEFAULT]
-ignoreip  = 127.0.0.1
-bantime   = 172800
-destemail = root@localhost
-banaction = iptables-multiport
 action    = %(action_mwl)s
+banaction = iptables-multiport
+bantime   = 172800
 
 
 #
@@ -63,27 +61,35 @@ enabled = true
 
 [apache-w00tw00t]
 enabled   = true
-port      = http,https
-filter    = apache-w00tw00t
-banaction = iptables-allports
 action    = %(action_mwl)s
-logpath   = /var/log/apache*/*error.log
+banaction = iptables-allports
+filter    = apache-w00tw00t
+logpath   = %(apache_error_log)s
 maxretry  = 1
+port      = http,https
 
 [apache-myadmin]
 enabled   = true
-port      = http,https
-filter    = apache-myadmin
-banaction = iptables-allports
 action    = %(action_mwl)s
-logpath   = /var/log/apache*/*error.log
+banaction = iptables-allports
+filter    = apache-myadmin
+logpath   = %(apache_error_log)s
 maxretry  = 2
+port      = http,https
 
 
 #
 # Web Applications JAILS
 #
 #
+[adminer]
+enabled   = true
+banaction = iptables-allports
+filter    = adminer
+logpath   = %(apache_access_log)s
+maxretry  = 3
+port      = http,https
+
 [drupal-auth]
 enabled   = true
 
@@ -133,11 +139,15 @@ enabled   = true
 #
 [pam-generic]
 enabled   = true
-banaction = iptables-allports
 
 [php-url-fopen]
 enabled   = true
-port      = http,https
-filter    = php-url-fopen
-logpath   = /var/log/apache*/*access.log
+logpath   = %(apache_access_log)s
 maxretry  = 1
+
+[stunnel]
+enabled   = true
+banaction = iptables-allports
+maxretry  = 3
+port      = 12320,12321
+
