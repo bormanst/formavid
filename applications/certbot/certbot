@@ -103,9 +103,16 @@ sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateChainFile /etc/letsencrypt/live/
 sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateKeyFile /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
 sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
 
+# update shellinabox
+mv -f /var/lib/shellinabox/certificate.pem /var/lib/shellinabox/certificate.pem.bak
+cat /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem > /var/lib/shellinabox/certificate.pem
+chown shellinabox:shellinabox /var/lib/shellinabox/certificate.pem
+cp -fp /var/lib/shellinabox/certificate.pem /var/lib/shellinabox/certificate-${APP_HOSTNAME}.pem
+
 # update stunnel
 CONF=/etc/stunnel/stunnel.conf
 sed -i '/^\s*cert\ =\ /s/^/;\ /g' ${CONF}
+sed -i "/^; cert =/a CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
 sed -i "/^; cert =/a cert = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
 sed -i "/^; cert =/a key = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
 
