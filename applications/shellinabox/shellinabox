@@ -16,8 +16,8 @@ if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check conf
 CONF=/etc/default/${PACKAGE}
-if [ -f "${CONF}" ];  then
-    MESSSAGE="File ${CONF} already exists. Skipping configuration for ${PACKAGE}."
+if [ $(grep -c '12320' ${CONF}) -gt 0 ];  then
+    MESSSAGE="File ${CONF} already modified. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
