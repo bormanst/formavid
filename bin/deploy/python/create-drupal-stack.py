@@ -602,7 +602,6 @@ def main():
     system("echo ''")
     system("echo 'Adding %s email addresses to postfix ...'" % hostname)
     system("echo ''")
-    system("echo 'webmaster@%s admin' >> /etc/postfix/virtual" % hostname)
     system("echo 'admin@%s admin' >> /etc/postfix/virtual" % hostname)
     system("echo 'support@%s admin' >> /etc/postfix/virtual" % hostname)
     system("postmap /etc/postfix/virtual")

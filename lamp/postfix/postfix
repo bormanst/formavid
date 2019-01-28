@@ -51,8 +51,9 @@ touch /etc/postfix/virtual
 
 # add aliases
 echo "support: admin" >> /etc/aliases
-echo "webmaster@localhost admin" >> /etc/postfix/virtual
+echo "root@localhost admin" >> /etc/postfix/virtual
 echo "root@${APP_HOSTNAME} admin" >> /etc/postfix/virtual
+echo "webmaster@localhost admin" >> /etc/postfix/virtual
 newaliases
 
 # post virtual map
