@@ -53,19 +53,14 @@ echo ${MESSSAGE} | tee -a ${LOG}
 # create admin
 USER=admin
 if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
-    addgroup ${USER}
-    adduser --shell /bin/bash --ingroup ${USER} ${USER}
-    echo ${USER}:${APP_PASS} | chpasswd
+    useradd -U -m -s /bin/bash -p ${APP_PASS} ${USER}
     usermod -aG sudo ${USER}
 fi
 
 # create cssadmin user
 USER=cssadmin
 if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
-    addgroup ${USER}
-    adduser --shell /bin/bash --ingroup ${USER} ${USER}
-    echo ${USER}:${APP_PASS} | chpasswd
-    echo "cd ${PROJECT_DIR}/web/themes" >> /home/${USER}/.bashrc
+    useradd -U -m -s /bin/bash -d "${PROJECT_DIR}/web/themes" -p ${APP_PASS} ${USER}
 fi
 
 # tools: add hosts entry
