@@ -60,7 +60,8 @@ fi
 # create cssadmin user
 USER=cssadmin
 if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash -d "${PROJECT_DIR}/web/themes" -p ${APP_PASS} ${USER}
+    useradd -U -m -s /bin/bash -p ${APP_PASS} ${USER}
+    echo "cd ${PROJECT_DIR}/web/themes" >> /home/cssadmin/.bashrc
 fi
 
 # tools: add hosts entry
