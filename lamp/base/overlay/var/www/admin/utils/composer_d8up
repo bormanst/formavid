@@ -208,14 +208,14 @@ if [ $(composer prohibits -d ${PROJECT_DIR} drupal/core:${NEW_VER} 2>&1 | grep -
     # update symfony dependencies
     MESSSAGE="$( date ) Updating project drupal and symfony dependencies ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    su - admin -c "composer update -d ${PROJECT_DIR} drupal/* symfony/* webflo/drupal-core-require-dev --with-dependencies 2>&1 | tee -a ${LOG}"
+    su - admin -c "composer update -d ${PROJECT_DIR} drupal/* symfony/* webflo/drupal-core-require-dev solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG}"
     HAS_UPDATES=true
 else
     # update drupal dependencies
     MESSSAGE="$( date ) Updating project drupal ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     # check no updates
-    if [ $(su - admin -c "composer update -d ${PROJECT_DIR} drupal/* --with-dependencies 2>&1 | tee -a ${LOG} | grep -c 'Nothing to install or update'") != 1 ]; then HAS_UPDATES=true; fi
+    if [ $(su - admin -c "composer update -d ${PROJECT_DIR} drupal/* solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG} | grep -c 'Nothing to install or update'") != 1 ]; then HAS_UPDATES=true; fi
 fi
 
 # check HAS_UPDATES
