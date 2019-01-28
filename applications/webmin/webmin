@@ -15,9 +15,9 @@ PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
 # check exists
-# Note: check inetd_ssl=1 in miniserv.conf
+# Note: check ssl_redirect=1 in miniserv.conf
 CONF=/etc/webmin/miniserv.conf
-if grep -q "inetd_ssl=1" ${CONF}; then
+if grep -q "ssl_redirect=1" ${CONF}; then
     MESSSAGE="The ${CONF} already exists. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
@@ -47,29 +47,15 @@ fi
 # update miniserv
 MESSSAGE="Updating miniserv for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-sed -i "/^ssl=/ s|=.*|=|" ${CONF}
+sed -i "/^blockhost_time=/ s|=.*|=600|" ${CONF}
 sed -i "/^ipv6=/ s|=.*|=0|" ${CONF}
-set ${BIND_ADDR:=127.0.0.1}
+sed -i "/^listen=/ s|=.*|=12321|" ${CONF}
+sed -i "/^port=/ s|=.*|=12321|" ${CONF}
+sed -i "/^ssl=/ s|=.*|=1|" ${CONF}
 cat >> ${CONF} <<EOF
-
-inetd_ssl=1
-bind=${BIND_ADDR}
-sockets=
 no_resolv_myname=0
-EOF
-
-# add stunnel entry
-MESSSAGE="Adding stunnel entry for ${PACKAGE} ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-set ${ACCEPT_PORT:=12321}
-set ${WEBMIN_PORT:=10000}
-CONF=/etc/stunnel/stunnel.conf
-cat >> ${CONF} <<EOF
-
-[webmin]
-accept = ${ACCEPT_PORT}
-connect = ${BIND_ADDR}:${WEBMIN_PORT}
-TIMEOUTclose = 0
+sockets=
+ssl_redirect=1
 EOF
 
 # update login cookie

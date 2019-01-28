@@ -307,23 +307,7 @@ if [ -n "${APP_EMAIL}" ]; then
     echo "#"
     echo "#############################################"
     echo ${MESSSAGE} >> ${LOG}
-    # restart stunnel4
-    DEPENDS=stunnel4
-    MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
-    systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
-    if (systemctl -q is-active ${DEPENDS}); then
-        systemctl restart ${DEPENDS}
-        MESSSAGE="$( date ) Service ${DEPENDS} has been restarted."
-    fi
-    echo ""
-    echo "#############################################"
-    echo "#"
-    echo "# ${MESSSAGE}"
-    echo "#"
-    echo "#############################################"
-    echo ${MESSSAGE} >> ${LOG}
-
-    # restart shellinabox - depends on stunnel4
+    # restart shellinabox
     DEPENDS=shellinabox
     MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
     systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10
@@ -342,7 +326,7 @@ if [ -n "${APP_EMAIL}" ]; then
     # check webmin exits
     FILE=/etc/webmin/config
     if [ -f "${FILE}" ]; then
-        # restart webmin - depends on stunnel4
+        # restart webmin
         DEPENDS=webmin
         MESSSAGE="$( date ) Unable to start ${DEPENDS}. Please manually check service."
         systemctl start ${DEPENDS} >/dev/null 2>&1 && sleep 10

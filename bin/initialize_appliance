@@ -67,10 +67,6 @@ MESSSAGE="$( date ) Initializing appliance ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 echo ""
 
-# enable stunnel4 services
-sed -i "s|ENABLED=0|ENABLED=1|" /etc/default/stunnel4
-systemctl restart stunnel4
-
 # disable apache2 default
 a2dissite 000-default
 

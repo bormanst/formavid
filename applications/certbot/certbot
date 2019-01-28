@@ -90,49 +90,65 @@ WEB_ROOT=${PROJECT_DIR}/web
 # certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME} -d admin.${APP_HOSTNAME} -d billing.${APP_HOSTNAME} -d support.${APP_HOSTNAME}
 certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME}
 
-# update ssl.conf
+# update apache
 CONF=/etc/apache2/mods-available/ssl.conf
-
-# comment any old pems
-sed -i '/^\s*SSLCertificateChainFile/s/^/#\ /g' ${CONF}
-sed -i '/^\s*SSLCertificateKeyFile/s/^/#\ /g' ${CONF}
-sed -i '/^\s*SSLCertificateFile/s/^/#\ /g' ${CONF}
-
-# add new pems
-sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateChainFile /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
-sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateKeyFile /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
-sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
-
-# update shellinabox
-mv -f /var/lib/shellinabox/certificate.pem /var/lib/shellinabox/certificate.pem.bak
-cat /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem > /var/lib/shellinabox/certificate.pem
-chown shellinabox:shellinabox /var/lib/shellinabox/certificate.pem
-cp -fp /var/lib/shellinabox/certificate.pem /var/lib/shellinabox/certificate-${APP_HOSTNAME}.pem
-
-# update stunnel
-CONF=/etc/stunnel/stunnel.conf
-sed -i '/^\s*cert\ =\ /s/^/;\ /g' ${CONF}
-sed -i "/^; cert =/a CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
-sed -i "/^; cert =/a cert = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
-sed -i "/^; cert =/a key = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
-
-# restart stunnel
-systemctl restart stunnel4
-
-# restart apache
-systemctl restart apache2
-
-# update postfix
-postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem"
-postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem"
-postconf -e "smtpd_tls_CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem"
-postfix reload
+if [ -f "${CONF}" ]; then
+    # comment any old pems
+    sed -i '/^\s*SSLCertificateChainFile/s/^/#\ /g' ${CONF}
+    sed -i '/^\s*SSLCertificateKeyFile/s/^/#\ /g' ${CONF}
+    sed -i '/^\s*SSLCertificateFile/s/^/#\ /g' ${CONF}
+    # add new pems
+    sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateChainFile /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem" ${CONF}
+    sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateKeyFile /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem" ${CONF}
+    sed -i "/SSLStrictSNIVHostCheck/a SSLCertificateFile /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem" ${CONF}
+    # restart apache
+    systemctl restart apache2
+fi
 
 # update dovecot
 CONF=/etc/dovecot/conf.d/10-ssl.conf
 if [ -f "${CONF}" ]; then
+    # add new pems
     sed -i "s/^ssl_cert =\(.*\)/ssl_cert = <\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/fullchain.pem/" ${CONF}
     sed -i "s/^ssl_key =\(.*\)/ssl_key = <\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/privkey.pem/" ${CONF}
+    # restart dovecot
+    systemctl restart dovecot
+fi
+
+# update postfix
+if (systemctl -q is-active postfix); then
+    postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem"
+    postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem"
+    postconf -e "smtpd_tls_CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem"
+    # reload postfix
+    postfix reload
+fi
+
+# update shellinabox
+CONF=/var/lib/shellinabox/certificate.pem
+if [ -f "${CONF}" ]; then
+    # create backup if none
+    if [ ! -f "${CONF}.bak" ]; then mv -f /var/lib/shellinabox/certificate.pem ${CONF}.bak; fi
+    # add new pems
+    rm ${CONF}
+    cat /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem > ${CONF}
+    chown shellinabox:shellinabox ${CONF}
+    cp -fp ${CONF} /var/lib/shellinabox/certificate-${APP_HOSTNAME}.pem
+    # restart shellinabox
+    systemctl restart shellinabox
+fi
+
+# update webmin
+CONF=/etc/webmin/miniserv.conf
+if [ -f "${CONF}" ]; then
+    sed -i "s/^keyfile=\(.*\)/keyfile=\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/privkey.pem/" ${CONF}
+    if grep -q "certfile" "${CONF}"; then
+        sed -i "s/^certfile=\(.*\)/keyfile=\/etc\/letsencrypt\/live\/${APP_HOSTNAME}\/fullchain.pem/" ${CONF}
+    else
+        echo "certfile=/etc/letsencrypt/live/modorbis.com/fullchain.pem" >> ${CONF}
+    fi
+    # restart webmin
+    systemctl restart webmin
 fi
 
 # logrotate file for letsencrypt

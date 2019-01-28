@@ -93,88 +93,13 @@ if [ ! -d "${TEMPLATES}" ]; then
     sed -i "s/sedbrsize/57px/g" ${APP_DIR}/*.php
 fi
 
-# stunnel conf
-CONF=/etc/stunnel/stunnel.conf
-cat > ${CONF} <<EOF
-; **************************************************************************
-; * Global options                                                         *
-; **************************************************************************
-
-; A copy of some devices and system files is needed within the chroot jail
-; Chroot conflicts with configuration file reload and many other features
-; Remember also to update the logrotate configuration.
-chroot = /var/lib/stunnel4/
-; Chroot jail can be escaped if setuid option is not used
-setuid = stunnel4
-setgid = stunnel4
-
-; PID is created inside the chroot jail
-pid = /stunnel4.pid
-
-; Debugging stuff (may useful for troubleshooting)
-;debug = 7
-;output = /var/log/stunnel4/stunnel.log
-
-; **************************************************************************
-; * Service defaults may also be specified in individual service sections  *
-; **************************************************************************
-
-; Certificate/key is needed in server mode and optional in client mode
-cert = /etc/ssl/private/cert.pem
-
-; Authentication stuff needs to be configured to prevent MITM attacks
-; It is not enabled by default!
-; verify = 2
-; Don't forget to c_rehash CApath
-; CApath is located inside chroot jail
-;CApath = /certs
-; It's often easier to use CAfile
-;CAfile = /etc/stunnel/certs.pem
-; CAfile = etc/ssl/certs/ca-certificates.crt
-; Don't forget to c_rehash CRLpath
-; CRLpath is located inside chroot jail
-;CRLpath = /crls
-; Alternatively CRLfile can be used
-;CRLfile = /etc/stunnel/crls.pem
-
-; Disable support for insecure SSLv2 protocol
-options = NO_SSLv3
-
-; Workaround for Eudora bug
-;options = DONT_INSERT_EMPTY_FRAGMENTS
-
-; These options provide additional security at some performance degradation
-;options = SINGLE_ECDH_USE
-;options = SINGLE_DH_USE
-
-options = CIPHER_SERVER_PREFERENCE
-renegotiation = no
-
-ciphers=${SECURE_CIPHER_LIST}
-EOF
-
-# enable stunnel to automatically start services
-sed -i "s|ENABLED=0|ENABLED=1|" /etc/default/stunnel4
 
 # shellinabox: create default configuration
-set ${SHELLINABOX_PORT:=12319}
 CONF=/etc/default/shellinabox
 cat > ${CONF} <<EOF
 SHELLINABOX_DAEMON_START=1
-SHELLINABOX_PORT=${SHELLINABOX_PORT}
-SHELLINABOX_ARGS="--no-beep --disable-ssl --localhost-only"
-EOF
-
-# shellinabox: add stunnel entry
-set ${ACCEPT_PORT:=12320}
-set ${BIND_ADDR:=127.0.0.1}
-CONF=/etc/stunnel/stunnel.conf
-cat >> ${CONF} <<EOF
-
-[shellinabox]
-accept = ${ACCEPT_PORT}
-connect = ${BIND_ADDR}:${SHELLINABOX_PORT}
-TIMEOUTclose = 0
+SHELLINABOX_PORT=12320
+SHELLINABOX_ARGS="--no-beep"
 EOF
 
 # set default theme as white on black

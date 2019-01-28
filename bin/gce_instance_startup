@@ -50,10 +50,6 @@ EOF
 chown solr:solr ${FILE}
 fi
 
-# disable stunnel4 services
-sed -i "s|ENABLED=1|ENABLED=0|" /etc/default/stunnel4
-systemctl stop stunnel4
-
 # disable apache2 confs
 a2dissite invoiceninja
 a2dissite support
