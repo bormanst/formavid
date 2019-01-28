@@ -93,31 +93,6 @@ if [ ! -d "${TEMPLATES}" ]; then
     sed -i "s/sedbrsize/57px/g" ${APP_DIR}/*.php
 fi
 
-
-# shellinabox: create default configuration
-CONF=/etc/default/shellinabox
-cat > ${CONF} <<EOF
-SHELLINABOX_DAEMON_START=1
-SHELLINABOX_PORT=12320
-SHELLINABOX_ARGS="--no-beep"
-EOF
-
-# set default theme as white on black
-ENABLED=/etc/shellinabox/options-enabled
-AVAILABLE=/etc/shellinabox/options-available
-rm ${ENABLED}/00*
-ln -s ${AVAILABLE}/00_White\ On\ Black.css ${ENABLED}/00+White\ On\ Black.css
-ln -s ${AVAILABLE}/00+Black\ on\ White.css ${ENABLED}/00_Black\ on\ White.css
-
-# shellinabox: update securetty (for root login)
-echo >> /etc/securetty
-echo "# shellinabox" >> /etc/securetty
-declare -i COUNT=0
-while [ $COUNT -le 40 ]; do
-    echo "pts/$COUNT" >> /etc/securetty
-    ((COUNT=$COUNT+1))
-done
-
 # set random early reboot when needed: 2 <= time < 5
 RANDOM_EARLY_TIME="0$((2 + RANDOM % 3)):$((RANDOM % 6))$((RANDOM % 10))"
 

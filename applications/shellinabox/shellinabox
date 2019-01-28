@@ -1,0 +1,76 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=shellinabox
+
+# log check
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# check conf
+CONF=/etc/default/${PACKAGE}
+if [ -f "${CONF}" ];  then
+    MESSSAGE="File ${CONF} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# apply overlay
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -rf ${OVERLAY_DIR}/* /
+    MESSSAGE="Applied overlay for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# create default configuration
+cat > ${CONF} <<EOF
+SHELLINABOX_DAEMON_START=1
+SHELLINABOX_PORT=12320
+SHELLINABOX_ARGS="--no-beep"
+EOF
+
+# set default theme as white on black
+ENABLED=/etc/shellinabox/options-enabled
+AVAILABLE=/etc/shellinabox/options-available
+rm ${ENABLED}/00*
+ln -s ${AVAILABLE}/00_White\ On\ Black.css ${ENABLED}/00+White\ On\ Black.css
+ln -s ${AVAILABLE}/00+Black\ on\ White.css ${ENABLED}/00_Black\ on\ White.css
+
+# shellinabox: update securetty (for root login)
+echo >> /etc/securetty
+echo "# shellinabox" >> /etc/securetty
+declare -i COUNT=0
+while [ $COUNT -le 40 ]; do
+    echo "pts/$COUNT" >> /etc/securetty
+    ((COUNT=$COUNT+1))
+done
+
+# restart service
+systemctl restart ${PACKAGE}
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0

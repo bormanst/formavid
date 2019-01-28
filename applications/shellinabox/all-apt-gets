@@ -4,7 +4,7 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-PACKAGE=base
+PACKAGE=shellinabox
 
 # log check
 MESSSAGE="Check packages: ${PACKAGE}"
@@ -13,11 +13,10 @@ echo ${MESSSAGE} >> ${LOG}
 # check packages
 PKG_CHECK=${PACKAGE^^}
 # check dir
-APP_DIR=${WEBROOT}/admin
+APP_DIR=/etc/${PACKAGE}
 if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ""
     echo ""
-    echo "WARNING! ${PACKAGE} already exists."
     echo "WARNING! ${PACKAGE} may have already been initialized by this script."
     echo "WARNING! Re-running this script may corrupt existing system."
     echo "WARNING! Please review script in applications/${PACKAGE} for further details."
@@ -26,10 +25,11 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     MESSSAGE="Skipping package install for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
-    # add base packages
-    export APTGETS="apt-listchanges apt-show-versions apt-transport-https apticron build-essential cron-apt dtach etckeeper git libauthen-pam-perl libffi-dev libio-pty-perl libnet-ssleay-perl libssl-dev monit ncurses-term openssl perl python-babel python-debtcollector python-dev python-dialog python-funcsigs python-iso8601 python-keystoneauth1 python-keystoneclient python-monotonic python-msgpack python-netaddr python-netifaces python-openssl python-oslo.config python-oslo.i18n python-oslo.serialization python-oslo.utils python-pbr python-pip python-pyparsing python-requests-futures python-rfc3986 python-stevedore python-swiftclient python-wrapt rsync unzip"
+    # install latest
+    export APTGETS=${PACKAGE}
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"
     echo ${MESSSAGE} | tee -a ${LOG} ${DEFAULT_ENVARS}
 fi
+
