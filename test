@@ -1,0 +1,17 @@
+#!/bin/bash -e
+# Copyright (C) 2019 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# get cur dir
+RET_DIR="${PWD}"
+
+# cd froamvid
+cd /usr/local
+printf "PWD is ${PWD}\n"
+
+cd "${RET_DIR}"
+printf "PWD is ${PWD}\n"
+
+exit 0

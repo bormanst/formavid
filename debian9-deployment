@@ -4,6 +4,9 @@
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
+# get cur dir
+RET_DIR="${PWD}"
+
 # update apt
 apt-get update
 
@@ -45,5 +48,7 @@ printf "Bash (admin sudo) - Activate BorgBackup (optional).\n"
 printf "    Set: /etc/formavid/default_envars/CONFIGURE_BORGBACKUP=\"True\"\n"
 printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
 printf "\n\n"
+
+cd "${RET_DIR}"
 
 exit 0
