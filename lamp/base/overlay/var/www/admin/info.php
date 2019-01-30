@@ -78,8 +78,9 @@
   </ul>
 </div>
 <div>
-  <h3><a href="https://www.invoiceninja.com/" title="Invoice Ninja"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</a></h3><br>
+  <h3><a href="https://app.invoiceninja.com/invoice_now?rc=p1sk0fldfqful0otedp3haw66i0rlunt" title="Invoice Ninja"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</a></h3><br>
   <ul>
+    <li><a href="https://app.invoiceninja.com/invoice_now?rc=p1sk0fldfqful0otedp3haw66i0rlunt" title="Free Cloud Account">Free Cloud Account</a></li>
     <li><a href="https://invoice-ninja.readthedocs.io/en/latest/" title="Invoice Ninja User Guide">Invoice Ninja User Guide</a></li>
     <li><a href="https://www.invoiceninja.com/invoice-template-designs/" title="Invoice & Quotation Template Designs">Invoice & Quotation Template Designs</a></li>
     <li><a href="https://www.invoiceninja.com/forums/forum/support/" title="Invoice Ninja Support Forum">Invoice Ninja Support Forum</a></li>

@@ -119,10 +119,11 @@
     <li>cssadmin access.</li>
     <li>root access (when enabled by admin).</li>
   </ul>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Invoice Ninja</h3></div><br>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/invoiceninja.png"/><br><br>Invoice Ninja</h3></div><br>
   <ul>
     <li>Initial apache password entered for Invoice Ninja setup page occurs during appliance install.</li>
     <li>Special note: application requires <b>user@BASESITENAME.TLD:password</b> for access (email address not just user name.)</li>
+    <li>Sign up for a <a href="https://app.invoiceninja.com/invoice_now?rc=p1sk0fldfqful0otedp3haw66i0rlunt" title="Free Cloud Account">Free Cloud Account</a></li>
   </ul>
   <div><h3><a href="/solr.php" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div><br>
   <ul>

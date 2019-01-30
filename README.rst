@@ -164,11 +164,11 @@ Credentials *(passwords required for initialization)*
 .. _Dovecot: https://www.dovecot.org/
 .. _Drupal: https://www.drupal.org/
 .. _Fail2ban: https://www.fail2ban.org/
+.. _Invoice Ninja: https://app.invoiceninja.com/invoice_now?rc=p1sk0fldfqful0otedp3haw66i0rlunt
 .. _MariaDB: https://mariadb.org/
 .. _OpenSSH: https://www.openssh.com/
 .. _Postfix: https://www.postfix.org/
 .. _ProFTPD: https://www.proftpd.org/
 .. _Roundup: https://roundup.sourceforge.net/
-.. _Invoice Ninja: https://www.invoiceninja.com/
 .. _Webmin: https://www.webmin.com/
 .. _Webshell: https://code.google.com/p/shellinabox/
