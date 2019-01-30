@@ -9,16 +9,16 @@
 
 
 
-Debian 9 or compatible base distro via ssh:
+Debian 9 or compatible base distro via ssh as 'root':
 
 apt-get update && apt-get install -y git
 git clone https://github.com/bormanst/formavid /usr/local/formavid
 cd /usr/local/formavid
 ./install
 
-The install script is meant to be run from a bash client on the HOST and will
-deploy the appliance onto a compatible base distro that uses standard locations,
-Systemd, and the bash shell. It is assumed that a "base distro" has only core
+The install script is meant to be run, as 'root', from a bash client on the HOST
+and will deploy the appliance onto a compatible base distro that uses standard
+locations, Systemd, and bash. It is assumed that a "base distro" has only core
 utilities and a ssh server installed - no desktop, other servers, or applications.
 However, if the distro has a component already installed, such as apache or mysql,
 then the install script should automatically skip installing the corresponding
