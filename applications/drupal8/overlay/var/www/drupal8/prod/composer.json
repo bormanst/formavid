@@ -28,7 +28,7 @@
         "drupal/console": "^1.0.2",
         "drupal/core": "^8.6.0",
         "drupal/ctools": "^3.0",
-        "drupal/devel": "^1.2",
+        "drupal/devel": "^2.0",
         "drupal/features": "^3.8",
         "drupal/field_group": "^1.0",
         "drupal/fivestar": "1.x-dev",

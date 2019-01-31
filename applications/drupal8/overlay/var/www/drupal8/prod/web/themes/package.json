@@ -39,7 +39,7 @@
     "eslint-config-airbnb": "^17.1",
     "eslint-config-airbnb-standard": "^2.1",
     "eslint-config-prettier": "^3.6",
-    "eslint-plugin-import": "^2.15",
+    "eslint-plugin-import": "^2.16",
     "eslint-plugin-jsx-a11y": "^6.2",
     "eslint-plugin-prettier": "^3.0",
     "eslint-plugin-react": "^7.12",
@@ -47,4 +47,3 @@
     "prettier": "^1.16"
   }
 }
-
