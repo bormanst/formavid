@@ -88,15 +88,17 @@ WEB_ROOT=${PROJECT_DIR}/web
 # need to stop apache2 for --standalone
 # --apache uses apache2 plugin
 # certbot certonly --cert-name ${APP_HOSTNAME} --apache --preferred-challenges http --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME} -d admin.${APP_HOSTNAME} -d billing.${APP_HOSTNAME} -d support.${APP_HOSTNAME}
-# modify the certbot renew command in /etc/cron.d/certbot accordingly - see 'certbot help renew' for options
+# webroot: DOMAINS="-w ${WEB_ROOT1} -d ${DOMAIN1_1} ... -w ${WEB_ROOTn} -d ${DOMAINn_1} ... -d ${DOMAINn_n}"
 # webroot: METHOD="--webroot --preferred-challenges http"
-# webroot: WEBROOTS="-w ${WEB_ROOT1} -w ${WEB_ROOT2} ... -w ${WEB_ROOTn}"
+# standalone: DOMAINS=
 # standalone: METHOD="--standalone"
-# standalone: WEBROOTS=
+# apache: DOMAINS="-d ${DOMAIN1} ... -d ${DOMAINn}"
+DOMAINS="-d ${APP_HOSTNAME}"
 METHOD="--apache --preferred-challenges http"
-certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n -d ${APP_HOSTNAME}
+certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n ${DOMAINS}
 
 # update cron
+# see 'certbot help renew' for options
 # apache: WEBROOTS=
 # standalone: WEBROOTS=
 # webroot: WEBROOTS="-w ${WEB_ROOT1} -w ${WEB_ROOT2} ... -w ${WEB_ROOTn}"
@@ -104,7 +106,6 @@ WEBROOTS=
 RENEW="certbot -q renew"
 CRON_MOD="${RENEW} --cert-name ${APP_HOSTNAME} ${METHOD} ${WEBROOTS}"
 sed -i "s/${RENEW}/${CRON_MOD}/g" /etc/cron.d/certbot
-
 
 # update apache
 CONF=/etc/apache2/mods-available/ssl.conf
