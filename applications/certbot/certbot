@@ -79,7 +79,41 @@ fi
 MESSSAGE="Configuring certs for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
-WEB_ROOT=${PROJECT_DIR}/web
+# create deploy hook
+MESSSAGE="Creating certbot deploy hook file for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+DEPLOY_HOOK=/etc/formavid/certbot_deploy_hook
+cat > ${DEPLOY_HOOK} <<EOF
+#!/bin/bash
+
+# update shellinabox if base cert
+UPDATE_DIR=/var/lib/shellinabox
+if [ "\${RENEWED_LINEAGE}" == "/etc/letsencrypt/live/${APP_HOSTNAME}" ] && [ -d "\${UPDATE_DIR}" ]; then
+    # certs to update
+    BACKUP_CERT=\${UPDATE_DIR}/certificate.pem.bak
+    CERT=\${UPDATE_DIR}/certificate.pem
+    DOMAIN_CERT=\${UPDATE_DIR}/certificate-${APP_HOSTNAME}.pem
+    # check cert
+    if [ -f "\${CERT}" ]; then
+        # create backup if none
+        if [ ! -f "\${BACKUP_CERT}" ]; then mv -f \${CERT} \${BACKUP_CERT}; fi
+        # remove old cert
+        rm \${CERT}
+    fi
+    # make new cert
+    cat \${RENEWED_LINEAGE}/fullchain.pem \${RENEWED_LINEAGE}/privkey.pem > \${CERT}
+    # set perms
+    chown shellinabox:shellinabox \${CERT}
+    # update domain cert
+    cp -fp \${CERT} \${DOMAIN_CERT}
+    # restart shellinabox
+    systemctl restart shellinabox
+fi
+EOF
+
+# set perms
+chmod 0755 ${DEPLOY_HOOK}
 
 # get cert
 # can add more webroots and domains that have DNS entries
@@ -94,8 +128,9 @@ WEB_ROOT=${PROJECT_DIR}/web
 # standalone: METHOD="--standalone"
 # apache: DOMAINS="-d ${DOMAIN1} ... -d ${DOMAINn}"
 DOMAINS="-d ${APP_HOSTNAME}"
+HOOKS="--deploy-hook ${DEPLOY_HOOK}"
 METHOD="--apache --preferred-challenges http"
-certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n ${DOMAINS}
+certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n ${HOOKS} ${DOMAINS}
 
 # update cron
 # see 'certbot help renew' for options
@@ -104,8 +139,8 @@ certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAI
 # webroot: WEBROOTS="-w ${WEB_ROOT1} -w ${WEB_ROOT2} ... -w ${WEB_ROOTn}"
 WEBROOTS=
 RENEW="certbot -q renew"
-CRON_MOD="${RENEW} --cert-name ${APP_HOSTNAME} ${METHOD} ${WEBROOTS}"
-sed -i "s/${RENEW}/${CRON_MOD}/g" /etc/cron.d/certbot
+RENEW_MOD="${RENEW} --cert-name ${APP_HOSTNAME} ${METHOD} ${HOOKS} ${WEBROOTS}"
+sed -i "s/${RENEW}/${RENEW_MOD}/g" /etc/cron.d/certbot
 
 # update apache
 CONF=/etc/apache2/mods-available/ssl.conf
@@ -139,20 +174,6 @@ if (systemctl -q is-active postfix); then
     postconf -e "smtpd_tls_CAfile = /etc/letsencrypt/live/${APP_HOSTNAME}/cert.pem"
     # reload postfix
     postfix reload
-fi
-
-# update shellinabox
-CONF=/var/lib/shellinabox/certificate.pem
-if [ -f "${CONF}" ]; then
-    # create backup if none
-    if [ ! -f "${CONF}.bak" ]; then mv -f /var/lib/shellinabox/certificate.pem ${CONF}.bak; fi
-    # add new pems
-    rm ${CONF}
-    cat /etc/letsencrypt/live/${APP_HOSTNAME}/fullchain.pem /etc/letsencrypt/live/${APP_HOSTNAME}/privkey.pem > ${CONF}
-    chown shellinabox:shellinabox ${CONF}
-    cp -fp ${CONF} /var/lib/shellinabox/certificate-${APP_HOSTNAME}.pem
-    # restart shellinabox
-    systemctl restart shellinabox
 fi
 
 # update webmin
