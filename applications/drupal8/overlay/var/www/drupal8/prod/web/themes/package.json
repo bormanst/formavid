@@ -44,6 +44,6 @@
     "eslint-plugin-prettier": "^3.0",
     "eslint-plugin-react": "^7.12",
     "gulp-watch": "^5.0",
-    "prettier": "^1.16"
+    "prettier": "^1.16.3"
   }
 }

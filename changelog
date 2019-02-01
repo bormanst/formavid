@@ -1,3 +1,26 @@
+formavid (15.1.13) stable; urgency=low
+
+  * Updated drupal modules.
+  
+  * Major component versions:
+
+    adminer         4.2.5
+    apache2         2.4.25
+    borgbackup      1.0.9
+    dovecot         2.2.27
+    drupal          8.6.7 (upstream archive)
+    drush           9.5.2 (upstream archive)
+    fail2ban        0.9.6
+    invoiceninja    4.5.8 (upstream archive)
+    mariadb         10.1.37
+    php             7.0.33
+    proftpd         1.35
+    postfix         3.1.8
+    roundup         1.6.0 (upstream archive)
+    solr (optional) 7.6.0 (upstream archive)
+
+ -- Sean Borman <bormanst@gmail.com>  Fri, 01 Feb 2019 01:43:37 -0500
+
 formavid (15.1.12) stable; urgency=low
 
   * Updated drupal modules.
