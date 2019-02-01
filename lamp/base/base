@@ -32,8 +32,8 @@ fi
 # empty assumes 'root'
 PRIVILEGED=
 
-# GCE installs as privileged user so need sudo
-if [ ! -z "${GCS_PROJECT_ID}" ] && [ "${GCS_PROJECT_ID}" != "None" ] && $(hash sudo 2>/dev/null); then PRIVILEGED=sudo; fi
+# check sudo
+if $(hash sudo 2>/dev/null); then PRIVILEGED=sudo; fi
 
 # verify PRIVILEGED
 if [ "${EUID}" -ne 0 ] && [ -z "${PRIVILEGED}" ]; then
