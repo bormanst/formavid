@@ -29,6 +29,19 @@ if [ -d "${APP_DIR}" ]; then
     exit 0
 fi
 
+# empty assumes 'root'
+PRIVILEGED=
+
+# GCE installs as privileged user so need sudo
+if [ ! -z "${GCS_PROJECT_ID}" ] && [ "${GCS_PROJECT_ID}" != "None" ] && $(hash sudo 2>/dev/null); then PRIVILEGED=sudo; fi
+
+# verify PRIVILEGED
+if [ "${EUID}" -ne 0 ] && [ -z "${PRIVILEGED}" ]; then
+    MESSSAGE="The configure script requires 'root' or sudo. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    exit 0
+fi
+
 # log configure
 MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
@@ -53,17 +66,17 @@ echo ${MESSSAGE} | tee -a ${LOG}
 # create admin
 USER=admin
 if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash ${USER}
-    echo ${USER}:${APP_PASS} | chpasswd
-    usermod -aG sudo ${USER}
+    ${PRIVILEGED} bash -c "useradd -U -m -s /bin/bash ${USER}"
+    ${PRIVILEGED} bash -c "echo ${USER}:${APP_PASS} | chpasswd"
+    ${PRIVILEGED} bash -c "usermod -aG sudo ${USER}"
 fi
 
-# create cssadmin user
+# create cssadmin
 USER=cssadmin
 if [ $(grep -c "^${USER}:" /etc/passwd) -eq 0 ]; then
-    useradd -U -m -s /bin/bash ${USER}
-    echo ${USER}:${APP_PASS} | chpasswd
-    echo "cd ${PROJECT_DIR}/web/themes" >> /home/${USER}/.bashrc
+    ${PRIVILEGED} bash -c "useradd -U -m -s /bin/bash ${USER}"
+    ${PRIVILEGED} bash -c "echo ${USER}:${APP_PASS} | chpasswd"
+    ${PRIVILEGED} bash -c "echo 'cd /var/www/drupal8/prod/web/themes' >> /home/${USER}/.bashrc"
 fi
 
 # tools: add hosts entry
