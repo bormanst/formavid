@@ -226,6 +226,16 @@ echo ""
 # clean up
 rm -rf ${SRC}/*${PACKAGE}*
 
+# update admin tools page
+MESSSAGE="Configuring admin tools page for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+FILE=/var/www/admin/index.php
+# enable admin link
+sed -i "s|<!--||" ${FILE}
+sed -i "s|-->||" ${FILE}
+# remove setup link
+sed -i '/solrsetup/d' ${FILE}
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}
