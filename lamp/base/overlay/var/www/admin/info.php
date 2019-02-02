@@ -101,12 +101,11 @@
 <div>
   <h3><a href="https://letsencrypt.org/" title="Let’s Encrypt"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/letsencrypt.png"/><br><br>Let’s Encrypt</a></h3><br>
   <ul>
-    <li><a href="/certbot.php" title="Certbot Local Info">Let’s Encrypt</a></li>
     <li><a href="https://letsencrypt.org/getting-started/" title="Let’s Encrypt Getting Started">Let’s Encrypt Getting Started</a></li>
     <li><a href="https://letsencrypt.org/docs/" title="Let’s Encrypt Docs">Let’s Encrypt Docs</a></li>
     <li><a href="https://letsencrypt.org/docs/faq/" title="Let’s Encrypt FAQs">Let’s Encrypt FAQs</a></li>
     <li><a href="https://community.letsencrypt.org/" title="Let’s Encrypt Forums">Let’s Encrypt Forums</a></li>
-    <li><a href="https://letsencrypt.org/donate/" title="Let’s Encrypt Donate">Certbot <b><i>Donate</i></b></a></li>
+    <li><a href="https://letsencrypt.org/donate/" title="Let’s Encrypt Donate">Let’s Encrypt <b><i>Donate</i></b></a></li>
   </ul>
 </div>
 <div>
