@@ -155,7 +155,7 @@ ${FORMAVID}/bin/initialize/python/webmin.py
 # make system theme overlay - used in bin/deploy/python/create-drupal-stack.py as well
 THEME=/usr/share/webmin/system-theme
 mkdir -p ${THEME}/unauthenticated
-cat > ${THEME}/theme-info<<EOF
+cat > ${THEME}/theme.info<<EOF
 desc=Appliance System Theme
 overlay=1
 overlays=authentic-theme
