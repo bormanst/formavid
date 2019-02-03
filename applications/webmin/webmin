@@ -153,18 +153,25 @@ echo ${MESSSAGE} | tee -a ${LOG}
 ${FORMAVID}/bin/initialize/python/webmin.py
 
 # make system theme overlay - used in bin/deploy/python/create-drupal-stack.py as well
-THEME=/usr/share/webmin/system-theme
-mkdir -p ${THEME}/unauthenticated
-cat > ${THEME}/theme.info<<EOF
+THEME=system-theme
+THEMEDIR=/usr/share/webmin/${THEME}
+mkdir -p ${THEMEDIR}/unauthenticated
+cat > ${THEMEDIR}/theme.info<<EOF
 desc=Appliance System Theme
 overlay=1
 overlays=authentic-theme
 version=1.0
 EOF
-cat > ${THEME}/config<<EOF
+cat > ${THEMEDIR}/config<<EOF
 headhtml=<link rel='stylesheet' type='text/css' href='/unauthenticated/system/components/asset-builds/css/header.css' />
 prebody=<header class='header' role='banner'><div id='block-${SITENAME}-branding' class='block block-system block-system-branding-block'><a href='/sysinfo.cgi?' title='Home' rel='home' class='site-logo'><img src='/unauthenticated/system/logo.svg' alt='Home' /></a><div class='site-name'><a href='/sysinfo.cgi?' title='Home' rel='home'>${SITETITLE} Webmin</a><br /></div></div></header>
 EOF
+
+# activate overlay
+CONF=/etc/webmin/config
+sed -i "s|^theme=\(.*\)|theme=authentic-theme ${THEME}|" ${CONF}
+CONF=/etc/webmin/miniserv.conf
+sed -i "s|^preroot=\(.*\)|preroot=authentic-theme ${THEME}|" ${CONF}
 
 # clean up
 rm -f /etc/webmin/*.cache
