@@ -158,7 +158,7 @@ mkdir -p ${THEME}/unauthenticated
 cat > ${THEME}/theme-info<<EOF
 desc=Appliance System Theme
 overlay=1
-overlays=authentic 
+overlays=authentic-theme
 version=1.0
 EOF
 cat > ${THEME}/config<<EOF
