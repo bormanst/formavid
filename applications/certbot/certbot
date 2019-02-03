@@ -93,6 +93,7 @@ if [ "\${RENEWED_LINEAGE}" == "/etc/letsencrypt/live/${APP_HOSTNAME}" ] && [ -d 
     # certs to update
     BACKUP_CERT=\${UPDATE_DIR}/certificate.pem.bak
     CERT=\${UPDATE_DIR}/certificate.pem
+    ADMIN_CERT=\${UPDATE_DIR}/certificate-admin.${APP_HOSTNAME}.pem
     DOMAIN_CERT=\${UPDATE_DIR}/certificate-${APP_HOSTNAME}.pem
     # check cert
     if [ -f "\${CERT}" ]; then
@@ -105,7 +106,8 @@ if [ "\${RENEWED_LINEAGE}" == "/etc/letsencrypt/live/${APP_HOSTNAME}" ] && [ -d 
     cat \${RENEWED_LINEAGE}/fullchain.pem \${RENEWED_LINEAGE}/privkey.pem > \${CERT}
     # set perms
     chown shellinabox:shellinabox \${CERT}
-    # update domain cert
+    # update domain certs
+    cp -fp \${CERT} \${ADMIN_CERT}
     cp -fp \${CERT} \${DOMAIN_CERT}
     # restart shellinabox
     systemctl restart shellinabox
@@ -192,11 +194,11 @@ fi
 # logrotate file for letsencrypt
 # MESSSAGE="Creating logrotate file for ${PACKAGE} ..."
 # echo ${MESSSAGE} | tee -a ${LOG}
-# 
+#
 # FILE=/etc/logrotate.d/letsencrypt
 # cat > ${FILE} <<EOF
 # Logrotate file for letsencrypt
-# 
+#
 # ${PACKAGE_LOG_DIR}/*.log {
 #         weekly
 #         missingok
