@@ -476,7 +476,7 @@ def main():
         lnTheme = "/var/www/support/html/theme"
         system("ln -s %s %s" % (sysTheme,lnTheme))
         # Symlink system theme to webmin - used in apllications/webmin/webmin as well
-        lnTheme = "/usr/share/webmin/authentic-theme/unauthenticated/system"
+        lnTheme = "/usr/share/webmin/system-theme/unauthenticated/system"
         system("ln -s %s %s" % (sysTheme,lnTheme))
 
     # Set local gulp for SASS.

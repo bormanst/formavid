@@ -152,21 +152,19 @@ MESSSAGE="Initializing admin info for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 ${FORMAVID}/bin/initialize/python/webmin.py
 
-# set font
-sed -i "s|^settings_font_family=(.*)|settings_font_family='sans-serif'|" /etc/webmin/authentic-theme/settings-root
-
-# set theme - used in bin/deploy/python/create-drupal-stack.py as well
-THEME=/usr/share/webmin/authentic-theme/authentic-init.pm
-
-# set style
-HTML='<link rel="stylesheet" type="text/css" href="/unauthenticated/system/components/asset-builds/css/header.css" />'
-EXPR="print '${HTML}' . \"\\\n\";"
-sed -i "/current_theme\/styles.css/i\    ${EXPR}" ${THEME}
-
-# set header
-HTML="<header class=\"header\" role=\"banner\"><div id=\"block-${SITENAME}-branding\" class=\"block block-system block-system-branding-block\"><a href=\"/\" title=\"Home\" rel=\"home\" class=\"site-logo\"><img src=\"/unauthenticated/system/logo.svg\" alt=\"Home\" /></a><div class=\"site-name\"><a href=\"/\" title=\"Home\" rel=\"home\">${SITETITLE} Webmin</a><br /></div></div></header>"
-EXPR="print '${HTML}' . \"\\\n\";"
-sed -i "/defined(&theme_prebody)/i\    ${EXPR}" ${THEME}
+# make system theme overlay - used in bin/deploy/python/create-drupal-stack.py as well
+THEME=/usr/share/webmin/system-theme
+mkdir -p ${THEME}/unauthenticated
+cat > ${THEME}/theme-info<<EOF
+desc=Appliance System Theme
+overlay=1
+overlays=authentic 
+version=1.0
+EOF
+cat > ${THEME}/config<<EOF
+headhtml=<link rel='stylesheet' type='text/css' href='/unauthenticated/system/components/asset-builds/css/header.css' />
+prebody=<header class='header' role='banner'><div id='block-${SITENAME}-branding' class='block block-system block-system-branding-block'><a href='/sysinfo.cgi?' title='Home' rel='home' class='site-logo'><img src='/unauthenticated/system/logo.svg' alt='Home' /></a><div class='site-name'><a href='/sysinfo.cgi?' title='Home' rel='home'>${SITETITLE} Webmin</a><br /></div></div></header>
+EOF
 
 # clean up
 rm -f /etc/webmin/*.cache
