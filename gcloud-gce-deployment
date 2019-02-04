@@ -58,27 +58,6 @@ printf "\n"
 # Force lowercase.
 GCS_ACCOUNT="${GCS_ACCOUNT,,}"
 
-# Firewall: ask update.
-printf "\n"
-printf "Do you wish to open the default VPC firewall ports for the applaince?\n"
-printf "Otherwise, the firewall will not be updated and as result some of the\n"
-printf "appliance services may not be reachable in the expected fashion.\n"
-printf "\n"
-printf "If the project firewall has already been configured then skip this step.\n"
-printf "In that case, it is recommended to manually adjust the firewall as needed\n"
-printf "so as not to open a port that may have been intentionally closed.\n"
-printf "\n"
-printf "The script gcloud-vpc-firewall may be run at a later time or the\n"
-printf "firewall can be manually configured using the console\n"
-printf "https://console.cloud.google.com/networking/firewalls/list?project= \n"
-printf "\n"
-read -p "Update VPC firewall (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) FIREWALL_UPDATE="True";;
-  * ) FIREWALL_UPDATE="False";;
-esac
-printf "\n"
-
 # Get DOMAIN.
 DOMAIN=""
 until [[ ${#DOMAIN} -ge 3 && "${DOMAIN}" == *[.]* ]]; do
@@ -125,20 +104,6 @@ case "${CHOICE^^}" in
 esac
 printf "\n"
 
-# Create initial stack ask.
-printf "\n"
-printf "The required information has been gathered to create the main drupal site.\n"
-printf "It is recommended to deploy the initial drupal stack during appliance creation\n"
-printf "but customizations can be made prior to manually running the python script\n"
-printf "create-drupal-stack.py for the initial stack creation.\n"
-printf "\n"
-read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
-case "${CHOICE^^}" in
-  Y|YES ) CREATE_DRUPAL_STACK="True";;
-  * ) CREATE_DRUPAL_STACK="False";;
-esac
-printf "\n"
-
 # BorgBackup: ask install.
 printf "\n"
 printf "Do you wish to configure BorgBackup server?\n"
@@ -158,29 +123,6 @@ case "${CHOICE^^}" in
 esac
 printf "\n"
 
-# Get default password.
-PASSWORD=""
-PASSWORD_LENGTH=8
-printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed.\n"
-# Loop until valid password/check.
-until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
-    # Notify password restrictions.
-    printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
-    # Get password.
-    read -p "Please enter default password for appliance:" -s PASSWORD
-    printf "\n"
-    # Confirm password.
-    read -p "Please confirm default password for appliance:" -s CHECK
-    # Check passwords match.
-    if [ ! "${PASSWORD}" == "${CHECK}" ]; then
-        # Blank password.
-        PASSWORD=""
-        # Notify passwords do not match.
-        printf "\n\n\n***Passwords do not match***\n\n"
-    fi
-done
-printf "\n\n"
-
 # Project IDs must be between 6 and 30 characters.
 GCS_PROJECT_ID_MIN=6
 GCS_PROJECT_ID_MAX=30
@@ -193,54 +135,76 @@ let RSIZE=29-${#DOMAIN_NO_PERIODS}
 # Initialize GCS_PROJECT_ID.
 GCS_PROJECT_ID=""
 
-# Generate random project id based on domain if possible.
-if [ ${RSIZE} -ge 6 ]; then
-    # Get random extension.
-    RANDOM_EXT=`head /dev/urandom | tr -dc a-z0-9 | head -c ${RSIZE}; echo ''`
-    # Set example GCS_PROJECT_ID.
-    GCS_PROJECT_ID="${DOMAIN_NO_PERIODS}-${RANDOM_EXT}"
-    # Notify user.
-    printf "\nProject Id must be unique and is NOT re-usable even if the project is deleted.\nA random Project Id, based on domain, has been generated.\nIt still has to pass a uniqueness test within gcloud.\n"
-    # Prompt user.
-    read -p "Is the Project Id of ${GCS_PROJECT_ID} alright to use (y/n)?" CHOICE
-    case "${CHOICE^^}" in
-      Y|YES ) :;;
-      * ) GCS_PROJECT_ID="";;
-    esac
-    printf "\n"
-fi
+printf "\n"
+read -p "Use existing GCS project (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) EXISTING_PROJECT="True";;
+  * ) EXISTING_PROJECT="False";;
+esac
+printf "\n"
 
-# Check GCS_PROJECT_ID exists.
-DATA=`gcloud projects list --format="value(PROJECT_ID)"`
-DATA=`echo ${DATA} | sed 's/\s/|/g'`
-if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
-    printf "\nProject Id currently exists.\n"
-    read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
-    case "${CHOICE^^}" in
-      Y|YES ) :;;
-      * ) GCS_PROJECT_ID="";;
-    esac
+if [ "${EXISTING_PROJECT}" == "True" ]; then
+    # Select GCS_PROJECT_ID.
+    PS3="Select one of the current GCE projects:"
+    LIST=`gcloud projects list --format="value(PROJECT_ID)"`
+    DATA=`echo ${LIST} | sed 's/\s/|/g'`
+    OPTIONLIST=`echo ${LIST} | sed 's/\s/ /g'`
+    OPTIONS=(${OPTIONLIST})
+    select option in "${OPTIONS[@]}"; do
+        if [ ! -z ${option} ]; then
+            GCS_PROJECT_ID="${option}"
+            break
+        fi
+    done
     printf "\n"
-fi
-
-# Verify format GCS_PROJECT_ID.
-until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le ${GCS_PROJECT_ID_MAX} && ! ( "${GCS_PROJECT_ID}" =~ [A-Z] ) && "${GCS_PROJECT_ID}" =~ ^[a-z] && "${GCS_PROJECT_ID}" == *[a-z0-9\-]* ]]; do
-    # notify GCS_PROJECT_ID restrictions.
-    printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n"
-    # get GCS_PROJECT_ID
-    read -p "Please enter a Project Id to use:" GCS_PROJECT_ID
-    printf "\n"
-    # Check GCS_PROJECT_ID exists.
-    if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
-        printf "\nProject Id currently exists.\n"
-        read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+else
+    # Generate random project id based on domain if possible.
+    if [ ${RSIZE} -ge 6 ]; then
+        # Get random extension.
+        RANDOM_EXT=`head /dev/urandom | tr -dc a-z0-9 | head -c ${RSIZE}; echo ''`
+        # Set example GCS_PROJECT_ID.
+        GCS_PROJECT_ID="${DOMAIN_NO_PERIODS}-${RANDOM_EXT}"
+        # Notify user.
+        printf "\nProject Id must be unique and is NOT re-usable even if the project is deleted.\nA random Project Id, based on domain, has been generated.\nIt still has to pass a uniqueness test within gcloud.\n"
+        # Prompt user.
+        read -p "Is the Project Id of ${GCS_PROJECT_ID} alright to use (y/n)?" CHOICE
         case "${CHOICE^^}" in
-          Y|YES ) break;;
+          Y|YES ) :;;
           * ) GCS_PROJECT_ID="";;
         esac
         printf "\n"
     fi
-done
+    # Check GCS_PROJECT_ID exists.
+    DATA=`gcloud projects list --format="value(PROJECT_ID)"`
+    DATA=`echo ${DATA} | sed 's/\s/|/g'`
+    if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+        printf "\nProject Id currently exists.\n"
+        read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+        case "${CHOICE^^}" in
+          Y|YES ) :;;
+          * ) GCS_PROJECT_ID="";;
+        esac
+        printf "\n"
+    fi
+    # Verify format GCS_PROJECT_ID.
+    until [[ ${#GCS_PROJECT_ID} -ge ${GCS_PROJECT_ID_MIN} && ${#GCS_PROJECT_ID} -le ${GCS_PROJECT_ID_MAX} && ! ( "${GCS_PROJECT_ID}" =~ [A-Z] ) && "${GCS_PROJECT_ID}" =~ ^[a-z] && "${GCS_PROJECT_ID}" == *[a-z0-9\-]* ]]; do
+        # notify GCS_PROJECT_ID restrictions.
+        printf "\nProject Id must:\nbe at least ${GCS_PROJECT_ID_MIN} characters long\nno more than ${GCS_PROJECT_ID_MAX} characters long\nmust start with a lowercase letter\ncan have lowercase ASCII letters, digits or hyphens\n"
+        # get GCS_PROJECT_ID
+        read -p "Please enter a Project Id to use:" GCS_PROJECT_ID
+        printf "\n"
+        # Check GCS_PROJECT_ID exists.
+        if [[ ${GCS_PROJECT_ID} =~ ^${DATA}$ ]]; then
+            printf "\nProject Id currently exists.\n"
+            read -p "Continue using existing Project Id of ${GCS_PROJECT_ID} (y/n)?" CHOICE
+            case "${CHOICE^^}" in
+              Y|YES ) break;;
+              * ) GCS_PROJECT_ID="";;
+            esac
+            printf "\n"
+        fi
+    done
+fi
 
 GCE_INSTANCE=""
 until [[ ${#GCE_INSTANCE} -ge 1 ]]; do
@@ -296,6 +260,27 @@ printf "\n"
 printf "\n\n"
 printf "GCE region:zone set to ${GCE_REGION}:${GCE_ZONE}."
 printf "\n\n"
+
+# Firewall: ask update.
+printf "\n"
+printf "Do you wish to open the default VPC firewall ports for the applaince?\n"
+printf "Otherwise, the firewall will not be updated and as result some of the\n"
+printf "appliance services may not be reachable in the expected fashion.\n"
+printf "\n"
+printf "If the project firewall has already been configured then skip this step.\n"
+printf "In that case, it is recommended to manually adjust the firewall as needed\n"
+printf "so as not to open a port that may have been intentionally closed.\n"
+printf "\n"
+printf "The script gcloud-vpc-firewall may be run at a later time or the\n"
+printf "firewall can be manually configured using the console\n"
+printf "https://console.cloud.google.com/networking/firewalls/list?project= \n"
+printf "\n"
+read -p "Update VPC firewall (y/n)?" CHOICE
+case "${CHOICE^^}" in
+  Y|YES ) FIREWALL_UPDATE="True";;
+  * ) FIREWALL_UPDATE="False";;
+esac
+printf "\n"
 
 # Update metadata.
 gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute project-info add-metadata --metadata google-compute-default-region=${GCE_REGION},google-compute-default-zone=${GCE_ZONE},serial-port-enable=1
@@ -469,6 +454,41 @@ printf "\n"
 
 # Check deploy.
 if [ "${DEPLOY_APPLIANCE}" == "True" ]; then
+    # Get default password.
+    PASSWORD=""
+    PASSWORD_LENGTH=8
+    printf "\nWill use a single password for all appliance access.\nThe password(s) can be changed anytime after the deployment has completed.\n"
+    # Loop until valid password/check.
+    until [[ ${#PASSWORD} -ge ${PASSWORD_LENGTH} && "${PASSWORD}" == *[A-Z]* && "${PASSWORD}" == *[a-z]* && "${PASSWORD}" == *[0-9]* ]]; do
+        # Notify password restrictions.
+        printf "\nPassword must:\nbe at least ${PASSWORD_LENGTH} characters long\nhave at least one digit\nhave at least one Upper case Alphabet\nhave at least one Lower case Alphabet\n\n"
+        # Get password.
+        read -p "Please enter default password for appliance:" -s PASSWORD
+        printf "\n"
+        # Confirm password.
+        read -p "Please confirm default password for appliance:" -s CHECK
+        # Check passwords match.
+        if [ ! "${PASSWORD}" == "${CHECK}" ]; then
+            # Blank password.
+            PASSWORD=""
+            # Notify passwords do not match.
+            printf "\n\n\n***Passwords do not match***\n\n"
+        fi
+    done
+    printf "\n\n"
+    # Create initial stack ask.
+    printf "\n"
+    printf "The required information has been gathered to create the main drupal site.\n"
+    printf "It is recommended to deploy the initial drupal stack during appliance creation\n"
+    printf "but customizations can be made prior to manually running the python script\n"
+    printf "create-drupal-stack.py for the initial stack creation.\n"
+    printf "\n"
+    read -p "Create the initial drupal stack for the appliance (y/n)?" CHOICE
+    case "${CHOICE^^}" in
+      Y|YES ) CREATE_DRUPAL_STACK="True";;
+      * ) CREATE_DRUPAL_STACK="False";;
+    esac
+    printf "\n"
     # Get USER.
     USER=${GCS_ACCOUNT%@*}
     # Commands to deploy.
