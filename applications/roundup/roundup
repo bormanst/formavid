@@ -188,6 +188,7 @@ if [ -f "${DRUPAL_SCRIPT}" ]; then
     # apply theme
     FILE=${APP_DIR}/html/page.html
     sed -i "s/<head>/<head>\n<link rel=\"shortcut icon\" href=\"@@file\/theme\/favicon.ico\" type=\"image\/vnd.microsoft.icon\" \/>/" ${FILE}
+    sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"@@file/theme/components/asset-builds/css/base.css\" \/>" ${FILE}
     sed -i "/stylesheet/a<link rel=\"stylesheet\" href=\"@@file/theme/components/asset-builds/css/header.css\" \/>" ${FILE}
     sed -i "/<body/r /etc/formavid/templates/sites-template/header.txt" ${FILE}
     sed -i "s/sedtoolname/Support/g" ${FILE}
