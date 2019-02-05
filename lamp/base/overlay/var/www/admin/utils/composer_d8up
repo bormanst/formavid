@@ -6,14 +6,14 @@
 
 PACKAGE=composer_d8up
 
-# set default drupal location
+# Set default drupal location.
 export PROJECT=prod
 export DRUPAL=/var/www/drupal8
 export PROJECT_DIR=${DRUPAL}/${PROJECT}
 
-# check PROJECT_DIR
+# Check PROJECT_DIR.
 if [ ! -d "${PROJECT_DIR}" ]; then
-    # notify dir should exist: this script is supposed to be located in ${PROJECT_DIR}
+    # Notify dir should exist: this script is supposed to be located in ${PROJECT_DIR}.
     printf "\n\nWARNING! ${PACKAGE} depends on drupal's location being in ${PROJECT_DIR}."
     printf "\nWARNING! Please ensure that drupal is located in ${PROJECT_DIR}."
     printf "\nWARNING! OR"
@@ -21,10 +21,10 @@ if [ ! -d "${PROJECT_DIR}" ]; then
     exit 0
 fi
 
-# check composer format
+# Check composer format.
 JSON=${PROJECT_DIR}/composer.json
 if [ `grep -c '"replace": {' ${JSON}` != 0  ]; then
-    # notify format
+    # Notify format.
     printf "\n\nWARNING! The default ${JSON} is not compatible with this script."
     printf "\nWARNING! A one-time manual edit of ${JSON} is required."
     printf "\n\n\nWARNING! This script depends on drupal/core being a requirement."
@@ -34,7 +34,7 @@ if [ `grep -c '"replace": {' ${JSON}` != 0  ]; then
     exit 0
 fi
 
-# notify update
+# Notify update.
 printf "\n\nWARNING! You are about to update your drupal installation using composer."
 printf "\nWARNING! This includes core, dependent modules, and possibly symphony modules."
 printf "\nWARNING! It will affect all drupal sites located in the default directory."
@@ -48,24 +48,24 @@ printf "\nNote: especially modules outside of the main drupal/* branch."
 printf "\nNote: File composer.json may have to be manually modified to resolve issues."
 printf "\nNote: Please see /var/log/formavid/update_drupal.log for relevant messages.\n\n"
 
-# verify update
+# Verify update.
 read -p "Continue with composer update to drupal 8 directory (y/n)?" CHOICE
 case "${CHOICE^^}" in
     Y|YES ) :;;
     * ) exit 0;;
 esac
 
-# export log
+# Export log.
 LOG=/var/log/formavid/update_drupal.log
 
-# touch in case
+# Touch in case.
 touch ${LOG}
 
-# set log perms
+# Set log perms.
 chown admin:admin ${LOG}
 chmod 0644 ${LOG}
 
-# start updates
+# Start updates.
 MESSSAGE="$( date ) ----------------------------"
 echo ${MESSSAGE} | tee -a ${LOG}
 MESSSAGE="$( date ) Starting drupal 8 updates ..."
@@ -87,6 +87,14 @@ if [[ -z "${MEMSTORE}" ]]; then MEMSTORE="-1"; fi
 # Set php memory_limit = -1.
 sed -i "/^memory_limit *=/ s|= *[^ ]\+|= -1|g" /etc/php/7.0/cli/php.ini
 
+# Disable xdebug - only needed for active debugging.
+if php -v | grep -q 'Xdebug'; then phpdismod xdebug; fi
+
+# Restart apache2.
+MESSSAGE="$( date ) Restarting apache2 server ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+systemctl restart apache2
+
 # Get version to update to.
 OLD_VER=`drush -r ${PROJECT_DIR} --fields=drupal-version status | sed -e "s/Drupal\sversion\s:\s//g" | xargs`
 echo ""
@@ -99,170 +107,153 @@ printf "\nKeeping the existing version will attempt to only apply other updates.
 # Get version.
 read -p "Please enter new drupal core version or press enter to keep ${OLD_VER}:" NEW_VER
 
-# clean input
+# Clean input.
 NEW_VER=${NEW_VER} | xargs
 
+# Set core update.
 UPDATE_CORE=true
 
-# check input or default
+# Check input or default.
 if [[ -z "${NEW_VER}" ]] || [[ $( echo "${NEW_VER}" | awk -F"." '{print NF-1}' ) != 2 ]]; then
     NEW_VER=${OLD_VER}
     UPDATE_CORE=false
 fi
 
-# set log dir
+# Set log dir.
 FORMAVID_LOGS=/var/log/formavid
 
-# check log dir exists
+# Check log dir exists.
 if [ ! -d "${FORMAVID_LOGS}" ]; then mkdir -p ${FORMAVID_LOGS}; fi
 
-# put sites in maintenance mode
+# Put sites in maintenance mode.
 MESSSAGE="$( date ) Putting drupal ${PROJECT} sites into maintenance mode ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 ENABLE_LIST=""
 PARENT_DIR=${PROJECT_DIR}/web/sites
 for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
-    # get site name
+    # Get site name.
     SITE_NAME=${CHILD_DIR##*/}
-    # get drush base ex
+    # Get drush base ex.
     DRUSH_EXECUTE="drush -r ${PROJECT_DIR} -l http://${SITE_NAME}"
-    # check site status
+    # Check site status.
     if [ "`${DRUSH_EXECUTE} sget system.maintenance_mode`" != "1" ]; then
-        # add to enable list
+        # Add to enable list.
         ENABLE_LIST=${ENABLE_LIST}${SITE_NAME}" "
-        # disable site
+        # Disable site.
         MESSSAGE="$( date ) Putting ${PROJECT} site ${SITE_NAME} into maintenance mode ..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} sset -y system.maintenance_mode 1 | tee -a ${LOG}
-        # clear caches
+        # Clear caches.
         MESSSAGE="$( date ) Rebuilding ${PROJECT} caches for ${SITE_NAME} ..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
     fi
 done
 
-# backup composer.json
+# Backup composer files.
 MESSSAGE="$( date ) Copying composer.json to composer.json.old ..."
 if [ ! -d "${PROJECT}" ]; then mkdir -p ${PROJECT}; fi
-
 echo ${MESSSAGE} | tee -a ${LOG}
 cp -f ${JSON} ${PROJECT}/composer.json.old
-
 LOCK=${PROJECT_DIR}/composer.lock
 if [ -f "${LOCK}" ]; then
-    # backup composer.lock
     MESSSAGE="$( date ) Copying composer.lock to composer.lock.old ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     cp -f ${LOCK} ${PROJECT}/composer.lock.old
 fi
 
-# check update core
+# Check update core.
 if ${UPDATE_CORE}; then
-    # drupal core update via composer
+    # Drupal core update via composer.
     MESSSAGE="$( date ) Updating core from ${OLD_VER} to ${NEW_VER} ..."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
-    # drupal core update via composer
+    # Drupal core update via composer.
     MESSSAGE="$( date ) Core unchanged: checking update other components ..."
     echo ${MESSSAGE} | tee -a ${LOG}
 fi
 
-# composer clear cache
+# Composer clear cache.
 MESSSAGE="$( date ) Clearing base composer caches ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer clear-cache -d ${DRUPAL} 2>&1 | tee -a ${LOG}"
 
-# update drupal base
+# Update drupal base.
 MESSSAGE="$( date ) Update base drupal console ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer update -d ${DRUPAL} drupal/console --with-dependencies 2>&1 | tee -a ${LOG}"
 
-# composer clear cache
+# Composer clear cache.
 MESSSAGE="$( date ) Clearing ${PROJECT} composer caches ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer clear-cache -d ${PROJECT_DIR} 2>&1 | tee -a ${LOG}"
 
-# check drupal dependencies
+# Check drupal dependencies.
 MESSSAGE="$( date ) Check outdated drupal ${PROJECT} components ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 su - admin -c "composer outdated -d ${PROJECT_DIR} drupal/* 2>&1 | tee -a ${LOG}"
 su - admin -c "composer outdated -d ${PROJECT_DIR} solarium/solarium 2>&1 | tee -a ${LOG}"
 
-# set HAS_UPDATES
+# Set HAS_UPDATES.
 HAS_UPDATES=false
 
-# stop apache2
-MESSSAGE="$( date ) Stopping apache2 server ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-systemctl stop apache2
-
-# clean swap
-# MESSSAGE="$( date ) Clean swap by disable/enable ..."
-# echo ${MESSSAGE} | tee -a ${LOG}
-# swapoff -a && swapon -a
-
-# start apache2
-MESSSAGE="$( date ) Starting apache2 server ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-systemctl start apache2
-
-# check symfony dependencies
+# Check symfony dependencies.
 if [ $(composer prohibits -d ${PROJECT_DIR} drupal/core:${NEW_VER} 2>&1 | grep -c "There is no installed package depending on") != 1 ]; then
-    # update symfony dependencies
+    # Update symfony dependencies.
     MESSSAGE="$( date ) Updating drupal ${PROJECT} and symfony dependencies ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     su - admin -c "composer update -d ${PROJECT_DIR} drupal/* symfony/* webflo/drupal-core-require-dev solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG}"
     HAS_UPDATES=true
 else
-    # update drupal dependencies
+    # Update drupal dependencies.
     MESSSAGE="$( date ) Updating drupal ${PROJECT} ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    # check no updates
+    # Check no updates.
     if [ $(su - admin -c "composer update -d ${PROJECT_DIR} drupal/* solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG} | grep -c 'Nothing to install or update'") != 1 ]; then HAS_UPDATES=true; fi
 fi
 
-# check HAS_UPDATES
+# Check HAS_UPDATES.
 if ${HAS_UPDATES}; then
-    # update sites
+    # Update sites.
     MESSSAGE="$( date ) Updating drupal ${PROJECT} sites ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     for CHILD_DIR in $(find ${PARENT_DIR}/*.* -maxdepth 0 -mindepth 0 -type d | sort); do
         SITE_NAME=${CHILD_DIR##*/}
-        # get site name
+        # Get site name.
         DRUSH_EXECUTE="drush -r ${PROJECT_DIR} -l http://${SITE_NAME}"
-        # update dbs
+        # Update dbs.
         MESSSAGE="$( date ) Updating ${PROJECT} database for ${SITE_NAME} ..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} updatedb -y | tee -a ${LOG}
-        # clear caches
+        # Clear caches.
         MESSSAGE="$( date ) Rebuilding ${PROJECT} caches for ${SITE_NAME} ..."
         echo ${MESSSAGE} | tee -a ${LOG}
         ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
     done
 fi
 
-# enable selected sites
+# Enable selected sites.
 MESSSAGE="$( date ) Returning drupal ${PROJECT} sites to live mode ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 for SITE_NAME in ${ENABLE_LIST}; do
-    # get drush base ex
+    # Get drush base ex.
     DRUSH_EXECUTE="drush -r ${PROJECT_DIR} -l http://${SITE_NAME}"
-    # enable site
+    # Enable site.
     MESSSAGE="$( date ) Returning drupal ${PROJECT} site ${SITE_NAME} to live mode ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     ${DRUSH_EXECUTE} sset -y system.maintenance_mode 0 | tee -a ${LOG}
-    # clear caches
+    # Clear caches.
     MESSSAGE="$( date ) Rebuilding ${PROJECT} caches for ${SITE_NAME} ..."
     echo ${MESSSAGE} | tee -a ${LOG}
     ${DRUSH_EXECUTE} cr -y | tee -a ${LOG}
 done
 
-# reset php.ini memory_limit
+# Reset php.ini memory_limit.
 MESSSAGE="$( date ) Set php.ini memory_limit = ${MEMSTORE}"
 echo ${MESSSAGE} | tee -a ${LOG}
 sed -i "/^memory_limit *=/ s|= *[^ ]\+|= ${MEMSTORE}|g" /etc/php/7.0/cli/php.ini
 
-# finished update
+# Finished update.
 MESSSAGE="$( date ) ----------------------------"
 echo ${MESSSAGE} | tee -a ${LOG}
 MESSSAGE="$( date ) Finished drupal ${PROJECT} 8 updates."
