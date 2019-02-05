@@ -108,3 +108,55 @@ are also skipped even though they may be requested by another script prompt.
 Please review the scripts involved before re-running any scripts. Many of the
 other scripts in the bin directory can be run individually, as well, to change
 passwords, etc.
+
+
+
+Post install manual configuration considerations:
+
+Cloud Console is located at:
+https://console.cloud.google.com/compute/instances?project=${GCS_PROJECT_ID}
+Cloud Console - Instance edit: Resize instance type if desired.
+Cloud Console - Instance edit: Enable instance 'delete protection' if desired.
+Cloud Console - Instance edit: Enable instance static ip address if desired.
+Cloud Console - Disable any unused firewall entries in GCE project firewall.
+
+Bash (admin sudo) - Disable any unused services: systemctl disable servicename
+Bash (admin sudo) - Add any addtional sites:
+    /usr/local/formavid/bin/deploy/python/create-drupal-stack.py
+Update DNS entries at hosting service.
+Bash (admin sudo) - Activate Certbot (optional):
+    Set: /etc/formavid/default_envars/CERTBOT_INSTALL="True"
+    Set: /etc/formavid/default_envars/CREATE_DRUPAL_STACK="False"
+    Add domains and subdomains (optional):
+        Modify /usr/local/formavid/applications/certbot/certbot
+        Append domain(s) to command line "certbot certonly ... -d domain"
+    If hacking local /etc/hosts for subdomain access then
+        update DNS with temporary entries at hosting service.
+    Deploy: /usr/local/formavid/bin/deploy_appliance
+    If hacking local /etc/hosts for subdomain access then
+        remove temporary DNS entries at hosting service.
+    Set redirects (optional): Update drupal apache2 entries in
+        /etc/apache2/sites-available with http to https redirects.
+        In section <VirtualHost *:80> replace DocumentRoot line
+        with RedirectPermanent / "https://sitedomain/"
+Webmin - Disable any associated appliance firewall entries.
+Bash (admin sudo) - Activate BorgBackup (optional).
+    Set: /etc/formavid/default_envars/CONFIGURE_BORGBACKUP="True"
+    Deploy: /usr/local/formavid/bin/deploy_appliance
+Cloud Console - Verify snapshot.
+
+
+
+Mail server additional configs:
+
+Add MX record to DNS - may take a while to propagate.
+Enable GCE and webmin firewall smtp port 25 for ingress.
+Default imap(s) ports should already be opened if update firewall option was selected.
+The pop3(s) ports, if used, have to be manually opened on the VPC and appliance firewalls.
+A mail relay is required for outgoing mail because egress ports 25 and 587 are blocked on GCE.
+https://cloud.google.com/compute/docs/tutorials/sending-mail/using-sendgrid
+https://sendgrid.com/docs/ui/account-and-settings/how-to-set-up-domain-authentication/
+Note: You must use egress port 2525 on GCE.
+Note: Need to regen sendgrid sasl_passwd.db if changing certs, i.e. certbot.
+mail check: echo 'Using sendgrid relay' | mail -s 'Relay check' user@email.add
+
