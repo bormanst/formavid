@@ -9,7 +9,7 @@
     "browser-sync": "^2.26",
     "chroma-sass": "^1.2",
     "del": "^3.0",
-    "eslint": "^5.12",
+    "eslint": "^5.13",
     "gulp": "^3.9",
     "gulp-autoprefixer": "^6.0",
     "gulp-eslint": "^5.0",
@@ -40,10 +40,10 @@
     "eslint-config-airbnb-standard": "^2.1",
     "eslint-config-prettier": "^3.6",
     "eslint-plugin-import": "^2.16",
-    "eslint-plugin-jsx-a11y": "^6.2",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-prettier": "^3.0",
     "eslint-plugin-react": "^7.12",
     "gulp-watch": "^5.0",
-    "prettier": "^1.16.3"
+    "prettier": "^1.16.4"
   }
 }
