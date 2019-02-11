@@ -155,7 +155,7 @@ gcsfuse --only-dir ${BACKUP_DIR}/ ${GCS_BUCKET} ${MOUNT}
 # initialize repository
 MESSSAGE="Initializing repository for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-BORG_PASSPHRASE="${BORGBACKUP_PASS}" borg init --info --encryption=repokey ${MOUNT} 2>> ${PACKAGE_LOG_DIR}/$( date +%Y%m%d ).log
+BORG_PASSPHRASE="${BORGBACKUP_PASS}" borg init --info --encryption=repokey ${MOUNT} 2>> ${PACKAGE_LOG_DIR}/${PACKAGE}.log
 
 # unmount fuse
 fusermount -u -z ${MOUNT}
@@ -272,11 +272,11 @@ borg create \\
     --exclude '/var/webmin/modules/system-status/*' \\
     --exclude '/var/webmin/modules/package-updates/*' \\
     --exclude '/var/www/.drush/cache/*' \\
-    --exclude '/var/www/drupal8/sites/*/files/config_*' \\
-    --exclude '/var/www/drupal8/sites/*/files/css/*' \\
-    --exclude '/var/www/drupal8/sites/*/files/js/*' \\
-    --exclude '/var/www/drupal8/sites/*/files/php/*' \\
-    --exclude '/var/www/drupal8/sites/*/files/styles/*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/config_*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/css/*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/js/*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/php/*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/styles/*' \\
     --exclude-caches \\
     --compression lzma \\
     ::'{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\
