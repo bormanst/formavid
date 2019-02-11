@@ -229,8 +229,11 @@ borg break-lock ${MOUNT} && sleep 10
 info "Starting main backup ..."
 
 borg create \\
-    --checkpoint-interval 30 \\
-    --compression lz4 \\
+    --info \\
+    --show-rc \\
+    --stats \\
+    --list \\
+    --filter AME \\
     --exclude '/etc/apt/*' \\
     --exclude '/etc/debian_version' \\
     --exclude '/etc/fstab' \\
@@ -275,11 +278,7 @@ borg create \\
     --exclude '/var/www/drupal8/sites/*/files/php/*' \\
     --exclude '/var/www/drupal8/sites/*/files/styles/*' \\
     --exclude-caches \\
-    --filter AME \\
-    --info \\
-    --list \\
-    --show-rc \\
-    --stats \\
+    --compression lzma \\
     ::'{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\
     /etc \\
     /home \\
@@ -316,9 +315,9 @@ info "Pruning repository ..."
 
 borg prune \\
     --info \\
+    --show-rc \\
     --list \\
     --prefix '{hostname}-' \\
-    --show-rc \\
     --keep-hourly 24 \\
     --keep-daily 7 \\
     --keep-weekly 4 \\
@@ -345,15 +344,14 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
     # Backup the logs differently
 
     borg create \\
-        --checkpoint-interval 30 \\
-        --compression lz4 \\
-        --exclude-caches \\
-        --exclude '/var/log/borgbackup/*' \\
-        --filter AME \\
         --info \\
-        --list \\
         --show-rc \\
         --stats \\
+        --list \\
+        --filter AME \\
+        --exclude '/var/log/borgbackup/*' \\
+        --exclude-caches \\
+        --compression lzma \\
         ::'log-{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\
         /var/log \\
         2>> \${BORG_LOG}
@@ -376,9 +374,9 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
 
     borg prune \\
         --info \\
+        --show-rc \\
         --list \\
         --prefix 'log-{hostname}-' \\
-        --show-rc \\
         --keep-daily 7 \\
         2>> \${BORG_LOG}
 
@@ -400,9 +398,9 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
 
     borg check \\
         --info \\
+        --show-rc \\
         --repository-only \\
         --save-space \\
-        --show-rc \\
         \${BORG_REPO} \\
         2>> \${BORG_LOG}
 
@@ -423,11 +421,11 @@ if [ "\${RUN_DAILIES}" = "00" ]; then
     info "Verifying main archives ..."
 
     borg check \\
-        --archives-only \\
         --info \\
-        --prefix '{hostname}-' \\
-        --save-space \\
         --show-rc \\
+        --archives-only \\
+        --save-space \\
+        --prefix '{hostname}-' \\
         \${BORG_REPO} \\
         2>> \${BORG_LOG}
 
