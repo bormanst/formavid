@@ -171,7 +171,7 @@ renice 10 \$\$
 ionice -c2 -n7 -p\$\$
 
 # set log dir
-BORG_LOG=${PACKAGE_LOG_DIR}/\$( date +%Y%m%d ).log
+BORG_LOG=${PACKAGE_LOG_DIR}/${PACKAGE}.log
 
 RUN_DAILIES=\$( date +%H )
 
@@ -271,7 +271,7 @@ borg create \\
     --exclude '/var/webmin/miniserv.lastcrons' \\
     --exclude '/var/webmin/modules/system-status/*' \\
     --exclude '/var/webmin/modules/package-updates/*' \\
-    --exclude '/var/www/.drush/cache/*' \\
+    --exclude '/var/www/drupal8/prod/web/sites/*/files/*/css/*' \\
     --exclude '/var/www/drupal8/prod/web/sites/*/files/config_*' \\
     --exclude '/var/www/drupal8/prod/web/sites/*/files/css/*' \\
     --exclude '/var/www/drupal8/prod/web/sites/*/files/js/*' \\
