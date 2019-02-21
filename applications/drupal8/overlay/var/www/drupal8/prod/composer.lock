@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "74bfec2fa2050a83b3ce2eed31a953ad",
-    "content-hash": "2735af8a095493e9765a0c9f80cf96b9",
+    "hash": "3eb92616cf9e10230c38c482bff95957",
+    "content-hash": "d4b5108e389b1a812980c1887a5b8ff2",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -2165,16 +2165,16 @@
         },
         {
             "name": "drupal/core",
-            "version": "8.6.9",
+            "version": "8.6.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "cac12e0ec19d5c6fa53778522b3ff4c542f86c8d"
+                "reference": "59568ac02948cf075ee8543e6c6d4386ad8daec1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/cac12e0ec19d5c6fa53778522b3ff4c542f86c8d",
-                "reference": "cac12e0ec19d5c6fa53778522b3ff4c542f86c8d",
+                "url": "https://api.github.com/repos/drupal/core/zipball/59568ac02948cf075ee8543e6c6d4386ad8daec1",
+                "reference": "59568ac02948cf075ee8543e6c6d4386ad8daec1",
                 "shasum": ""
             },
             "require": {
@@ -2400,7 +2400,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
-            "time": "2019-02-08 12:21:40"
+            "time": "2019-02-20 18:35:01"
         },
         {
             "name": "drupal/ctools",
@@ -3044,22 +3044,23 @@
         },
         {
             "name": "drupal/imagemagick",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/imagemagick",
-                "reference": "8.x-2.3"
+                "reference": "8.x-2.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/imagemagick-8.x-2.3.zip",
-                "reference": "8.x-2.3",
-                "shasum": "8359921d4700e954364c2633332c20579bb75a34"
+                "url": "https://ftp.drupal.org/files/projects/imagemagick-8.x-2.4.zip",
+                "reference": "8.x-2.4",
+                "shasum": "7607cf3b98ac4d592791ea32e40d3625d6cc7c3f"
             },
             "require": {
                 "drupal/core": "^8.3",
                 "drupal/file_mdm": "^1.1",
-                "drupal/file_mdm_exif": "^1.1"
+                "drupal/file_mdm_exif": "^1.1",
+                "fileeye/mimemap": "^1.0"
             },
             "type": "drupal-module",
             "extra": {
@@ -3067,8 +3068,8 @@
                     "dev-2.x": "2.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-2.3",
-                    "datestamp": "1520958305",
+                    "version": "8.x-2.4",
+                    "datestamp": "1550494985",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -3644,17 +3645,17 @@
         },
         {
             "name": "drupal/search_api_solr",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/search_api_solr",
-                "reference": "8.x-2.5"
+                "reference": "8.x-2.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-2.5.zip",
-                "reference": "8.x-2.5",
-                "shasum": "53bf277fed870e89580fc25bbcc87c4a09359413"
+                "url": "https://ftp.drupal.org/files/projects/search_api_solr-8.x-2.6.zip",
+                "reference": "8.x-2.6",
+                "shasum": "4b412d1d9cc0c9ddec46a642d4262b6c2adcc4e2"
             },
             "require": {
                 "drupal/core": "^8.5",
@@ -3687,8 +3688,8 @@
                     "dev-2.x": "2.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-2.5",
-                    "datestamp": "1548236880",
+                    "version": "8.x-2.6",
+                    "datestamp": "1550248084",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -3735,7 +3736,7 @@
         },
         {
             "name": "drupal/search_api_solr_defaults",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "require": {
                 "drupal/core": "*",
                 "drupal/search_api_solr": "self.version"
@@ -3746,8 +3747,8 @@
                     "dev-2.x": "2.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-2.5",
-                    "datestamp": "1548236880",
+                    "version": "8.x-2.6",
+                    "datestamp": "1550248084",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -4417,6 +4418,50 @@
                 "validator"
             ],
             "time": "2018-09-25 20:59:41"
+        },
+        {
+            "name": "fileeye/mimemap",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FileEye/MimeMap.git",
+                "reference": "cb9eda0a7caaadd35d2de22abb44b59650072d9b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FileEye/MimeMap/zipball/cb9eda0a7caaadd35d2de22abb44b59650072d9b",
+                "reference": "cb9eda0a7caaadd35d2de22abb44b59650072d9b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "<9",
+                "sebastian/comparator": "*",
+                "sebastian/diff": "*",
+                "squizlabs/php_codesniffer": "*",
+                "symfony/console": "*",
+                "symfony/filesystem": "*",
+                "symfony/var-dumper": "*",
+                "symfony/yaml": "*"
+            },
+            "bin": [
+                "bin/fileeye-mimemap"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FileEye\\MimeMap\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "description": "A PHP library to handle MIME Content-Type fields and their related file extensions.",
+            "homepage": "https://github.com/FileEye/MimeMap",
+            "time": "2019-02-16 15:57:06"
         },
         {
             "name": "g1a/composer-test-scenarios",
@@ -9083,6 +9128,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-08-09 05:50:03"
         },
         {
@@ -9860,16 +9906,16 @@
         },
         {
             "name": "webflo/drupal-core-require-dev",
-            "version": "8.6.9",
+            "version": "8.6.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webflo/drupal-core-require-dev.git",
-                "reference": "c083ddd802bda504d836dc0d4fea44cf2e6f191f"
+                "reference": "a3ec86723a2d753c020bfa995281c3cefa0cbb89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webflo/drupal-core-require-dev/zipball/c083ddd802bda504d836dc0d4fea44cf2e6f191f",
-                "reference": "c083ddd802bda504d836dc0d4fea44cf2e6f191f",
+                "url": "https://api.github.com/repos/webflo/drupal-core-require-dev/zipball/a3ec86723a2d753c020bfa995281c3cefa0cbb89",
+                "reference": "a3ec86723a2d753c020bfa995281c3cefa0cbb89",
                 "shasum": ""
             },
             "require": {
@@ -9877,7 +9923,7 @@
                 "behat/mink-goutte-driver": "^1.2",
                 "behat/mink-selenium2-driver": "1.3.x-dev",
                 "drupal/coder": "^8.2.12",
-                "drupal/core": "8.6.9",
+                "drupal/core": "8.6.10",
                 "jcalderonzumba/gastonjs": "^1.0.2",
                 "jcalderonzumba/mink-phantomjs-driver": "^0.3.1",
                 "mikey179/vfsstream": "^1.2",
@@ -9893,7 +9939,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "require-dev dependencies from drupal/core",
-            "time": "2019-02-08 12:31:37"
+            "time": "2019-02-20 20:01:42"
         }
     ],
     "aliases": [],
