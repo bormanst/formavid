@@ -11,7 +11,7 @@ formavid (15.1.17) stable; urgency=low
     drupal          8.6.10 (upstream archive)
     drush           9.5.2 (upstream archive)
     fail2ban        0.9.6
-    invoiceninja    4.5.9 (upstream archive)
+    invoiceninja    4.5.10 (upstream archive)
     mariadb         10.1.37
     php             7.0.33
     proftpd         1.35
