@@ -483,9 +483,14 @@ def main():
     system("echo ''")
     system("echo 'Setting up local Gulp for %s theme ...'" % sitename)
     system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
+    system("sed -i \"s/^[[:space:]]*options.rootPath.project + 'gulpfile.js',/\/\/\  options.rootPath.project + 'gulpfile.js',/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
     system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/web/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
     system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("echo \"%s\" >>  %s/web/themes/%s/gulpfile.js" % (GULP_WATCH_SCSS_SCRIPT,drupaldir,sitename))
+    system("echo \"%s\" >> %s/web/themes/%s/gulpfile.js" % (GULP_WATCH_SCSS_SCRIPT,drupaldir,sitename))
+    system("sed -i 's/\"anonymous\": \"always\",/\"anonymous\": \"never\",/g' %s/web/themes/%s/.eslintrc" % (drupaldir,sitename))
+    system("echo 'bracketSpacing: false' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+    system("echo 'endOfLine: lf' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+    system("echo 'singleQuote: true' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
     system("echo 'Gulp ready to run locally within theme directory.'")
 
     # Drupal - set site theme permissions.

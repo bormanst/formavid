@@ -235,6 +235,10 @@ chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 # background safe: depends on gulp-cli
 su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
 
+# fix issue in chroma-sass module
+CONF=${PROJECT_DIR}/web/themes/node_modules/chroma-sass/sass/chroma/_internals.scss
+su - cssadmin -c "sed -i 's/return call(\$function,/return call(get-function(\$function),/g' ${CONF}"
+
 # update settings
 MESSSAGE="Updating settings for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
