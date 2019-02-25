@@ -74,7 +74,7 @@ DEFAULT_TITLE = "Example Site Name"
 
 SOLR_TEXT = """Solr search can be used as a replacement for core content search and boasts both extra features and better performance. Low memory systems may wish to use the default search to avoid the overhead associated with a Java virtual machine."""
 
-GULP_WATCH_SCSS_SCRIPT = """
+GULP_SCRIPTS = """
 // #########################################################
 // ONLY watches for changed scss files.
 // JS files and the style guide require the regular gulp
@@ -82,6 +82,44 @@ GULP_WATCH_SCSS_SCRIPT = """
 // the regular watch after theming is completed.
 // #########################################################
 gulp.task('watch-scss', ['watch:css', 'lint:sass']);
+
+// #########################################################
+// ONLY tries to fix js files.
+// It is recommended to run watch after fixes completed.
+// #########################################################
+gulp.task('fix-js', ['fix-gulpfile-js', 'fix-theme-js']);
+
+options.fix = {
+  gulpfile: [options.rootPath.project + 'gulpfile.js'],
+  jsfiles: [
+    options.theme.js + '**/*.js',
+    '!' + options.theme.js + '**/*.min.js',
+    options.theme.components + '**/*.js',
+    '!' + options.theme.build + '**/*.js'
+  ]
+};
+
+function isFixed(file) {
+  return file.eslint != null && file.eslint.fixed;
+}
+
+gulp.task('fix-theme-js', function() {
+  return gulp
+    .src(options.fix.jsfiles)
+    .pipe($.eslint({fix: true}))
+    .pipe($.eslint.format())
+    .pipe(gulpIf(isFixed, gulp.dest(options.theme.js)))
+    .pipe($.eslint.failOnError());
+});
+
+gulp.task('fix-gulpfile-js', function() {
+  return gulp
+    .src(options.fix.gulpfile)
+    .pipe($.eslint({fix: true}))
+    .pipe($.eslint.format())
+    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.project)))
+    .pipe($.eslint.failOnError());
+});
 """
 
 HTACCESS = """
@@ -479,25 +517,56 @@ def main():
         lnTheme = "/usr/share/webmin/system-theme/unauthenticated/system"
         system("ln -s %s %s" % (sysTheme,lnTheme))
 
-    # Set local gulp for SASS.
-    system("echo ''")
-    system("echo 'Setting up local Gulp for %s theme ...'" % sitename)
-    system("sed -i \"s/^[[:space:]]*'use strict';/\/\/\ 'use strict'/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("sed -i \"s/^[[:space:]]*options.rootPath.project + 'gulpfile.js',/\/\/\  options.rootPath.project + 'gulpfile.js',/g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s/web/themes/%s/gulpfile.js" % (hostname,drupaldir,sitename))
-    system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s/web/themes/%s/gulpfile.js" % (drupaldir,sitename))
-    system("echo \"%s\" >> %s/web/themes/%s/gulpfile.js" % (GULP_WATCH_SCSS_SCRIPT,drupaldir,sitename))
-    system("sed -i 's/\"anonymous\": \"always\",/\"anonymous\": \"never\",/g' %s/web/themes/%s/.eslintrc" % (drupaldir,sitename))
-    system("echo 'bracketSpacing: false' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
-    system("echo 'endOfLine: lf' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
-    system("echo 'singleQuote: true' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
-    system("echo 'Gulp ready to run locally within theme directory.'")
+    # Check local gulp for SASS.
+    gulpFile = "%s/web/themes/%s/gulpfile.js" % (drupaldir,sitename)
+    if os.path.exists(gulpFile):
+        # Set local gulp for SASS.
+        system("echo ''")
+        system("echo 'Setting up local Gulp for %s theme ...'" % sitename)
+        system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s" % (hostname,gulpFile))
+        system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s" % gulpFile)
+        system("sed -i \"/require('kss')/i  gulpIf      = require('gulp-if'),\" %s" % gulpFile)
+        system("echo \"%s\" >> %s" % (GULP_SCRIPTS,gulpFile))
+        system("echo 'Gulp ready to run locally within theme directory.'")
+        # Set prettier compatibility.
+        system("echo ''")
+        system("echo 'Setting up prettier compatibility for %s theme ...'" % sitename)
+        system("sed -i 's/\"anonymous\": \"always\",/\"anonymous\": \"never\",/g' %s/web/themes/%s/.eslintrc" % (drupaldir,sitename))
+        system("sed -i 's/no-empty-rulesets: 2/no-empty-rulesets: 1/g' %s/web/themes/%s/.sass-lint.yml" % (drupaldir,sitename))
+        system("echo 'bracketSpacing: false' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+        system("echo 'endOfLine: lf' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+        system("echo 'singleQuote: true' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+        system("echo 'Gulp prettier compatibility completed.'")
+        # Pretty up zen theme.
+        system("echo ''")
+        system("echo 'Prettying up %s theme files ...'" % sitename)
+        scssFile = "%s/web/themes/%s/components/init/clearfix/_clearfix.scss" % (drupaldir,sitename)
+        if os.path.exists(scssFile):
+            system("sed -i 's/\&:after/\&::after/g' %s" % scssFile)
+            system("sed -i 's/\&:before/\&::before/g' %s" % scssFile)
+        scssFile = "%s/web/themes/%s/components/base/forms/_forms.scss" % (drupaldir,sitename)
+        if os.path.exists(scssFile):
+            system("sed -i 's/\*/\/\/ \*/g' %s" % scssFile)
+        scssFile = "%s/web/themes/%s/components/base/links/_links.scss" % (drupaldir,sitename)
+        if os.path.exists(scssFile):
+            system("sed -i 's/href\]:after/href\]::after/g' %s" % scssFile)
+            system("sed -i \"s/'javascript:'\]:after/'javascript:'\]::after/g\" %s" % scssFile)
+            system("sed -i \"s/'#'\]:after/'#'\]::after/g\" %s" % scssFile)
+        scssFile = "%s/web/themes/%s/components/base/text/_text.scss" % (drupaldir,sitename)
+        if os.path.exists(scssFile):
+            system("sed -i 's/\&:after/\&::after/g' %s" % scssFile)
+        system("gulp -f %s fix-js" % gulpFile)
+        system("echo 'Prettying up theme files completed.'")
 
     # Drupal - set site theme permissions.
     system("chown -R cssadmin:cssadmin %s/web/themes/%s" % (drupaldir,sitename))
     system("find %s/web/themes/%s -type d -name \* -exec chmod 0755 {} \;" % (drupaldir,sitename))
-    system("find %s/web/themes/%s/components/asset-builds -type d -name \* -exec chmod 0777 {} \;" % (drupaldir,sitename))
-    system("chmod 0777 %s/web/themes/%s/styleguide" % (drupaldir,sitename))
+    pathDir = "%s/web/themes/%s/components/asset-builds" % (drupaldir,sitename)
+    if os.path.exists(pathDir):
+        system("find %s -type d -name \* -exec chmod 0777 {} \;" % pathDir)
+    pathDir = "%s/web/themes/%s/styleguide" % (drupaldir,sitename)
+    if os.path.exists(pathDir):
+        system("chmod 0777 %s" % pathDir)
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
