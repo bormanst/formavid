@@ -89,6 +89,10 @@ gulp.task('watch-scss', ['watch:css', 'lint:sass']);
 // #########################################################
 gulp.task('fix-js', ['fix-gulpfile-js', 'fix-theme-js']);
 
+function isFixed(file) {
+  return file.eslint != null && file.eslint.fixed;
+}
+
 options.fix = {
   gulpfile: [options.rootPath.project + 'gulpfile.js'],
   jsfiles: [
@@ -99,9 +103,14 @@ options.fix = {
   ]
 };
 
-function isFixed(file) {
-  return file.eslint != null && file.eslint.fixed;
-}
+gulp.task('fix-gulpfile-js', function() {
+  return gulp
+    .src(options.fix.gulpfile)
+    .pipe($.eslint({fix: true}))
+    .pipe($.eslint.format())
+    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.project)))
+    .pipe($.eslint.failOnError());
+});
 
 gulp.task('fix-theme-js', function() {
   return gulp
@@ -109,15 +118,6 @@ gulp.task('fix-theme-js', function() {
     .pipe($.eslint({fix: true}))
     .pipe($.eslint.format())
     .pipe(gulpIf(isFixed, gulp.dest(options.theme.js)))
-    .pipe($.eslint.failOnError());
-});
-
-gulp.task('fix-gulpfile-js', function() {
-  return gulp
-    .src(options.fix.gulpfile)
-    .pipe($.eslint({fix: true}))
-    .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.project)))
     .pipe($.eslint.failOnError());
 });
 """
