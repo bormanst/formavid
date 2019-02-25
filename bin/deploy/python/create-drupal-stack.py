@@ -87,37 +87,52 @@ gulp.task('watch-scss', ['watch:css', 'lint:sass']);
 // ONLY tries to fix js files.
 // It is recommended to run watch after fixes completed.
 // #########################################################
-gulp.task('fix-js', ['fix-gulpfile-js', 'fix-theme-js']);
+gulp.task('fix-js', ['fix-gulpfile-js', 'fix-base-js', 'fix-components-js']);
 
 function isFixed(file) {
   return file.eslint != null && file.eslint.fixed;
 }
 
+options.gulpfilepath = options.rootPath.project;
+options.jsbasepath = options.theme.js;
+options.jscomponentspath = options.theme.components;
+
 options.fix = {
-  gulpfile: [options.rootPath.project + 'gulpfile.js'],
-  jsfiles: [
-    options.theme.js + '**/*.js',
-    '!' + options.theme.js + '**/*.min.js',
-    options.theme.components + '**/*.js',
+  gulpfile: [options.gulpfilepath + 'gulpfile.js'],
+  jsbasefiles: [
+    options.jsbasepath + '**/*.js',
+    '!' + options.jsbasepath + '**/*.min.js'
+  ],
+  jscomponents: [
+    options.jscomponentspath + '**/*.js',
     '!' + options.theme.build + '**/*.js'
   ]
 };
+
+gulp.task('fix-components-js', function() {
+  return gulp
+    .src(options.fix.jscomponents)
+    .pipe($.eslint({fix: true}))
+    .pipe($.eslint.format())
+    .pipe(gulpIf(isFixed, gulp.dest(options.jscomponentspath)))
+    .pipe($.eslint.failOnError());
+});
 
 gulp.task('fix-gulpfile-js', function() {
   return gulp
     .src(options.fix.gulpfile)
     .pipe($.eslint({fix: true}))
     .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.project)))
+    .pipe(gulpIf(isFixed, gulp.dest(options.gulpfilepath)))
     .pipe($.eslint.failOnError());
 });
 
-gulp.task('fix-theme-js', function() {
+gulp.task('fix-base-js', function() {
   return gulp
-    .src(options.fix.jsfiles)
+    .src(options.fix.jsbasefiles)
     .pipe($.eslint({fix: true}))
     .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.theme.js)))
+    .pipe(gulpIf(isFixed, gulp.dest(options.jsbasepath)))
     .pipe($.eslint.failOnError());
 });
 """
