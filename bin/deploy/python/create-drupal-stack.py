@@ -575,6 +575,14 @@ def main():
         system("gulp -f %s fix-js" % gulpFile)
         system("echo 'Prettying up theme files completed.'")
 
+    # Drupal - init git site theme.
+    gitDir = "/".join(["/var/lib/git/drupal8",drupalsubdir,"web/themes",sitename])
+    system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme)
+    system("echo 'styleguide' >> %s/.gitignore" % siteTheme)
+    system("git -C %s init --separate-git-dir=%s" % (siteTheme,gitDir))
+    system('git -C %s config user.email "cssadmin@modorbis.com"' % siteTheme)
+    system('git -C %s config user.name "cssadmin"' % siteTheme)
+
     # Drupal - set site theme permissions.
     system("chown -R cssadmin:cssadmin %s" % siteTheme)
     system("find %s -type d -name \* -exec chmod 0755 {} \;" % siteTheme)
@@ -585,12 +593,10 @@ def main():
     if os.path.exists(pathDir):
         system("chmod 0777 %s" % pathDir)
 
-    # Drupal - init git site theme.
-    system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme)
-    system("echo 'styleguide' >> %s/.gitignore" % siteTheme)
-    system("git -C %s init --separate-git-dir=/var/lib/git/drupal8/%s/web/themes/%s" % (siteTheme,drupalsubdir,sitename))
-    system('git -C %s config user.email "cssadmin@modorbis.com"' % siteTheme)
-    system('git -C %s config user.name "cssadmin"' % siteTheme)
+    # Drupal - git commit site theme.
+    system('git -C %s add .' % siteTheme)
+    system('git -C %s commit -m "Initial commit by site creation script."' % siteTheme)
+    system("chown -R cssadmin:cssadmin %s" % gitDir)
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
