@@ -586,11 +586,11 @@ def main():
         system("chmod 0777 %s" % pathDir)
 
     # Drupal - init git site theme.
-    system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme
-    system("echo 'styleguide' >> %s/.gitignore" % siteTheme
-    system("git -C %s init --separate-git-dir=/var/lib/git/drupal8/%s/web/themes/%s" % (siteTheme,drupalsubdir,sitename)
-    system('git -C %s config user.email "cssadmin@modorbis.com"' % siteTheme
-    system('git -C %s config user.name "cssadmin"' % siteTheme
+    system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme)
+    system("echo 'styleguide' >> %s/.gitignore" % siteTheme)
+    system("git -C %s init --separate-git-dir=/var/lib/git/drupal8/%s/web/themes/%s" % (siteTheme,drupalsubdir,sitename))
+    system('git -C %s config user.email "cssadmin@modorbis.com"' % siteTheme)
+    system('git -C %s config user.name "cssadmin"' % siteTheme)
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
