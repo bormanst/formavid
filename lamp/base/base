@@ -145,6 +145,9 @@ save_seen=/var/lib/apt/listchanges.db
 which=news
 EOF
 
+# add generic git repo for easy backup scans
+mkdir -p /var/lib/git
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}

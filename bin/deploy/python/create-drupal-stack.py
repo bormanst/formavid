@@ -499,15 +499,18 @@ def main():
     system("echo 'Creating custom theme for %s based on zen theme ...'" % sitetitle)
     system("echo ''")
 
+    # Site theme location.
+    siteTheme = "%s/web/themes/%s" % (drupaldir,sitename)
+
     # Enable zen theme.
     system("drush -r %s -l http://%s theme:enable -y zen" % (drupaldir,hostname))
 
     # Create site sub-theme from zen theme.
     system("cp -fpr %s/web/themes/contrib/zen/STARTERKIT %s/web/themes" % (drupaldir,drupaldir))
-    system("mv %s/web/themes/STARTERKIT %s/web/themes/%s" % (drupaldir,drupaldir,sitename))
-    system("find %s/web/themes/%s -iname \"*STARTERKIT*\" -exec rename 's/STARTERKIT/%s/' {} \;" % (drupaldir,sitename,sitename))
-    system("find %s/web/themes/%s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (drupaldir,sitename,sitename))
-    system("find %s/web/themes/%s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (drupaldir,sitename,sitetitle))
+    system("mv %s/web/themes/STARTERKIT %s" % (drupaldir,siteTheme))
+    system("find %s -iname \"*STARTERKIT*\" -exec rename 's/STARTERKIT/%s/' {} \;" % (siteTheme,sitename))
+    system("find %s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (siteTheme,sitename))
+    system("find %s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (siteTheme,sitetitle))
     system("echo ''")
     system("echo 'Theme %s is ready for modification.'" % sitename)
     system("echo ''")
@@ -518,22 +521,21 @@ def main():
         system("echo ''")
         system("echo 'Symlinking system theme to %s theme ...'" % sitename)
         system("echo ''")
-        lnTheme = "%s/web/themes/%s" % (drupaldir,sitename)
         sysTheme = "%s/web/themes/system" % (drupaldir)
         system("rm -f %s" % sysTheme)
-        system("ln -s %s %s" % (lnTheme,sysTheme))
+        system("ln -s %s %s" % (siteTheme,sysTheme))
         # Symlink system theme to admin pages.
-        lnTheme = "/var/www/admin/theme"
-        system("ln -s %s %s" % (sysTheme,lnTheme))
+        appTheme = "/var/www/admin/theme"
+        system("ln -s %s %s" % (sysTheme,appTheme))
         # Symlink system theme to support pages.
-        lnTheme = "/var/www/support/html/theme"
-        system("ln -s %s %s" % (sysTheme,lnTheme))
+        appTheme = "/var/www/support/html/theme"
+        system("ln -s %s %s" % (sysTheme,appTheme))
         # Symlink system theme to webmin - used in apllications/webmin/webmin as well
-        lnTheme = "/usr/share/webmin/system-theme/unauthenticated/system"
-        system("ln -s %s %s" % (sysTheme,lnTheme))
+        appTheme = "/usr/share/webmin/system-theme/unauthenticated/system"
+        system("ln -s %s %s" % (sysTheme,appTheme))
 
     # Check local gulp for SASS.
-    gulpFile = "%s/web/themes/%s/gulpfile.js" % (drupaldir,sitename)
+    gulpFile = "%s/gulpfile.js" % siteTheme
     if os.path.exists(gulpFile):
         # Set local gulp for SASS.
         system("echo ''")
@@ -546,42 +548,49 @@ def main():
         # Set prettier compatibility.
         system("echo ''")
         system("echo 'Setting up prettier compatibility for %s theme ...'" % sitename)
-        system("sed -i 's/\"anonymous\": \"always\",/\"anonymous\": \"never\",/g' %s/web/themes/%s/.eslintrc" % (drupaldir,sitename))
-        system("sed -i 's/no-empty-rulesets: 2/no-empty-rulesets: 1/g' %s/web/themes/%s/.sass-lint.yml" % (drupaldir,sitename))
-        system("echo 'bracketSpacing: false' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
-        system("echo 'endOfLine: lf' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
-        system("echo 'singleQuote: true' >> %s/web/themes/%s/.prettierrc" % (drupaldir,sitename))
+        system("sed -i 's/\"anonymous\": \"always\",/\"anonymous\": \"never\",/g' %s/.eslintrc" % siteTheme)
+        system("sed -i 's/no-empty-rulesets: 2/no-empty-rulesets: 1/g' %s/.sass-lint.yml" % siteTheme)
+        system("echo 'bracketSpacing: false' >> %s/.prettierrc" % siteTheme)
+        system("echo 'endOfLine: lf' >> %s/.prettierrc" % siteTheme)
+        system("echo 'singleQuote: true' >> %s/.prettierrc" % siteTheme)
         system("echo 'Gulp prettier compatibility completed.'")
         # Pretty up zen theme.
         system("echo ''")
         system("echo 'Prettying up %s theme files ...'" % sitename)
-        scssFile = "%s/web/themes/%s/components/init/clearfix/_clearfix.scss" % (drupaldir,sitename)
+        scssFile = "%s/components/init/clearfix/_clearfix.scss" % siteTheme
         if os.path.exists(scssFile):
             system("sed -i 's/\&:after/\&::after/g' %s" % scssFile)
             system("sed -i 's/\&:before/\&::before/g' %s" % scssFile)
-        scssFile = "%s/web/themes/%s/components/base/forms/_forms.scss" % (drupaldir,sitename)
+        scssFile = "%s/components/base/forms/_forms.scss" % siteTheme
         if os.path.exists(scssFile):
             system("sed -i 's/\*/\/\/ \*/g' %s" % scssFile)
-        scssFile = "%s/web/themes/%s/components/base/links/_links.scss" % (drupaldir,sitename)
+        scssFile = "%s/components/base/links/_links.scss" % siteTheme
         if os.path.exists(scssFile):
             system("sed -i 's/href\]:after/href\]::after/g' %s" % scssFile)
             system("sed -i \"s/'javascript:'\]:after/'javascript:'\]::after/g\" %s" % scssFile)
             system("sed -i \"s/'#'\]:after/'#'\]::after/g\" %s" % scssFile)
-        scssFile = "%s/web/themes/%s/components/base/text/_text.scss" % (drupaldir,sitename)
+        scssFile = "%s/components/base/text/_text.scss" % siteTheme
         if os.path.exists(scssFile):
             system("sed -i 's/\&:after/\&::after/g' %s" % scssFile)
         system("gulp -f %s fix-js" % gulpFile)
         system("echo 'Prettying up theme files completed.'")
 
     # Drupal - set site theme permissions.
-    system("chown -R cssadmin:cssadmin %s/web/themes/%s" % (drupaldir,sitename))
-    system("find %s/web/themes/%s -type d -name \* -exec chmod 0755 {} \;" % (drupaldir,sitename))
-    pathDir = "%s/web/themes/%s/components/asset-builds" % (drupaldir,sitename)
+    system("chown -R cssadmin:cssadmin %s" % siteTheme)
+    system("find %s -type d -name \* -exec chmod 0755 {} \;" % siteTheme)
+    pathDir = "%s/components/asset-builds" % siteTheme
     if os.path.exists(pathDir):
         system("find %s -type d -name \* -exec chmod 0777 {} \;" % pathDir)
-    pathDir = "%s/web/themes/%s/styleguide" % (drupaldir,sitename)
+    pathDir = "%s/styleguide" % siteTheme
     if os.path.exists(pathDir):
         system("chmod 0777 %s" % pathDir)
+
+    # Drupal - init git site theme.
+    system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme
+    system("echo 'styleguide' >> %s/.gitignore" % siteTheme
+    system("git -C %s init --separate-git-dir=/var/lib/git/drupal8/%s/web/themes/%s" % (siteTheme,drupalsubdir,sitename)
+    system('git -C %s config user.email "cssadmin@modorbis.com"' % siteTheme
+    system('git -C %s config user.name "cssadmin"' % siteTheme
 
     # Set path to solr configs.
     solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
@@ -668,7 +677,7 @@ def main():
         # Finished drupal setup.
         system("echo 'Please validate %s by viewing the drupal admin status report.'" % baseUri)
         if not os.path.exists("/var/www/admin/images/%s.svg" % sitename):
-            system("ln -s %s/web/themes/%s/logo.svg /var/www/admin/images/%s.svg" % (drupaldir,sitename,sitename))
+            system("ln -s %s/logo.svg /var/www/admin/images/%s.svg" % (siteTheme,sitename))
         # Log info.
         logging.info('Drupal site created/configured for %s.' % baseUri)
 
@@ -680,14 +689,14 @@ def main():
     # Check formavid logo.
     if not sitename == "formavidorg":
         # Set theme.
-        lnTheme = "ln -sf %s/web/themes/%s" % (drupaldir,sitename)
+        lnLoc = "ln -sf %s" % siteTheme
         # Admin Tools - use first "base" site logo.
         lnFile = "logo.svg"
         pathDir = "/var/www/admin/images"
         pathFile = ''.join([pathDir,'/',lnFile])
         if os.path.exists(pathDir) and not os.path.exists(pathFile):
             # Symlink logo to admin pages.
-            system("%s/%s %s" % (lnTheme,lnFile,pathFile))
+            system("%s/%s %s" % (lnLoc,lnFile,pathFile))
 
     # Postfix - add virtual addresses.
     system("echo ''")

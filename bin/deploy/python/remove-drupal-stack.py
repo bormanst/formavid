@@ -218,15 +218,24 @@ def main():
         logging.info('Removed logo symlink for %s from tools ...' % hostname)
 
     # Drupal - remove stack site theme.
-    themes = "/".join([drupaldir,"themes"])
-    if os.path.exists(themes):
+    theme = "/".join([drupaldir,"themes",sitename])
+    if os.path.exists(theme):
         system("echo ''")
         system("echo 'Removing drupal theme for %s ...'" % hostname)
         system("echo ''")
-        system("touch %s/%s" % (themes, sitename))
-        system("rm -rf %s/%s" % (themes, sitename))
+        system("rm -rf %s" % theme)
         # log info
         logging.info('Removed drupal theme for %s.' % hostname)
+
+    # Drupal - remove site theme from git repo.
+    theme = "/".join(["/var/lib/git/drupal8",drupalsubdir,"web/themes",sitename])
+    if os.path.exists(theme):
+        system("echo ''")
+        system("echo 'Removing git repo for %s theme ...'" % hostname)
+        system("echo ''")
+        system("rm -rf %s" % theme)
+        # log info
+        logging.info('Removed git repo for %s theme.' % hostname)
 
     try:
         # Get db cursor.
