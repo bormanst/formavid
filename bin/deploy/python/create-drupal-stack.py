@@ -87,52 +87,48 @@ gulp.task('watch-scss', ['watch:css', 'lint:sass']);
 // ONLY tries to fix js files.
 // It is recommended to run watch after fixes completed.
 // #########################################################
-gulp.task('fix-js', ['fix-gulpfile-js', 'fix-base-js', 'fix-components-js']);
+gulp.task('fix-js', ['fix-base-js', 'fix-components-js', 'fix-theme-js']);
 
 function isFixed(file) {
   return file.eslint != null && file.eslint.fixed;
 }
 
-options.gulpfilepath = options.rootPath.project;
-options.jsbasepath = options.theme.js;
-options.jscomponentspath = options.theme.components;
-
 options.fix = {
-  gulpfile: [options.gulpfilepath + 'gulpfile.js'],
-  jsbasefiles: [
-    options.jsbasepath + '**/*.js',
-    '!' + options.jsbasepath + '**/*.min.js'
-  ],
+  jsbase: [options.rootPath.theme],
   jscomponents: [
-    options.jscomponentspath + '**/*.js',
+    options.theme.components + '**/*.js',
     '!' + options.theme.build + '**/*.js'
+  ],
+  jstheme: [
+    options.theme.js + '**/*.js',
+    '!' + options.theme.js + '**/*.min.js'
   ]
 };
+
+gulp.task('fix-base-js', function() {
+  return gulp
+    .src(options.fix.jsbase)
+    .pipe($.eslint({fix: true}))
+    .pipe($.eslint.format())
+    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.theme)))
+    .pipe($.eslint.failOnError());
+});
 
 gulp.task('fix-components-js', function() {
   return gulp
     .src(options.fix.jscomponents)
     .pipe($.eslint({fix: true}))
     .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.jscomponentspath)))
+    .pipe(gulpIf(isFixed, gulp.dest(options.theme.components)))
     .pipe($.eslint.failOnError());
 });
 
-gulp.task('fix-gulpfile-js', function() {
+gulp.task('fix-theme-js', function() {
   return gulp
-    .src(options.fix.gulpfile)
+    .src(options.fix.jstheme)
     .pipe($.eslint({fix: true}))
     .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.gulpfilepath)))
-    .pipe($.eslint.failOnError());
-});
-
-gulp.task('fix-base-js', function() {
-  return gulp
-    .src(options.fix.jsbasefiles)
-    .pipe($.eslint({fix: true}))
-    .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.jsbasepath)))
+    .pipe(gulpIf(isFixed, gulp.dest(options.theme.js)))
     .pipe($.eslint.failOnError());
 });
 """
