@@ -573,6 +573,7 @@ def main():
 
     # Drupal - init git site theme.
     gitDir = "/".join(["/var/lib/git/drupal8",drupalsubdir,"web/themes",sitename])
+    system("mkdir -p %s" % gitDir)
     system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme)
     system("echo 'styleguide' >> %s/.gitignore" % siteTheme)
     system("git -C %s init --separate-git-dir=%s" % (siteTheme,gitDir))
