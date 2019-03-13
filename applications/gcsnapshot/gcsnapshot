@@ -193,6 +193,15 @@ checkSnapshotDeletion()
 }
 
 # input: SNAPSHOT_NAME
+getSnapshotStorageBytes()
+{
+    local snapshot_storagebytes="\$(gcloud compute snapshots describe \$1 | grep "storageBytes:" | cut -d " " -f 2 | tr -d \')"
+
+    #  return size
+    echo -e \${snapshot_storagebytes}
+}
+
+# input: SNAPSHOT_NAME
 deleteSnapshot()
 {
     echo -e "\$(gcloud compute snapshots delete \$1 -q 2>> \${LOG})"
@@ -259,8 +268,30 @@ deleteSnapshotsWrapper()
         if [ "\${DELETION_CHECK}" -eq "1" ]; then
             OUTPUT_SNAPSHOT_DELETION=\$(deleteSnapshot \${snapshot})
         fi
-
     done
+}
+
+sizeSnapshotsWrapper()
+{
+    # log time
+    logTime "Start of sizeSnapshotsWrapper"
+
+    # get list of snapshots for regex - saved in global array
+    getSnapshots "gcs-.*\${INSTANCE_ID}-.*"
+
+    # loop through snapshots
+    SNAPSHOTS_TOTAL=0
+    for snapshot in "\${SNAPSHOTS[@]}"
+    do
+        # get snapshot size
+        SNAPSHOT_BYTES=\$(getSnapshotStorageBytes \${snapshot})
+
+        # update snapshots total
+        let SNAPSHOTS_TOTAL=SNAPSHOTS_TOTAL+\${SNAPSHOT_BYTES}
+    done
+    
+    # log size
+    logTime "Total size of snapshots is \${SNAPSHOTS_TOTAL} bytes."
 }
 
 # log time
@@ -274,6 +305,9 @@ createSnapshotWrapper
 
 # delete snapshots older than 'x' days
 deleteSnapshotsWrapper
+
+# get snapshots size
+sizeSnapshotsWrapper
 
 # log time
 logTime "End of Script"
