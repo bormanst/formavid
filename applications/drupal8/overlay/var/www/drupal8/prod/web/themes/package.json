@@ -9,7 +9,7 @@
     "browser-sync": "^2.26",
     "chroma-sass": "^1.2",
     "del": "^3.0",
-    "eslint": "^5.14",
+    "eslint": "^5.15",
     "gulp": "^3.9",
     "gulp-autoprefixer": "^6.0",
     "gulp-eslint": "^5.0",
