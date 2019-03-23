@@ -134,16 +134,6 @@ HOOKS="--deploy-hook ${DEPLOY_HOOK}"
 METHOD="--apache --preferred-challenges http"
 certbot certonly --cert-name ${APP_HOSTNAME} ${METHOD} --agree-tos -m ${APP_EMAIL} --max-log-backups 30 -n ${HOOKS} ${DOMAINS}
 
-# update cron
-# see 'certbot help renew' for options
-# apache: WEBROOTS=
-# standalone: WEBROOTS=
-# webroot: WEBROOTS="-w ${WEB_ROOT1} -w ${WEB_ROOT2} ... -w ${WEB_ROOTn}"
-WEBROOTS=
-RENEW="certbot -q renew"
-RENEW_MOD="${RENEW} --cert-name ${APP_HOSTNAME} ${METHOD} ${HOOKS} ${WEBROOTS}"
-sed -i "s/${RENEW}/${RENEW_MOD}/g" /etc/cron.d/certbot
-
 # update apache
 CONF=/etc/apache2/mods-available/ssl.conf
 if [ -f "${CONF}" ]; then
