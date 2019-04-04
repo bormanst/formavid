@@ -46,7 +46,7 @@ MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # set version
-SOLR_SPEC="7.7.0"
+SOLR_SPEC="7.7.1"
 
 # modify to location of compressed tgz
 SRC=/usr/local/src
