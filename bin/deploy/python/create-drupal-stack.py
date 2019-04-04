@@ -521,16 +521,19 @@ def main():
         system("rm -f %s" % sysTheme)
         system("ln -s %s %s" % (siteTheme,sysTheme))
         # Symlink system theme to admin pages.
-        appTheme = "/var/www/admin/theme"
-        if os.path.exists(appTheme):
+        appDir = "/var/www/admin"
+        if os.path.exists(appDir):
+            appTheme = "/".join([appDir,"theme"])
             system("ln -s %s %s" % (sysTheme,appTheme))
         # Symlink system theme to support pages.
-        appTheme = "/var/www/support/html/theme"
-        if os.path.exists(appTheme):
+        appDir = "/var/www/support/html"
+        if os.path.exists(appDir):
+            appTheme = "/".join([appDir,"theme"])
             system("ln -s %s %s" % (sysTheme,appTheme))
         # Symlink system theme to webmin - used in apllications/webmin/webmin as well
-        appTheme = "/usr/share/webmin/system-theme/unauthenticated/system"
-        if os.path.exists(appTheme):
+        appDir = "/usr/share/webmin/system-theme/unauthenticated"
+        if os.path.exists(appDir):
+            appTheme = "/".join([appDir,"system"])
             system("ln -s %s %s" % (sysTheme,appTheme))
 
     # Check local gulp for SASS.
