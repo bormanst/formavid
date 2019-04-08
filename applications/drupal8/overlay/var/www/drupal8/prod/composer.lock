@@ -2958,7 +2958,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/fivestar.git",
-                "reference": "ee888670ec1276ecf313da7caa38800f62190c32"
+                "reference": "cd9319a8a5e5c67d88d97aee6025d5f429165d55"
             },
             "require": {
                 "drupal/core": "~8.0",
@@ -2971,7 +2971,7 @@
                 },
                 "drupal": {
                     "version": "8.x-1.x-dev",
-                    "datestamp": "1498146542",
+                    "datestamp": "1553264286",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Dev releases are not covered by Drupal security advisories."
@@ -2983,6 +2983,10 @@
                 "GPL-2.0-or-later"
             ],
             "authors": [
+                {
+                    "name": "Alex Liannoy",
+                    "homepage": "https://www.drupal.org/user/2415162"
+                },
                 {
                     "name": "Dave Reid",
                     "homepage": "https://www.drupal.org/user/53892"
@@ -3008,6 +3012,10 @@
                     "homepage": "https://www.drupal.org/user/473174"
                 },
                 {
+                    "name": "init90",
+                    "homepage": "https://www.drupal.org/user/1322186"
+                },
+                {
                     "name": "quicksketch",
                     "homepage": "https://www.drupal.org/user/35821"
                 },
@@ -3019,9 +3027,9 @@
             "description": "Enables fivestar ratings on content, users, etc.",
             "homepage": "https://www.drupal.org/project/fivestar",
             "support": {
-                "source": "http://cgit.drupalcode.org/fivestar"
+                "source": "https://git.drupalcode.org/project/fivestar"
             },
-            "time": "2017-06-22 15:45:06"
+            "time": "2018-12-29 15:09:32"
         },
         {
             "name": "drupal/honeypot",
@@ -4066,26 +4074,20 @@
         },
         {
             "name": "drupal/typed_data",
-            "version": "1.0.0-alpha2",
+            "version": "1.0.0-alpha3",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/typed_data.git",
-                "reference": "8.x-1.0-alpha2"
+                "reference": "8.x-1.0-alpha3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/typed_data-8.x-1.0-alpha2.zip",
-                "reference": "8.x-1.0-alpha2",
-                "shasum": "a4e5f9fe5ad5842c335414ae2cbfb2aed69ef0fe"
+                "url": "https://ftp.drupal.org/files/projects/typed_data-8.x-1.0-alpha3.zip",
+                "reference": "8.x-1.0-alpha3",
+                "shasum": "962d53659f73de8dfa43f291ef40ec26e1b7a07f"
             },
             "require": {
                 "drupal/core": "~8.0"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
-                "drupal/coder": "8.2.*",
-                "squizlabs/php_codesniffer": "2.9.*",
-                "symfony/yaml": "3.*"
             },
             "type": "drupal-module",
             "extra": {
@@ -4093,8 +4095,8 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-alpha2",
-                    "datestamp": "1536437580",
+                    "version": "8.x-1.0-alpha3",
+                    "datestamp": "1554612486",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Alpha releases are not covered by Drupal security advisories."
@@ -4118,7 +4120,7 @@
             "description": "Extends the core Typed Data API with new APIS and features.",
             "homepage": "https://www.drupal.org/project/typed_data",
             "support": {
-                "source": "http://cgit.drupalcode.org/typed_data"
+                "source": "https://git.drupalcode.org/project/typed_data"
             }
         },
         {
@@ -6292,16 +6294,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.4.23",
+            "version": "v3.4.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "ec625e2fff7f584eeb91754821807317b2e79236"
+                "reference": "a088aafcefb4eef2520a290ed82e4374092a6dff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/ec625e2fff7f584eeb91754821807317b2e79236",
-                "reference": "ec625e2fff7f584eeb91754821807317b2e79236",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/a088aafcefb4eef2520a290ed82e4374092a6dff",
+                "reference": "a088aafcefb4eef2520a290ed82e4374092a6dff",
                 "shasum": ""
             },
             "require": {
@@ -6351,7 +6353,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:06:07"
+            "time": "2019-04-02 08:51:52"
         },
         {
             "name": "symfony/filesystem",
