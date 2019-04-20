@@ -11,7 +11,7 @@
     "del": "^3.0",
     "eslint": "^5.16",
     "gulp": "^3.9",
-    "gulp-autoprefixer": "^6.0",
+    "gulp-autoprefixer": "^6.1",
     "gulp-eslint": "^5.0",
     "gulp-if": "^2.0",
     "gulp-load-plugins": "^1.5",
@@ -39,11 +39,11 @@
     "eslint-config-airbnb": "^17.1",
     "eslint-config-airbnb-standard": "^2.1",
     "eslint-config-prettier": "^3.6",
-    "eslint-plugin-import": "^2.16",
+    "eslint-plugin-import": "^2.17",
     "eslint-plugin-jsx-a11y": "^6.2",
     "eslint-plugin-prettier": "^3.0",
     "eslint-plugin-react": "^7.12",
     "gulp-watch": "^5.0",
-    "prettier": "^1.16"
+    "prettier": "^1.17"
   }
 }
