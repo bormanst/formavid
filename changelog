@@ -1,7 +1,5 @@
-formavid (15.2.01) stable; urgency=low
+formavid (15.2.02) stable; urgency=low
 
-  * Drupal updated to 8.7.0.
-  
   * Updated drupal modules.
 
   * Major component versions:
@@ -21,7 +19,7 @@ formavid (15.2.01) stable; urgency=low
     roundup         1.6.0 (upstream archive)
     solr (optional) 7.7.1 (upstream archive)
 
- -- Sean Borman <bormanst@gmail.com>  Fri, 03 May 2019 02:57:33 -0500
+ -- Sean Borman <bormanst@gmail.com>  Sun, 05 May 2019 04:52:07 -0500
 
 formavid (15.1.26) stable; urgency=low
 
