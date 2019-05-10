@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "937616303fa49c33211be90eb402609e",
-    "content-hash": "8777f3202bd04e2b496be461f2a0b422",
+    "hash": "9accb1e95c137aad0bbbfab1d0a666ec",
+    "content-hash": "10ab691d6cc0435e402c14d9d54849b9",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -2340,16 +2340,16 @@
         },
         {
             "name": "drupal/core",
-            "version": "8.7.0",
+            "version": "8.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "5da135abcf5dbc0204e9a75c87381c7553a74d5e"
+                "reference": "969f24810fb31eac71dd624de593f551bd6dc2a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/5da135abcf5dbc0204e9a75c87381c7553a74d5e",
-                "reference": "5da135abcf5dbc0204e9a75c87381c7553a74d5e",
+                "url": "https://api.github.com/repos/drupal/core/zipball/969f24810fb31eac71dd624de593f551bd6dc2a3",
+                "reference": "969f24810fb31eac71dd624de593f551bd6dc2a3",
                 "shasum": ""
             },
             "require": {
@@ -2394,7 +2394,7 @@
                 "symfony/validator": "~3.4.0",
                 "symfony/yaml": "~3.4.5",
                 "twig/twig": "^1.38.2",
-                "typo3/phar-stream-wrapper": "^2.0.1",
+                "typo3/phar-stream-wrapper": "^2.1.1",
                 "zendframework/zend-diactoros": "^1.1",
                 "zendframework/zend-feed": "^2.4"
             },
@@ -2580,7 +2580,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
-            "time": "2019-05-01 18:39:15"
+            "time": "2019-05-08 16:00:55"
         },
         {
             "name": "drupal/ctools",
@@ -7831,16 +7831,16 @@
         },
         {
             "name": "typo3/phar-stream-wrapper",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3/phar-stream-wrapper.git",
-                "reference": "b7a21f0859059ed5d9754af8c11f852d43762334"
+                "reference": "e438b0c78652b33407983eb29d215a1a3f68f6f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3/phar-stream-wrapper/zipball/b7a21f0859059ed5d9754af8c11f852d43762334",
-                "reference": "b7a21f0859059ed5d9754af8c11f852d43762334",
+                "url": "https://api.github.com/repos/TYPO3/phar-stream-wrapper/zipball/e438b0c78652b33407983eb29d215a1a3f68f6f3",
+                "reference": "e438b0c78652b33407983eb29d215a1a3f68f6f3",
                 "shasum": ""
             },
             "require": {
@@ -7850,6 +7850,7 @@
                 "php": "^5.3.3|^7.0"
             },
             "require-dev": {
+                "ext-xdebug": "*",
                 "phpunit/phpunit": "^4.8.36"
             },
             "type": "library",
@@ -7870,7 +7871,7 @@
                 "security",
                 "stream-wrapper"
             ],
-            "time": "2019-03-01 17:43:52"
+            "time": "2019-05-05 17:30:51"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -10469,16 +10470,16 @@
         },
         {
             "name": "webflo/drupal-core-require-dev",
-            "version": "8.7.0",
+            "version": "8.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webflo/drupal-core-require-dev.git",
-                "reference": "dc2bd5de993e2634fb8e0a33505e02c0f25f5271"
+                "reference": "91acb9e4723e371290b11eff67fbb5884d3c8e6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webflo/drupal-core-require-dev/zipball/dc2bd5de993e2634fb8e0a33505e02c0f25f5271",
-                "reference": "dc2bd5de993e2634fb8e0a33505e02c0f25f5271",
+                "url": "https://api.github.com/repos/webflo/drupal-core-require-dev/zipball/91acb9e4723e371290b11eff67fbb5884d3c8e6c",
+                "reference": "91acb9e4723e371290b11eff67fbb5884d3c8e6c",
                 "shasum": ""
             },
             "require": {
@@ -10486,7 +10487,7 @@
                 "behat/mink-goutte-driver": "^1.2",
                 "behat/mink-selenium2-driver": "1.3.x-dev",
                 "drupal/coder": "^8.3.1",
-                "drupal/core": "8.7.0",
+                "drupal/core": "8.7.1",
                 "jcalderonzumba/gastonjs": "^1.0.2",
                 "jcalderonzumba/mink-phantomjs-driver": "^0.3.1",
                 "justinrainbow/json-schema": "^5.2",
@@ -10503,7 +10504,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "require-dev dependencies from drupal/core",
-            "time": "2019-05-02 01:08:54"
+            "time": "2019-05-08 17:31:44"
         }
     ],
     "aliases": [],
