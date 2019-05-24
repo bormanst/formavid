@@ -30,7 +30,7 @@
         "drupal/ctools": "^3.2",
         "drupal/devel": "^2.0",
         "drupal/features": "^3.8",
-        "drupal/field_group": "^1.0",
+        "drupal/field_group": "^3.0",
         "drupal/fivestar": "1.x-dev",
         "drupal/honeypot": "^1.29",
         "drupal/image_style_quality": "^1.3",
