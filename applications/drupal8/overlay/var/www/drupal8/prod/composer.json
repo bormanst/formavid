@@ -25,7 +25,7 @@
         "drupal/backup_migrate": "^4.0",
         "drupal/captcha": "^1.0@beta",
         "drupal/components": "^1.1",
-        "drupal/console": "^1.0",
+        "drupal/console": "1.8.0",
         "drupal/core": "^8.7.0",
         "drupal/ctools": "^3.2",
         "drupal/devel": "^2.0",
