@@ -1,4 +1,29 @@
-formavid (15.2.14) stable; urgency=high
+formavid (15.2.15) stable; urgency=low
+
+  * Drupal updated to 8.7.8.
+
+  * Updated drupal modules.
+
+  * Major component versions:
+
+    adminer         4.2.5
+    apache2         2.4.25
+    borgbackup      1.0.9
+    dovecot         2.2.27
+    drupal          8.7.8 (upstream archive)
+    drush           9.5.2 (upstream archive)
+    fail2ban        0.9.6
+    invoiceninja    4.5.14 (upstream archive)
+    mariadb         10.1.41
+    php             7.0.33
+    proftpd         1.35
+    postfix         3.1.12
+    roundup         1.6.0 (upstream archive)
+    solr (optional) 7.7.1 (upstream archive)
+
+ -- Sean Borman <bormanst@gmail.com>  Sat, 05 Oct 2019 00:54:43 -0500
+ 
+ formavid (15.2.14) stable; urgency=high
 
   * Reverted drupal console to v1.8.0.
     Drupal console 1.9.2 has broken multisite install.
