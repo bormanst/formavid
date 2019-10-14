@@ -38,7 +38,6 @@
         "drupal/imagemagick": "^2.5",
         "drupal/imce": "^1.7",
         "drupal/inline_entity_form": "^1.0@RC",
-        "drupal/jsonapi": "^2.3",
         "drupal/module_filter": "^3.1",
         "drupal/panels": "^4.4",
         "drupal/pathauto": "^1.4",
