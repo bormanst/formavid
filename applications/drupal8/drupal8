@@ -140,11 +140,23 @@ COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
 # enable drupal console within subdirs
-MESSSAGE="Enabling drupal console for ${PACKAGE} ..."
-echo ${MESSSAGE} | tee -a ${LOG}
-curl https://drupalconsole.com/installer -L -o drupal.phar
-mv drupal.phar /usr/local/bin/drupal
-chmod +x /usr/local/bin/drupal
+# MESSSAGE="Enabling drupal console for ${PACKAGE} ..."
+# echo ${MESSSAGE} | tee -a ${LOG}
+# curl https://drupalconsole.com/installer -L -o drupal.phar
+# mv drupal.phar /usr/local/bin/drupal
+# chmod +x /usr/local/bin/drupal
+
+# apply composer files
+TARGET_DIR=/usr/local/bin
+OVERLAY_DIR=$1${TARGET_DIR}
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}/drupal ${TARGET_DIR}
+    chmod +x ${TARGET_DIR}/drupal
+    MESSSAGE="Applied drupal console file for use within subdirs."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
 
 # init drupal project console
 MESSSAGE="Initializing installation for ${PACKAGE} ..."
