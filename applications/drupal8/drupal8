@@ -146,11 +146,10 @@ su - admin -c "${COMMAND}"
 # mv drupal.phar /usr/local/bin/drupal
 # chmod +x /usr/local/bin/drupal
 
-# apply composer files
+# apply drupal console phar file.
 TARGET_DIR=/usr/local/bin
-OVERLAY_DIR=$1${TARGET_DIR}
-if [ -d "${OVERLAY_DIR}" ]; then
-    cp -f ${OVERLAY_DIR}/drupal ${TARGET_DIR}
+if [ -d "${OVERLAY_DIR}${TARGET_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${TARGET_DIR}/drupal ${TARGET_DIR}
     chmod +x ${TARGET_DIR}/drupal
     MESSSAGE="Applied drupal console file for use within subdirs."
     echo ${MESSSAGE} | tee -a ${LOG}
