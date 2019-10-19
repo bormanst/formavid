@@ -139,6 +139,10 @@ echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
+# hack to fix recently introduced bug with drupal-project 8.x-dev and console TranslatorManager
+COMMAND="ln -sf ${PROJECT_DIR}/console/language/console-en ${PROJECT_DIR}/vendor/drupal/console-en"
+su - admin -c "${COMMAND}"
+
 # enable drupal console within subdirs
 # MESSSAGE="Enabling drupal console for ${PACKAGE} ..."
 # echo ${MESSSAGE} | tee -a ${LOG}
