@@ -168,7 +168,7 @@ def main():
         system("rm -rf %s/%s" % (solrdata, sitename))
         # Check solr service running.
         out = system("systemctl is-active solr")
-        if out.strip().lower() == 'active':
+        if out == 'active':
             # Restart to apply changes.
             system("systemctl restart solr")
         # log info
@@ -188,22 +188,24 @@ def main():
         system("echo ''")
         system("touch %s/poll.%s" % (sites, hostname))
         system("rm -rf %s/poll.%s" % (sites, hostname))
-        system("sed -i '/poll.%s/d' %s/sites.php" % (hostname, sites))
         system("touch %s/forum.%s" % (sites, hostname))
         system("rm -rf %s/forum.%s" % (sites, hostname))
-        system("sed -i '/forum.%s/d' %s/sites.php" % (hostname, sites))
         system("touch %s/book.%s" % (sites, hostname))
         system("rm -rf %s/book.%s" % (sites, hostname))
-        system("sed -i '/book.%s/d' %s/sites.php" % (hostname, sites))
         system("touch %s/blog.%s" % (sites, hostname))
         system("rm -rf %s/blog.%s" % (sites, hostname))
-        system("sed -i '/blog.%s/d' %s/sites.php" % (hostname, sites))
         system("touch %s/aggregator.%s" % (sites, hostname))
         system("rm -rf %s/aggregator.%s" % (sites, hostname))
-        system("sed -i '/aggregator.%s/d' %s/sites.php" % (hostname, sites))
         system("touch %s/%s" % (sites, hostname))
         system("rm -rf %s/%s" % (sites, hostname))
-        system("sed -i '/%s/d' %s/sites.php" % (hostname, sites))
+        multisite = "/".join([sites,"sites.php"])
+        if os.path.exists(multisite):
+            system("sed -i '/poll.%s/d' %s" % (hostname, multisite))
+            system("sed -i '/forum.%s/d' %s" % (hostname, multisite))
+            system("sed -i '/book.%s/d' %s" % (hostname, multisite))
+            system("sed -i '/blog.%s/d' %s" % (hostname, multisite))
+            system("sed -i '/aggregator.%s/d' %s" % (hostname, multisite))
+            system("sed -i '/%s/d' %s" % (hostname, multisite))
         # log info
         logging.info('Drupal directory removals complete.')
 
