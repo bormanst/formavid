@@ -9,7 +9,7 @@
 
 
 
-Debian 9 or compatible base distro via ssh as 'root':
+Debian 10 or compatible base distro via ssh as 'root':
 
 apt-get update && apt-get install -y git
 git clone https://github.com/bormanst/formavid /usr/local/formavid
@@ -23,12 +23,12 @@ utilities and a ssh server installed - no desktop, other servers, or application
 However, if the distro has a component already installed, such as apache or mysql,
 then the install script should automatically skip installing the corresponding
 component; the triggers depend on standard locations and Systemd. Please review
-and modify the available scripts before deploying on something other than Debian 9
+and modify the available scripts before deploying on something other than Debian 10
 Stretch. The scripts are well documented and relatively easy to read and edit.
 
 
 
-Google GCE Debian 9 image via local bash:
+Google GCE Debian 10 image via local bash:
 
 apt-get update && apt-get install -y git
 git clone https://github.com/bormanst/formavid /usr/local/formavid

@@ -46,7 +46,7 @@ MESSSAGE="Configuring ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # set version
-SOLR_SPEC="7.7.1"
+SOLR_SPEC="8.2.0"
 
 # modify to location of compressed tgz
 SRC=/usr/local/src
@@ -217,10 +217,10 @@ export SOLR_OLD="SolrRocks"
 ${FORMAVID}/bin/initialize/python/${PACKAGE}.py
 systemctl stop solr
 
-# open firewall ports in GCE/Webin
+# open firewall ports in GCE/Webmin
 echo ""
 echo "Be sure the GCE and webmin firewall ports are open if remote access is required."
-echo "The default values is https:8983."
+echo "The default values are http and 8983."
 echo ""
 
 # clean up

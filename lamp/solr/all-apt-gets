@@ -29,7 +29,7 @@ elif [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # install dependencies
-    export APTGETS="openjdk-8-jdk"
+    export APTGETS="openjdk-11-jdk"
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

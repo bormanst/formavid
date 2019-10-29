@@ -102,7 +102,7 @@ fi
 HOME="/home/${DB_USER}/.local"
 if [ ! -d "${HOME}" ]; then
     # set version
-    VERSION="1.6.0"
+    VERSION="1.6.1"
     # install roundup to user home
     su - ${DB_USER} -c "pip install ${PACKAGE}==${VERSION} --user"
     # set home access perms

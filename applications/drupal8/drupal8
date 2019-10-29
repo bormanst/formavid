@@ -79,6 +79,7 @@ echo ${MESSSAGE} | tee -a ${LOG}
 # add drupal8 user to database
 MESSSAGE="Adding drupal8 user to database for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
+mysql --user=root --password=${DB_PASS} --execute "DELETE FROM mysql.user WHERE User = 'drupal8'; FLUSH PRIVILEGES;"
 mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal8@localhost IDENTIFIED BY '${APP_PASS}';"
 
 # composer peformance issue
@@ -139,9 +140,19 @@ echo ${MESSSAGE} | tee -a ${LOG}
 COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
 su - admin -c "${COMMAND}"
 
+# hack to allow solarium to update properly
+if [ `grep -c "\"symfony/event-dispatcher\": \"~3.4" ${PROJECT_DIR}/web/core/composer.json` == 1 ]; then 
+    COMMAND="composer require -d ${PROJECT_DIR} symfony/event-dispatcher:\"4.3.5 as 3.4.99\""
+    su - admin -c "${COMMAND}"
+    COMMAND="composer update -d ${PROJECT_DIR}"
+    su - admin -c "${COMMAND}"
+fi
+
 # hack to fix recently introduced bug with drupal-project 8.x-dev and console TranslatorManager
-COMMAND="ln -sf ${PROJECT_DIR}/console/language/console-en ${PROJECT_DIR}/vendor/drupal/console-en"
-su - admin -c "${COMMAND}"
+if [ ! -d "${PROJECT_DIR}/vendor/drupal/console-en" ] && [ -d "${PROJECT_DIR}/console/language/console-en" ]; then
+    COMMAND="ln -sf ${PROJECT_DIR}/console/language/console-en ${PROJECT_DIR}/vendor/drupal/console-en"
+    su - admin -c "${COMMAND}"
+fi
 
 # enable drupal console within subdirs
 # MESSSAGE="Enabling drupal console for ${PACKAGE} ..."
@@ -188,7 +199,7 @@ COMMAND="cd ${APP_DIR}"
 su - admin -c "${COMMAND}"
 
 # clean up mod_php5 references in htaccess
-MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}..."
+MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
 MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}."
@@ -208,32 +219,31 @@ cat > /etc/drush/drushrc.php <<EOF
 \$options['r'] = '${APP_DIR}';
 EOF
 
-# update nodejs to latest
-MESSSAGE="Installing gulp for ${PACKAGE} ..."
+# update npm
+MESSSAGE="Updating npm ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-npm cache clean -f
-npm install -g n
-n stable
-
-# update npm to latest
 npm install -g npm@latest
 touch /usr/bin/npm
 rm /usr/bin/npm
 ln -s /usr/local/bin/npm /usr/bin/npm
 
 # install gulp-cli
+MESSSAGE="Installing gulp for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 npm install -g gulp-cli
 
 # copy custom package.json
 if [ -d "${OVERLAY_DIR}" ]; then
-    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/web/themes/package.json ${PROJECT_DIR}/web/themes
-    MESSSAGE="Applied gulp package.json for ${PROJECT_DIR}/web/themes."
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/web/themes/* ${PROJECT_DIR}/web/themes
+    MESSSAGE="Applied npm package info for ${PROJECT_DIR}/web/themes."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
 fi
 
 # set temp system theme to be updated by create-drupal-stack
+MESSSAGE="Setting default system theme ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 DEFAULT_THEME=${PROJECT_DIR}/web/themes/contrib/zen/STARTERKIT
 if [ -d "${DEFAULT_THEME}" ]; then
     # symlink system theme to default zen theme if file_exists
@@ -244,18 +254,27 @@ else
 fi
 
 # set cssadmin perms
+MESSSAGE="Setting cssadmin perms for default theme ..."
+echo ${MESSSAGE} | tee -a ${LOG}
 chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
 
 # preload node_modules for themes
 # background safe: depends on gulp-cli
-su - cssadmin -c "cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
+MESSSAGE="Installing node packages for ${PACKAGE} themes ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+if [ -f "${OVERLAY_DIR}${PROJECT_DIR}/web/themes/package-lock.json" ]; then
+    COMMAND="cd ${PROJECT_DIR}/web/themes && npm ci --unsafe-perm"
+else
+    COMMAND="cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
+fi
+su - cssadmin -c "${COMMAND}"
 
 # fix issue in chroma-sass module
 CONF=${PROJECT_DIR}/web/themes/node_modules/chroma-sass/sass/chroma/_internals.scss
 su - cssadmin -c "sed -i 's/return call(\$function,/return call(get-function(\$function),/g' ${CONF}"
 
 # update settings
-MESSSAGE="Updating settings for ${PACKAGE} ..."
+MESSSAGE="Updating default site settings for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 CONF=${PROJECT_DIR}/web/sites/default/settings.php
 cp ${PROJECT_DIR}/web/sites/default/default.settings.php ${CONF}

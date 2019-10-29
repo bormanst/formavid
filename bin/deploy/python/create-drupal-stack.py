@@ -349,37 +349,6 @@ def main():
     # siteTypes = ['article','aggregator','blog','book','forum','poll']
     siteTypes = ['article']
 
-    # Check if solr needs configuration.
-    if installSolr:
-        # Solr - set core properties.
-        system("echo ''")
-        system("echo 'Configuring solr search core data ...'")
-        system("echo ''")
-        # Solr - create template dir.
-        system("mkdir -p %s/%s" % (templates,sitename))
-        for sitetype in siteTypes:
-            system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-            system("cp -f /etc/formavid/templates/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,sitename,sitetype))
-            system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-            system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-        # Solr - load cores.
-        solrdata = "/var/lib/solr/data"
-        system("mv %s/%s %s" % (templates,sitename,solrdata))
-        # Solr - copy drupal solr conf.
-        apachesolr = "/".join([drupaldir,"web/modules/contrib/search_api_solr/solr-conf/7.x"])
-        for sitetype in siteTypes:
-            system("cp -r %s %s/%s/%s/conf" % (apachesolr,solrdata,sitename,sitetype))
-            system("sed -i \"s|solr.install.dir=.*|solr.install.dir=/usr/local/solr|g\" %s/%s/%s/conf/solrcore.properties" % (solrdata,sitename,sitetype))
-        # Solr - ensure owner.
-        system("chown -R solr:solr %s/%s" % (solrdata,sitename))
-        # Solr - enable changes.
-        system("systemctl restart solr")
-        system("echo ''")
-        system("echo 'Solr search core data configuration is complete.'")
-        system("echo ''")
-        # Log info.
-        logging.info('Solr search core data configuration is complete.')
-
     # Hosts - update.
     for sitetype in siteTypes:
         sitetypemod = ''
@@ -442,9 +411,6 @@ def main():
         # Log info.
         logging.info('The drupal site %s has been created.' % baseUri)
 
-    # Sites - clean up.
-    system("rm -rf %s/sites-staging" % templates)
-
     try:
         # Get db conection.
         con = mdb.connect(host="localhost", user="root", passwd="%s" % dbpass)
@@ -504,7 +470,7 @@ def main():
     # Create site sub-theme from zen theme.
     system("cp -fpr %s/web/themes/contrib/zen/STARTERKIT %s/web/themes" % (drupaldir,drupaldir))
     system("mv %s/web/themes/STARTERKIT %s" % (drupaldir,siteTheme))
-    system("find %s -iname \"*STARTERKIT*\" -exec rename 's/STARTERKIT/%s/' {} \;" % (siteTheme,sitename))
+    system("find %s -iname \"*STARTERKIT*\" -exec rename.ul STARTERKIT %s {} \;" % (siteTheme,sitename))
     system("find %s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (siteTheme,sitename))
     system("find %s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (siteTheme,sitetitle))
     system("echo ''")
@@ -602,7 +568,7 @@ def main():
     system("chown -R cssadmin:cssadmin %s" % gitDir)
 
     # Set path to solr configs.
-    solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/search_api_solr_defaults/config/optional"])
+    solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/modules/search_api_solr_defaults/config/optional"])
 
     # Drupal - enable/disable properties.
     for sitetype in siteTypes:
@@ -631,8 +597,9 @@ def main():
                     system("cp %s/search_api.index.default_solr_index.yml %s/search_api.index.default_solr_index.bak" % (solrconfigpath,solrconfigpath))
                     # Update solr defaults yaml settings.
                     set_solr_configs(solrconfigpath,solrserverid,solrservername,solrcorename,solrnew,formavid)
-                    # Enable module.
+                    # Enable and then disable module.
                     system("drupal --root=%s --uri=\"http://%s\" module:install %s --no-interaction" % (drupaldir,baseUri,module))
+                    system("drupal --root=%s --uri=\"http://%s\" module:uninstall %s --no-interaction" % (drupaldir,baseUri,module))
                     # Restore solr defaults yaml files.
                     system("mv -f %s/search_api.server.default_solr_server.bak %s/search_api.server.default_solr_server.yml" % (solrconfigpath,solrconfigpath))
                     system("mv -f %s/search_api.index.default_solr_index.bak %s/search_api.index.default_solr_index.yml" % (solrconfigpath,solrconfigpath))
@@ -640,14 +607,44 @@ def main():
                     # Enable module.
                     system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri,module))
 
-        # Install sub-theme.
-        system("drupal --root=%s --uri=\"http://%s\" theme:install  %s --set-default" % (drupaldir,baseUri,sitename))
+        # Install sub-theme prior to possible disabling default search - fails otherwise.
+        system("drupal --root=%s --uri=\"http://%s\" theme:install %s --set-default" % (drupaldir,baseUri,sitename))
+
+        # Check if solr needs configuration.
         if installSolr:
             # After all installs disable default search module if solr.
-            system("drupal --root=%s --uri=\"http://%s\" module:uninstall  search --no-interaction" % (drupaldir,baseUri))
+            system("drupal --root=%s --uri=\"http://%s\" module:uninstall search --no-interaction" % (drupaldir,baseUri))
+            # Solr - set core properties.
+            system("echo ''")
+            system("echo 'Configuring solr search core data ...'")
+            system("echo ''")
+            # Solr - create template dir.
+            system("mkdir -p %s/%s" % (templates,sitename))
+            for sitetype in siteTypes:
+                system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
+                system("cp -f /etc/formavid/templates/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,sitename,sitetype))
+                system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
+                system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
+            # Solr - load cores.
+            solrdata = "/var/lib/solr/data"
+            system("mv %s/%s %s" % (templates,sitename,solrdata))
+            # Solr - copy drupal solr conf.
+            for sitetype in siteTypes:
+                system("drush -r %s -l http://%s solr-gsc %s_solr_server %s/%s/%s/configs.zip" % (drupaldir,baseUri,solrserverid,solrdata,sitename,sitetype))
+                system("unzip -o %s/%s/%s/configs.zip -d %s/%s/%s/conf/" % (solrdata,sitename,sitetype,solrdata,sitename,sitetype))
+                system("sed -i \"s|solr.install.dir=.*|solr.install.dir=/usr/local/solr|g\" %s/%s/%s/conf/solrcore.properties" % (solrdata,sitename,sitetype))
+            # Solr - ensure owner.
+            system("chown -R solr:solr %s/%s" % (solrdata,sitename))
+            # Solr - enable changes.
+            system("systemctl restart solr")
+            system("echo ''")
+            system("echo 'Solr search core data configuration is complete.'")
+            system("echo ''")
+            # Log info.
+            logging.info('Solr search core data configuration is complete.')
+
         # Set configs.
-        system("drush -r %s -l http://%s config:set -y block.block.%s_powered status 0 " % (drupaldir,baseUri,sitename))
-        # system("drupal --root=%s --uri=\"http://%s\" settings:set  block.block.%s_powered status 0  --no-interaction" % (drupaldir,baseUri,sitename))
+        system("drush -r %s -l http://%s config:set -y block.block.%s_powered status 0" % (drupaldir,baseUri,sitename))
         # Clean up.
         system("echo ''")
         system("echo 'Rebuilding %s drupal caches ...'" % baseUri)
@@ -689,6 +686,9 @@ def main():
             system("ln -s %s/logo.svg /var/www/admin/images/%s.svg" % (siteTheme,sitename))
         # Log info.
         logging.info('Drupal site created/configured for %s.' % baseUri)
+
+    # Sites - clean up.
+    system("rm -rf %s/sites-staging" % templates)
 
     # Set admin owner for sites/themes.
     system("chown admin:admin %s/web/sites" % drupaldir)

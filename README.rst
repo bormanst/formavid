@@ -1,13 +1,11 @@
-The FormaVid Small Business Appliance has been completely refactored:
+The FormaVid Small Business Appliance has been updated for Debian 10 Buster:
 ------------------------------------------------------------------------
 
-- Refactored to be a collection of install and configuration scripts.
-- No longer incorporates base operating system allowing for user choice.
-- Specifically designed to run on Google Compute Engine's Debian-9 image
+- Specifically designed to run on Google Compute Engine's Debian-10 image
   but will run on compatible distros with minor modifications.
-- All dependencies on other vendor distros have been removed.
 - Deployable on local hardware, VMs, or to the cloud.
 - Select any compatible base distro and let the scripts do the work.
+- Notable improvements include php-7.3.9 and solr-8 using openjdk-11.
 
 
 The FormaVid Small Business Appliance integrates the following features:
@@ -40,21 +38,20 @@ and large community-driven websites.
    - Backup and migrate: Backup and restore your Drupal site
      on-demand or on a schedule.
    - CAPTCHA: A challenge-response test for forms.
+   - Chaos tool suite: Set of APIs and tools for developers.
    - Component Libraries: Registers “component libraries” defined by
      your theme or module as Twig namespaces.
-   - Chaos tool suite: Set of APIs and tools for developers.
    - Devel: A suite of helper modules for Drupal module and theme
      developers.
-   - Drush: a command line shell and Unix scripting interface for
-     Drupal.
+   - Drush: a command line shell and Unix scripting interface for Drupal.
    - Features: Enables the capture and management of features.
    - Field Group: Enables grouping fields together.
    - FiveStar: Simple five-star voting widget for nodes.
    - Honeypot: Methods for deterring spam bots.
-   - Image Style Quality: Allows you to specify a custom quality on
-     individual image styles.
    - ImageAPI Optimize: allows you to use your preferred toolkit and
      optimize (losslessly) the image when it is saved.
+   - Image Style Quality: Allows you to specify a custom quality on
+     individual image styles.
    - ImageMagick: Allows to use ImageMagick or GraphicsMagick as image
      toolkit for Image API.
    - Imce: Powerful image file uploader and browser, with support for
@@ -62,15 +59,16 @@ and large community-driven websites.
    - Inline Entity Form: Provides a widget for inline management
      (creation, modification, removal) of referenced entities.
    - Module Filter: The ability to quickly find  modules.
-   - Panels: Drag and drop customized layouts for pages, nodes and
-     blocks.
+   - Panels: Drag and drop customized layouts for pages, nodes and blocks.
    - PathAuto: Auto-generate search engine friendly URLs (SEO).
    - Recaptcha: Thwart spammers by adding image or text based
      CAPTCHAs to your site.
+   - RestUI: Provides a user interface to manage REST resources.
    - Rules: Allows site administrators to define conditionally
      executed actions based on occurring events.
-   - Search API Solr Search: Optional customizable search support.
+   - Search API Solr: Optional customizable search support.
    - Tagadelic: Makes weighted tag clouds from your taxonomy terms.
+   - Typed Data: Extends the core Typed Data API with new APIs and features.
    - Views Bulk Operations: augments Views by allowing bulk operations
      to be executed on the displayed rows.
    - Zen: a modern, powerful, HTML5 starting theme with component-based
@@ -138,14 +136,14 @@ Additional Features
 - `Apache Solr`_ optional search server (listening on port 8983).
 - `BorgBackup`_ deduplicating archiver with compression and encryption.
 - `Dovecot`_ IMAP/POP3 server (listening on ports 993/143).
+- `Fail2ban`_ bans IPs that show malicious signs.
+- `OpenSSH`_ SSH server (listening on port 22).
 - `Postfix`_ MTA (bound to localhost) to allow sending of email (e.g.,
   password recovery).
 - `ProFTPD`_ ftp server (listening on port 21).
-- `OpenSSH`_ SSH server (listening on port 22).
 - `Webmin`_ (listening on port 12321) with modules for configuring
   Apache2, Dovecot, Fail2ban, PHP, ProFTPD, MariaDB and Postfix.
 - `Webshell`_ (listening on port 12320).
-- `Fail2ban`_ bans IPs that show malicious signs.
 
 
 Credentials *(passwords required for initialization)*
