@@ -26,8 +26,6 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     MESSSAGE="Skipping package install for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
-    # add node.js source
-    curl -sL https://deb.nodesource.com/setup_9.x | bash -
     # install dependencies
     export APTGETS="composer libjs-jquery-colorbox libpng-dev libssl-dev nodejs npm php-cli php-curl php-fpm php-gd php-getid3 php-gmp php-json php-mbstring php-mysql php-opcache php-readline php-ssh2 php-twig php-xml python-yaml"
     export "${PACKAGE^^}"="True"
