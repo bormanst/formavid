@@ -30,7 +30,9 @@ else
     # check install gcsfuse
     if [ "${GCS_BUCKET}" != "None" ] && [ "${GCS_PROJECT_ID}" != "None" ]; then
         # using gcsfuse to directly temp mount storage buckets instead of rclone, etc.
-        export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+        # export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+        # no buster so use stretch
+        export GCSFUSE_REPO=gcsfuse-stretch
         echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list
         curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
         export APTGETS="${PACKAGE} ${PACKAGE}-doc gcsfuse"
