@@ -39,7 +39,7 @@ if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
     apt-get update
     apt-get install -y python2.7 google-cloud-sdk
     echo ""
-    echo "You must manually run `gcloud auth login` to initialize your account."
+    echo "You must manually run `gcloud init` to initialize your account."
     echo "Then re-run this script to install the appliance."
     echo ""
     exit 0
