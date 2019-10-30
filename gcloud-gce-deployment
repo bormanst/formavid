@@ -39,6 +39,13 @@ export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
 
 # Check for Cloud SDK apt list.
 if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
+    echo "The source list google-cloud-sdk.list was not detected for the google-cloud-sdk."
+    echo "This script adds the google-cloud-sdk.list to /etc/apt/sources.list.d."
+    echo "Installing the google-cloud-sdk with this script requires root privileges."
+    echo ""
+    # Need curl for install.
+    apt-get update
+    apt-get install -y curl
     # Add the Cloud SDK distribution URI as a package source.
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     # Import the Google Cloud public key.
@@ -46,6 +53,11 @@ if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
     # Update and install Python 2.7 and the Cloud SDK.
     apt-get update
     apt-get install -y python2.7 google-cloud-sdk
+    echo ""
+    echo "You must manually run `gcloud auth login` to initialize your account."
+    echo "Then re-run this script to install the appliance."
+    echo ""
+    exit 0
 fi
 
 # Get account to use.
