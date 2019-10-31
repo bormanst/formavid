@@ -34,26 +34,58 @@ printf "\n\n"
 # 11) Create GCE instance: gcloud --quiet --account=${GCS_ACCOUNT} --project=${GCS_PROJECT_ID} compute instances create ${GCE_INSTANCE} --source-instance-template ${GCE_TEMPLATE}
 # 12) Create bucket: gsutil mb -p ${GCS_PROJECT_ID} -c ${GCS_BUCKET_TYPE} -l ${GCE_REGION} gs://${GCS_BUCKET}
 
-# Check for Cloud SDK apt list.
-if [ ! -f "/etc/apt/sources.list.d/google-cloud-sdk.list" ]; then
-    echo "The source list google-cloud-sdk.list was not detected for the google-cloud-sdk."
-    echo "This script adds the google-cloud-sdk.list to /etc/apt/sources.list.d."
-    echo "Installing the google-cloud-sdk with this script requires root privileges."
-    echo ""
+# Check for Cloud SDK.
+if ! (hash gcloud); then
+		printf "\n"
+		printf "The google-cloud-sdk was not detected and is required to use this script.\n"
+		printf "This script adds the google-cloud-sdk.list to /etc/apt/sources.list.d.\n"
+		printf "Therefore, installing the google-cloud-sdk with this script requires root privileges.\n"
+		printf "Alternatively, the debian10-deployment script can be run directly on a valid image if installing the google-cloud-sdk is not viable.\n"
+		printf "\n"
+		printf "Choose 'n' when the sdk prompts with 'You must log in to continue. Would you like to log in (Y/n)?'\n"
+		printf "Choosing 'y' will try to open a browser to initialize your account which can hang and fail given newer browser protections.\n"
+		printf "If this happens, use ctrl+c to stop this script and then manually initialize your account as indicated below.\n"
+		printf "\n"
+		printf "After the sdk is installed you must manually run 'gcloud init --console-only' to initialize your account.\n"
+		printf "Then re-run this script, without root privileges, to install the appliance.\n"
+		printf "\n"
+		read -p "Currently running this script with root privileges and wish to install the google-cloud-sdk (y/n)?" CHOICE
+		case "${CHOICE^^}" in
+  		N|NO ) exit 0;
+		esac
+		printf "\n"
     # Need curl for install.
-    apt-get update
-    apt-get install -y curl
+    if ! (hash curl); then
+			printf "\n"
+			printf "\n"
+			printf "Need curl to install google-cloud-sdk. Installing curl using apt-get ...\n"
+			printf "\n"
+			printf "\n"
+    	apt-get update
+    	apt-get install -y curl
+    fi
+    if [[ `python -c 'import platform; print(platform.python_version())'` == "2.7."* ]]; then
+			printf "\n"
+			printf "\n"
+			printf "Need python 2.7 to install google-cloud-sdk. Installing python2.7 using apt-get ...\n"
+			printf "\n"
+			printf "\n"
+    	apt-get update
+    	apt-get install -y python2.7
+    fi
     # Add the Cloud SDK distribution URI as a package source.
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     # Import the Google Cloud public key.
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
     # Update and install Python 2.7 and the Cloud SDK.
     apt-get update
-    apt-get install -y python2.7 google-cloud-sdk
-    echo ""
-    echo "You must manually run `gcloud init --console-only` to initialize your account."
-    echo "Then re-run this script to install the appliance."
-    echo ""
+    apt-get install -y google-cloud-sdk
+		printf "\n"
+		printf "\n"
+		printf "You must manually run 'gcloud init --console-only' to initialize your account.\n"
+		printf "Then re-run this script, with or without root privileges, to install the appliance.\n"
+		printf "\n"
+		printf "\n"
     exit 0
 fi
 
