@@ -85,7 +85,7 @@ MEMSTORE=`php -i | grep memory_limit | awk 'NF>1{print $NF}'`
 if [[ -z "${MEMSTORE}" ]]; then MEMSTORE="-1"; fi
 
 # Set php memory_limit = -1.
-sed -i "/^memory_limit *=/ s|= *[^ ]\+|= -1|g" /etc/php/7.0/cli/php.ini
+sed -i "/^memory_limit *=/ s|= *[^ ]\+|= -1|g" /etc/php/7.3/cli/php.ini
 
 # Disable xdebug - only needed for active debugging.
 if php -v | grep -q 'Xdebug'; then phpdismod xdebug; fi
@@ -251,7 +251,7 @@ done
 # Reset php.ini memory_limit.
 MESSSAGE="$( date ) Set php.ini memory_limit = ${MEMSTORE}"
 echo ${MESSSAGE} | tee -a ${LOG}
-sed -i "/^memory_limit *=/ s|= *[^ ]\+|= ${MEMSTORE}|g" /etc/php/7.0/cli/php.ini
+sed -i "/^memory_limit *=/ s|= *[^ ]\+|= ${MEMSTORE}|g" /etc/php/7.3/cli/php.ini
 
 # Finished update.
 MESSSAGE="$( date ) ----------------------------"
