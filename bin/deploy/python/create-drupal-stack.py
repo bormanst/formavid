@@ -74,65 +74,6 @@ DEFAULT_TITLE = "Example Site Name"
 
 SOLR_TEXT = """Solr search can be used as a replacement for core content search and boasts both extra features and better performance. Low memory systems may wish to use the default search to avoid the overhead associated with a Java virtual machine."""
 
-GULP_SCRIPTS = """
-// #########################################################
-// ONLY watches for changed scss files.
-// JS files and the style guide require the regular gulp
-// watch to compile any updates. It is recommended to run
-// the regular watch after theming is completed.
-// #########################################################
-gulp.task('watch-scss', ['watch:css', 'lint:sass']);
-
-// #########################################################
-// ONLY tries to fix js files.
-// It is recommended to run watch after fixes completed.
-// #########################################################
-gulp.task('fix-js', ['fix-base-js', 'fix-components-js', 'fix-theme-js']);
-
-function isFixed(file) {
-  return file.eslint != null && file.eslint.fixed;
-}
-
-options.fix = {
-  jsbase: [options.rootPath.theme],
-  jscomponents: [
-    options.theme.components + '**/*.js',
-    '!' + options.theme.build + '**/*.js'
-  ],
-  jstheme: [
-    options.theme.js + '**/*.js',
-    '!' + options.theme.js + '**/*.min.js'
-  ]
-};
-
-gulp.task('fix-base-js', function() {
-  return gulp
-    .src(options.fix.jsbase)
-    .pipe($.eslint({fix: true}))
-    .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.rootPath.theme)))
-    .pipe($.eslint.failOnError());
-});
-
-gulp.task('fix-components-js', function() {
-  return gulp
-    .src(options.fix.jscomponents)
-    .pipe($.eslint({fix: true}))
-    .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.theme.components)))
-    .pipe($.eslint.failOnError());
-});
-
-gulp.task('fix-theme-js', function() {
-  return gulp
-    .src(options.fix.jstheme)
-    .pipe($.eslint({fix: true}))
-    .pipe($.eslint.format())
-    .pipe(gulpIf(isFixed, gulp.dest(options.theme.js)))
-    .pipe($.eslint.failOnError());
-});
-"""
-
 HTACCESS = """
 # Turn off all options we don't need.
 Options None
@@ -373,6 +314,9 @@ def main():
     # Apache - enable added sites.
     system("cp -sf /etc/apache2/sites-available/%s.conf /etc/apache2/sites-enabled/." % hostname)
 
+    # Sites - replace sitethemename in js.
+    system("find %s/sites-staging -name \"*.js\" -exec sed -i \"s/sitethemename/%s/g\" '{}' \\;" % (templates,sitename))
+
     # Set root owner for sites/themes.
     system("chown root:root %s/web/themes" % drupaldir)
 
@@ -508,10 +452,7 @@ def main():
         # Set local gulp for SASS.
         system("echo ''")
         system("echo 'Setting up local Gulp for %s theme ...'" % sitename)
-        system("sed -i \"s/options.drupalURL\ =\ ''\;/options.drupalURL\ =\ 'http:\/\/%s'\;/\" %s" % (hostname,gulpFile))
-        system("sed -i \"s/node_modules\//..\/node_modules\//g\" %s" % gulpFile)
-        system("sed -i \"/require('kss')/i  gulpIf      = require('gulp-if'),\" %s" % gulpFile)
-        system("echo \"%s\" >> %s" % (GULP_SCRIPTS,gulpFile))
+        system("cp -f %s/sites-staging/gulpfile.js %s" % (templates,siteTheme))
         system("echo 'Gulp ready to run locally within theme directory.'")
         # Set prettier compatibility.
         system("echo ''")

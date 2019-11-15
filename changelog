@@ -1,3 +1,36 @@
+formavid (16.2.0) stable; urgency=low
+
+  * Drupal updated to 8.7.10.
+
+  * Updated drupal modules.
+
+  * Updated Gulp to 4.0.2.
+    Existing installations (new appliance installs already have the following):
+    Requires changes to gulpfile.js in any pre-existing theme dirs.
+    Refer to /usr/local/formavid/templates/sites-template/gulpfile.js for reference.
+    Need to manually copy /usr/local/formavid/templates/sites-template/gulpfile.js into
+    /etc/formavid/templates/sites-template prior to the creation of more site stacks.
+
+  * Major component versions:
+
+    adminer         4.7.1
+    apache2         2.4.38
+    borgbackup      1.1.9
+    dovecot         2.3.4.1
+    drupal          8.7.10 (upstream archive)
+    drush           9.7.1 (upstream archive)
+    fail2ban        0.10.2
+    invoiceninja    4.5.16 (upstream archive)
+    mariadb         10.3.17
+    php             7.3.9
+    proftpd         1.36
+    postfix         3.4.5
+    roundup         1.6.1 (upstream archive)
+    solr (optional) 8.3.0 (upstream archive)
+    webmin          1.930
+
+ -- Sean Borman <bormanst@gmail.com>  Thu, 14 Nov 2019 22:35:12 -0600
+ 
 formavid (16.1.0) stable; urgency=low
 
   * Drupal updated to 8.7.9.
