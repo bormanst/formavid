@@ -4,6 +4,12 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:buster
     steps:
+      - run:
+          name: Enable systemd
+          sudo apt-get install -y systemd
+          sudo reboot
+          sudo apt-get install -y systemd-sysv
+          sudo reboot
       - checkout
       - run:
           name: Setup
