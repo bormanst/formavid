@@ -253,9 +253,7 @@ a2ensite ${PACKAGE}
 # add hosts entry
 MESSSAGE="Adding host entry for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-sed -i "/127.0.1.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
-
-# clean up
+sed -i "/127.0.0.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
 
 # initialize admin info
 MESSSAGE="Initializing admin info for ${PACKAGE} ..."
