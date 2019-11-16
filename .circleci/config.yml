@@ -9,6 +9,9 @@ jobs:
           command: |
             sudo apt-get install -y systemd
             sudo reboot
+      - run:
+          name: Enable systemd
+          command: |
             sudo apt-get install -y systemd-sysv
             sudo reboot
       - checkout
