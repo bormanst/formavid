@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     machine:
-      image: ubuntu-1804:201908-01
+      image: ubuntu-1804
     steps:
       - checkout
       - run:
