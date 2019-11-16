@@ -22,7 +22,7 @@ fi
 
 # dependencies check: composer requires lotsa mem or just a swap
 SWAPFILE=/swapfile
-if [ $(swapon -s | grep -ci "partition") -eq 0 ];  then
+if [ "${CREATE_SWAPFILE}" == "True" ] && [ $(swapon -s | grep -ci "partition") -eq 0 ];  then
     # add permanent swap:
     echo "$( date ) Adding permanent swap." >> ${LOG}
     fallocate -l 3G ${SWAPFILE}
@@ -35,9 +35,7 @@ fi
 
 # required for all-apt-gets
 apt-get update
-apt-get install -y curl
-apt-get install -y gnupg
-apt-get install -y wget
+apt-get install -y apt-show-versions curl gnupg wget
 
 echo ""
 echo ""

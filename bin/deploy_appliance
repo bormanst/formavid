@@ -111,7 +111,7 @@ if [ -d "${APP_DIR}" ]; then export ALREADY_RUN="True"; fi
 . ${FORMAVID}/bin/deploy/shell/get_passwords
 
 # dependencies check
-if [ "${CHECK_DEPENDENCIES}" == "True" ]; then ${FORMAVID}/bin/deploy/shell/dependencies; fi
+${FORMAVID}/bin/deploy/shell/dependencies
 
 # check envars
 if [ -n "${APP_EMAIL}" ]; then
