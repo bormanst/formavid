@@ -1,0 +1,84 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/buildpack-deps:buster
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+            mkdir -p /usr/local/formavid
+            mv * /usr/local/formavid
+      - run:
+          name: Deploy Appliance
+          command: |
+            # set envars
+            export DOMAIN="examplesitename.com"
+          	export PASSWORD="Pass1234"
+
+          	# deploy with params: DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCE_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP SOLR_INSTALL CREATE_DRUPAL_STACK PASSWORD
+            /usr/local/formavidbin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD}"
+      - run:
+          name: Verify Appliance URLs
+          command: |
+            # set envars
+            export DOMAIN="examplesitename.com"
+          	export PASSWORD="Pass1234"
+
+						# verify DRUPAL
+						if [[ `curl -s -k --head http://${DOMAIN} | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]] \
+  						&& [[ `drush -r /var/www/drupal8/prod -l http://${DOMAIN} status bootstrap | grep -q Successful` -eq 0 ]]; then
+							echo "DRUPAL=TRUE"
+						else
+							echo "DRUPAL=FALSE"
+						fi
+						
+						# verify ADMINPAGE
+						if [[ `curl -u "admin:${PASSWORD}" -s -k --head https://admin.${DOMAIN} | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "ADMINPAGE=TRUE"
+						else
+							echo "ADMINPAGE=FALSE"
+						fi
+						
+						# verify INVOICENINJA
+						if [[ `curl -s -k --head https://billing.${DOMAIN} | head -n 1 | grep "HTTP/1.[01] [3].."` == *"302 Found"* ]]; then
+							echo "INVOICENINJA=TRUE"
+						else
+							echo "INVOICENINJA=FALSE"
+						fi
+						
+						# verify ROUNDUP
+						if [[ `curl -s -k --head https://support.${DOMAIN}/support/ | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "ROUNDUP=TRUE"
+						else
+							echo "ROUNDUP=FALSE"
+						fi
+						
+						# verify SHELLINABOX
+						if [[ `curl -s -k --head https://${DOMAIN}:12320 | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "SHELLINABOX=TRUE"
+						else
+							echo "SHELLINABOX=FALSE"
+						fi
+						
+						# verify WEBMIN
+						if [[ `curl -s -k --head https://${DOMAIN}:12321 | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "WEBMIN=TRUE"
+						else
+							echo "WEBMIN=FALSE"
+						fi
+						
+						# verify ADMINER
+						if [[ `curl -s -k --head https://${DOMAIN}:12322 | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "ADMINER=TRUE"
+						else
+							echo "ADMINER=FALSE"
+						fi
+						
+						# verify SOLR
+						if [[ `curl -u "admin:${PASSWORD}" -s -k --head http://${DOMAIN}:8983/solr/#/login | head -n 1 | grep "HTTP/1.[01] [2].."` == *"200"* ]]; then
+							echo "SOLR=TRUE"
+						else
+							echo "SOLR=FALSE"
+						fi
