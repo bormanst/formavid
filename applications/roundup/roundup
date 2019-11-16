@@ -245,6 +245,11 @@ ln -s ${CONF} /etc/apache2/sites-available/${TRACKER}.conf
 # apache2: enable conf
 a2ensite ${TRACKER}
 
+# add hosts entry
+MESSSAGE="Adding host entry for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+sed -i "/127.0.0.1/s/$/ ${SUBDOMAIN}${APP_HOSTNAME}/" /etc/hosts
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}
