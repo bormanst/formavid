@@ -4,12 +4,9 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:buster
     steps:
+      - attach_workspace:
+          at: /usr/local/formavid
       - checkout
-      - run:
-          name: Setup
-          command: |
-            mkdir -p /usr/local/formavid
-            mv * /usr/local/formavid
       - run:
           name: Deploy Appliance
           command: |
@@ -18,7 +15,7 @@ jobs:
             export PASSWORD="Pass1234"
 
             # deploy with params: DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCE_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP SOLR_INSTALL CREATE_DRUPAL_STACK PASSWORD
-            /usr/local/formavidbin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD}"
+            bin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD}"
       - run:
           name: Verify Appliance URLs
           command: |
