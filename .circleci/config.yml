@@ -17,8 +17,8 @@ jobs:
             export DOMAIN="examplesitename.com"
             export PASSWORD="Pass1234"
 
-            # deploy with params: DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCE_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP SOLR_INSTALL CREATE_DRUPAL_STACK PASSWORD
-            sudo /usr/local/formavid/bin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD}"
+            # deploy with params: DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCE_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP SOLR_INSTALL CREATE_DRUPAL_STACK PASSWORD CHECK_DEPENDENCIES
+            sudo /usr/local/formavid/bin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD} "False""
       - run:
           name: Verify Appliance URLs
           command: |
