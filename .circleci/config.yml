@@ -6,10 +6,11 @@ jobs:
     steps:
       - run:
           name: Enable systemd
-          sudo apt-get install -y systemd
-          sudo reboot
-          sudo apt-get install -y systemd-sysv
-          sudo reboot
+          command: |
+            sudo apt-get install -y systemd
+            sudo reboot
+            sudo apt-get install -y systemd-sysv
+            sudo reboot
       - checkout
       - run:
           name: Setup
