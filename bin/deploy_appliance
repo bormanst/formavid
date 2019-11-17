@@ -60,8 +60,8 @@ echo "$( date ) -------------------" >> ${LOG}
 echo "" >> ${LOG}
 
 # configure apt for queued access
-# CONF=/etc/apt/apt.conf
-# if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
+CONF=/etc/apt/apt.conf
+if [ ! -f "${CONF}" ]; then echo 'Acquire::Queue-Mode "access";' >> ${CONF}; fi
 
 # check default envars
 DEFAULT_ENVARS=/etc/formavid/default_envars
