@@ -5,7 +5,6 @@ before_install:
   - sudo rm -rf /usr/local/formavid/applications/webmin
 install: skip
 script: 
-  - sudo apt-get -o Acquire::GzipIndexes=false update
   - sudo /usr/local/formavid/bin/deploy_appliance "examplesitename.com" "Example Site Name" "admin@examplesitename.com" "None" "None" "None" "None" "False" "True" "True" "Pass1234" "False"
 after_success:
   - |
