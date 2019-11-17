@@ -184,7 +184,7 @@ if [ -n "${APP_EMAIL}" ]; then
         # disable interactive apt installs
         export DEBIAN_FRONTEND=noninteractive
         # batch install packages
-        apt-get install -y -qq ${ALLAPTGETS}
+        apt-get install -y ${ALLAPTGETS}
     fi
     echo ""
     MESSSAGE="$( date ) Required apt packages are installed."
