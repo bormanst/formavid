@@ -2,10 +2,10 @@ dist: bionic
 before_install:
   - sudo mkdir -p /usr/local/formavid
   - sudo mv * /usr/local/formavid
-  - sudo rm -rf /usr/local/formavid/applications/webmin
+  - sudo rm -rf /usr/local/formavid/applications/drupal8
 install: skip
 script: 
-  - sudo /usr/local/formavid/bin/deploy_appliance "examplesitename.com" "Example Site Name" "admin@examplesitename.com" "None" "None" "None" "None" "False" "True" "True" "Pass1234" "False"
+  - sudo /usr/local/formavid/bin/deploy_appliance "examplesitename.com" "Example Site Name" "admin@examplesitename.com" "None" "None" "None" "None" "False" "True" "False" "Pass1234" "False"
 after_success:
   - |
     # verify DRUPAL
