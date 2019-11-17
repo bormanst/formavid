@@ -6,6 +6,7 @@ install: skip
 script: 
   - export DOMAIN="examplesitename.com"
   - export PASSWORD="Pass1234"
+  - sudo apt-get -o Acquire::GzipIndexes=false update
   - sudo /usr/local/formavid/bin/deploy_appliance "${DOMAIN}" "Example Site Name" "admin@${DOMAIN}" "None" "None" "None" "None" "False" "True" "True" "${PASSWORD}" "False"
 after_success:
   - export DOMAIN="examplesitename.com"
