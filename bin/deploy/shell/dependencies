@@ -35,7 +35,7 @@ fi
 
 # required for all-apt-gets
 apt-get update
-apt-get install -y apt-show-versions curl gnupg wget
+apt-get install -y apt-transport-https apt-show-versions curl gnupg software-properties-common wget
 
 echo ""
 echo ""
