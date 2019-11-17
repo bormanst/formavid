@@ -2,6 +2,7 @@ dist: bionic
 before_install:
   - sudo mkdir -p /usr/local/formavid
   - sudo mv * /usr/local/formavid
+  - sudo rm -rf /usr/local/formavid/applications/webmin
 install: skip
 script: 
   - sudo apt-get -o Acquire::GzipIndexes=false update
