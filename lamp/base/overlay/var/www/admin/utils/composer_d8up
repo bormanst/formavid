@@ -191,7 +191,7 @@ su - admin -c "composer clear-cache -d ${PROJECT_DIR} 2>&1 | tee -a ${LOG}"
 # Check drupal dependencies.
 MESSSAGE="$( date ) Check outdated drupal ${PROJECT} components ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-su - admin -c "composer outdated -d ${PROJECT_DIR} drupal/* 2>&1 | tee -a ${LOG}"
+su - admin -c "composer outdated -d ${PROJECT_DIR} \"drupal/*\" 2>&1 | tee -a ${LOG}"
 su - admin -c "composer outdated -d ${PROJECT_DIR} solarium/solarium 2>&1 | tee -a ${LOG}"
 
 # Set HAS_UPDATES.
@@ -202,7 +202,7 @@ if [ $(composer prohibits -d ${PROJECT_DIR} drupal/core:${NEW_VER} 2>&1 | grep -
     # Update symfony dependencies.
     MESSSAGE="$( date ) Updating drupal ${PROJECT} and symfony dependencies ..."
     echo ${MESSSAGE} | tee -a ${LOG}
-    su - admin -c "composer update -d ${PROJECT_DIR} drupal/* symfony/* webflo/drupal-core-require-dev solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG}"
+    su - admin -c "composer update -d ${PROJECT_DIR} \"drupal/*\" \"symfony/*\" solarium/solarium --with-dependencies 2>&1 | tee -a ${LOG}"
     HAS_UPDATES=true
 else
     # Update drupal dependencies.
