@@ -295,6 +295,9 @@ gulp.task('watch:js', gulp.series('lint:js', function () {
 // Watch for Sass and JavaScript changes.
 gulp.task('watch', gulp.parallel('watch:css', 'watch:js'));
 
+// Watch for Sass only changes.
+gulp.task('watch-scss', gulp.series('watch:css'));
+
 // Watch for Sass and JavaScript changes with browser sync.
 gulp.task('watch:sync', gulp.parallel('browser-sync', 'watch:js'));
 
