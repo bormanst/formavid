@@ -1,3 +1,28 @@
+formavid (16.4.1) stable; urgency=high
+
+  * Drupal core updated to 8.9.1 
+  * Updated drupal modules.
+
+  * Major component versions:
+
+    adminer         4.7.1
+    apache2         2.4.38
+    borgbackup      1.1.9
+    dovecot         2.3.4.1
+    drupal          8.9.1 (upstream archive)
+    drush           9.7.1 (upstream archive)
+    fail2ban        0.10.2
+    invoiceninja    4.5.18 (upstream archive)
+    mariadb         10.3.17
+    php             7.3.9
+    proftpd         1.36
+    postfix         3.4.5
+    roundup         1.6.1 (upstream archive)
+    solr (optional) 8.3.1 (upstream archive)
+    webmin          1.930
+
+ -- Sean Borman <bormanst@gmail.com>  Wed, 24 Jun 2020 16:27:38 -0600
+ 
 formavid (16.4.0) stable; urgency=high
 
   * Drupal core updated to 8.9.0 
