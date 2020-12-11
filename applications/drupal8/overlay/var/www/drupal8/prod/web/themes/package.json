@@ -6,7 +6,7 @@
   "repository": {},
   "devDependencies": {
     "breakpoint-sass": "^2.7",
-    "browser-sync": "^2.26",
+    "browser-sync": "^2.26.13",
     "chroma-sass": "^1.2",
     "del": "^3.0",
     "eslint": "^5.16",
@@ -36,13 +36,13 @@
     "test": "gulp"
   },
   "dependencies": {
-    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-standard": "^3.1.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.20.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.2.0",
+    "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^1.7",
     "gulp-watch": "^5.0",
     "prettier": "^1.19"
