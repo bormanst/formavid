@@ -1,4 +1,35 @@
-formavid (16.4.1) stable; urgency=high
+formavid (16.4.2) stable; urgency=high
+
+  * Drupal core updated to 8.9.11
+  * Updated drupal modules.
+
+  * mariadb updated to 10.3.27
+
+  * postfix updated to 3.4.14
+  
+  * webmin updated to 1.962
+  
+  * Major component versions:
+
+    adminer         4.7.1
+    apache2         2.4.38
+    borgbackup      1.1.9
+    dovecot         2.3.4.1
+    drupal          8.9.11 (upstream archive)
+    drush           9.7.1 (upstream archive)
+    fail2ban        0.10.2
+    invoiceninja    4.5.23 (upstream archive)
+    mariadb         10.3.27
+    php             7.3.9
+    proftpd         1.36
+    postfix         3.4.14
+    roundup         1.6.1 (upstream archive)
+    solr (optional) 8.3.1 (upstream archive)
+    webmin          1.962
+
+ -- Sean Borman <bormanst@gmail.com>  Thu, 10 Dec 2020 23:57:56 -0600
+ 
+ formavid (16.4.1) stable; urgency=high
 
   * Drupal core updated to 8.9.1 
   * Updated drupal modules.
