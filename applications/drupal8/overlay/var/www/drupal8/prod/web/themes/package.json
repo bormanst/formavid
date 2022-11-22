@@ -6,7 +6,7 @@
   "repository": {},
   "devDependencies": {
     "breakpoint-sass": "^2.7",
-    "browser-sync": "^2.26.13",
+    "browser-sync": "^2.27.10",
     "chroma-sass": "^1.2",
     "del": "^3.0",
     "eslint": "^5.16",
