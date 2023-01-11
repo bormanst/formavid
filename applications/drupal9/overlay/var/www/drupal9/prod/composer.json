@@ -1,0 +1,119 @@
+{
+    "name": "drupal-composer/drupal-project",
+    "description": "Project template for Drupal 9 projects with Composer",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "",
+            "role": ""
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "composer/installers": "^1.9",
+        "cweagans/composer-patches": "^1.7",
+        "dflydev/dot-access-data": "^3.0",
+        "drupal/advanced_help": "^1.0",
+        "drupal/background_image": "^2.0",
+        "drupal/backup_migrate": "^5.0",
+        "drupal/captcha": "^1.4",
+        "drupal/components": "^2.4",
+        "drupal/core": "~9.5.0",
+        "drupal/core-composer-scaffold": "~9.5.0",
+        "drupal/core-recommended": "~9.5.0",
+        "drupal/ctools": "~3.11",
+        "drupal/devel": "^4.1",
+        "drupal/features": "^3.12",
+        "drupal/field_group": "^3.2",
+        "drupal/file_mdm": "^2.4",
+        "drupal/fivestar": "^1.0@alpha",
+        "drupal/honeypot": "^2.1",
+        "drupal/image_style_quality": "^1.4",
+        "drupal/imagemagick": "^3.3",
+        "drupal/inline_entity_form": "^1.0@RC",
+        "drupal/jquery_ui": "^1.4",
+        "drupal/jquery_ui_accordion": "^1.1",
+        "drupal/module_filter": "^3.2",
+        "drupal/panels": "^4.6",
+        "drupal/pathauto": "^1.10",
+        "drupal/recaptcha": "^3.0",
+        "drupal/redirect": "^1.7",
+        "drupal/restui": "^1.21",
+        "drupal/rules": "^3.0@alpha",
+        "drupal/search_api_solr": "^4.2",
+        "drupal/search_api_solr_defaults": "^4.2",
+        "drupal/typed_data": "^1.0@beta",
+        "drupal/views_bulk_operations": "^4.1",
+        "drupal/zen": "^7.0@alpha",
+        "drush/drush": "^11.0",
+        "symfony/event-dispatcher": "^4.4",
+        "typo3/phar-stream-wrapper": "^3.1",
+        "vlucas/phpdotenv": "^5.1",
+        "webflo/drupal-finder": "^1.2"
+    },
+    "require-dev": {
+        "drupal/core-dev": "~9.5.0"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "discard-changes": true,
+        "sort-packages": true,
+        "allow-plugins": {            "composer/installers": true,
+            "cweagans/composer-patches": true,
+            "drupal/core-composer-scaffold": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "autoload": {
+        "classmap": [
+            "scripts/composer/ScriptHandler.php"
+        ],
+        "files": ["load.environment.php"]
+    },
+    "scripts": {
+        "pre-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "pre-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "post-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+        ],
+        "post-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+        ]
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web/"
+            }
+        },
+        "installer-paths": {
+            "web/core": ["type:drupal-core"],
+            "web/libraries/{$name}": ["type:drupal-library"],
+            "web/modules/contrib/{$name}": ["type:drupal-module"],
+            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "web/themes/contrib/{$name}": ["type:drupal-theme"],
+            "drush/Commands/contrib/{$name}": ["type:drupal-drush"]
+        },
+        "composer-exit-on-patch-failure": true,
+        "patchLevel": {
+            "drupal/core": "-p2"
+        },
+        "patches": {
+        }
+    }
+}

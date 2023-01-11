@@ -1,0 +1,301 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=drupal9
+
+# log check
+MESSSAGE="Checking dependencies for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# check packages
+PKG_CHECK=${PACKAGE^^}
+if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
+
+# set dirs
+APP_DIR=${DRUPAL_DIR}
+
+# check dir
+if [ -d "${APP_DIR}" ]; then
+    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! ${PACKAGE} may have already been initialized by this script."
+    echo "WARNING! Re-running this script may corrupt existing system."
+    echo "WARNING! Please review script in applications/${PACKAGE} for further details."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: apache2
+DEPENDS=apache2
+systemctl start ${DEPENDS} && sleep 10
+if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: mysql
+DEPENDS=mysql
+systemctl start ${DEPENDS} && sleep 10
+if ! (systemctl -q is-active ${DEPENDS}); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# dependencies check: php
+DEPENDS=php
+if ! (hash php); then
+    MESSSAGE="Required service ${DEPENDS} not active. Skipping configuration for ${PACKAGE}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+    echo "WARNING! Please ensure that ${DEPENDS} is active."
+    echo ""
+    echo ""
+    exit 0
+fi
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# add drupal9 user to database
+MESSSAGE="Adding drupal9 user to database for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+mysql --user=root --password=${DB_PASS} --execute "DELETE FROM mysql.user WHERE User = 'drupal9'; FLUSH PRIVILEGES;"
+mysql --user=root --password=${DB_PASS} --execute "CREATE USER drupal9@localhost IDENTIFIED BY '${APP_PASS}';"
+
+# composer peformance issue
+MESSSAGE="Disabling xdebug for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+phpdismod xdebug
+
+# make drupal dir
+mkdir -p ${APP_DIR}
+
+# set admin owner
+chown admin:admin ${APP_DIR}
+
+# apply composer files
+OVERLAY_DIR=$1/overlay
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${APP_DIR}/composer.* ${APP_DIR}
+    chown admin:admin ${APP_DIR}/composer.*
+    MESSSAGE="Applied composer files for ${APP_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# change to drupal dir
+COMMAND="cd ${APP_DIR}"
+su - admin -c "${COMMAND}"
+
+# load composer console in drupal root
+MESSSAGE="Installing composer for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+COMMAND="composer install -d ${APP_DIR} --no-progress --optimize-autoloader"
+su - admin -c "${COMMAND}"
+
+# create project template with --no-install
+MESSSAGE="Creating project template for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+COMMAND="composer create-project -d ${APP_DIR} drupal-composer/drupal-project:9.x-dev ${PROJECT_DIR} --stability dev --no-install --no-progress --no-interaction"
+su - admin -c "${COMMAND}"
+
+# apply composer files
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/composer.* ${PROJECT_DIR}
+    chown admin:admin ${PROJECT_DIR}/composer.*
+    MESSSAGE="Applied composer files for ${PROJECT_DIR}."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# change to project subdir
+COMMAND="cd ${PROJECT_DIR}"
+su - admin -c "${COMMAND}"
+
+# download and install
+MESSSAGE="Installing composer into project for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+COMMAND="composer install -d ${PROJECT_DIR} --no-progress --optimize-autoloader"
+su - admin -c "${COMMAND}"
+
+# change to drupal dir
+COMMAND="cd ${APP_DIR}"
+su - admin -c "${COMMAND}"
+
+# clean up mod_php5 references in htaccess
+MESSSAGE="Replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# clean up mod_php7 references in htaccess
+MESSSAGE="Replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php7/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# add drush symlinks
+MESSSAGE="Configuring drush for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush /usr/local/bin/drush
+ln -sf ${PROJECT_DIR}/vendor/drush/drush/drush.complete.sh /etc/bash_completion.d/drush
+
+# add drush configs
+mkdir -p /etc/drush
+cat > /etc/drush/drushrc.php <<EOF
+<?php
+// by default use the drupal root directory
+\$options['r'] = '${APP_DIR}';
+EOF
+
+# install nodejs v14 which includes npm
+curl -sL https://deb.nodesource.com/setup_14.x | bash -
+apt-get install -y nodejs
+
+# update npm
+# MESSSAGE="Updating npm ..."
+# echo ${MESSSAGE} | tee -a ${LOG}
+# npm install -g npm@latest
+# touch /usr/bin/npm
+# rm /usr/bin/npm
+# ln -s /usr/local/bin/npm /usr/bin/npm
+
+# install gulp-cli
+MESSSAGE="Installing gulp for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+npm install -g gulp-cli
+
+# copy custom package.json
+if [ -d "${OVERLAY_DIR}" ]; then
+    cp -f ${OVERLAY_DIR}${PROJECT_DIR}/web/themes/* ${PROJECT_DIR}/web/themes
+    MESSSAGE="Applied npm package info for ${PROJECT_DIR}/web/themes."
+    echo ${MESSSAGE} | tee -a ${LOG}
+    echo ""
+    echo ""
+fi
+
+# set temp system theme to be updated by create-drupal-stack
+MESSSAGE="Setting default system theme ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+DEFAULT_THEME=${PROJECT_DIR}/web/themes/contrib/zen/STARTERKIT
+if [ -d "${DEFAULT_THEME}" ]; then
+    # add Drupal 9 comapatibility
+    echo "core_version_requirement: ^8 || ^9" >> ${DEFAULT_THEME}/STARTERKIT.info.yml
+    # symlink system theme to default zen theme if file_exists
+    ln -sf ${DEFAULT_THEME} ${PROJECT_DIR}/web/themes/system
+	CONF=${DEFAULT_THEME}/.prettierignore
+	touch ${CONF}
+	echo "gulpfile.js" >> ${CONF}
+	echo "js/script.js" >> ${CONF}
+    chmod 0664 ${CONF}
+else
+    # empty structure to satisfy apache.conf dependencies of other apps
+    mkdir -p ${PROJECT_DIR}/web/themes/system/components/asset-builds/css
+fi
+
+# set cssadmin perms
+MESSSAGE="Setting cssadmin perms for default theme ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+chown -R cssadmin:cssadmin ${PROJECT_DIR}/web/themes
+
+# preload node_modules for themes
+# background safe: depends on gulp-cli
+MESSSAGE="Installing node packages for ${PACKAGE} themes ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+if [ -f "${OVERLAY_DIR}${PROJECT_DIR}/web/themes/package-lock.json" ]; then
+    COMMAND="cd ${PROJECT_DIR}/web/themes && npm ci --unsafe-perm"
+else
+    COMMAND="cd ${PROJECT_DIR}/web/themes && npm install --unsafe-perm"
+fi
+su - cssadmin -c "${COMMAND}"
+
+# fix issue in chroma-sass module
+CONF=${PROJECT_DIR}/web/themes/node_modules/chroma-sass/sass/chroma/_internals.scss
+su - cssadmin -c "sed -i 's/return call(\$function,/return call(get-function(\$function),/g' ${CONF}"
+
+# update settings
+MESSSAGE="Updating default site settings for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+CONF=${PROJECT_DIR}/web/sites/default/settings.php
+cp ${PROJECT_DIR}/web/sites/default/default.settings.php ${CONF}
+
+# insert "www.example.com" as default trusted_host (inithook will adjust)
+NEW_LINES="\$settings['trusted_host_patterns'] = array\(\n\t'^www\\\.example\\\.com\$',\n\);\n"
+sed -i "/trusted_host_patterns/,/\*\//{n;s|^$|${NEW_LINES}|}" ${CONF}
+
+# disable poor mans cron and setup drush cron
+MESSSAGE="Updating cron for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+cat >> ${CONF} <<EOF
+
+/**
+ * Disable Poor Man's Cron:
+ *
+ * Drupal 9 enables the built-in Poor Man's Cron by default.
+ * Poor Man's Cron relies on site activity to trigger Drupal's cron,
+ * and is not well suited for low activity websites.
+ *
+ * We will use the Linux system cron and override Poor Man's Cron
+ *
+ * To re-enable Poor Man's Cron:
+ *    Comment out the line below, and disable the system cron
+ *    in /etc/cron.hourly/drupal9
+ */
+\$config['automated_cron.settings']['interval'] = 0;
+EOF
+
+# Loop through all sites in drupal.
+# Drupal sites, by custom scripted design, will have a "." in their directory name.
+CRON_DRUPAL=/etc/cron.daily/drupal9
+cat > ${CRON_DRUPAL} <<EOF
+#!/bin/bash -e
+# Trigger drush cron
+# Alternatively Drupal's poor mans cron: sites/default/settings.php
+[ -x /usr/local/bin/drush ] || exit 0
+# su www-data -c "/usr/local/bin/drush --quiet cron"
+# su www-data -s /bin/bash -c "/usr/local/bin/drush --quiet cron"
+# Drupal sites, by custom scripted design, will have a "." in their directory name.
+sites=()
+while read -r -d ''; do
+    sites+=("\$REPLY")
+done < <(cd ${PROJECT_DIR}/web/sites/; find *.* -maxdepth 0 -type d -print0)
+# Run cron on the sites.
+len=\${#sites[*]}
+for((i=0; i<\$len; i++)); do
+    su www-data -s /bin/bash -c "/usr/local/bin/drush --root=${PROJECT_DIR} --uri=http://\${sites[\${i}]} --quiet cron"
+done
+EOF
+chmod +x ${CRON_DRUPAL}
+
+# configure apache
+a2enmod rewrite
+
+# log completed
+MESSSAGE="Package ${PACKAGE} install has completed."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0

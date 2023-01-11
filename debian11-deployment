@@ -1,0 +1,54 @@
+#!/bin/bash -e
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+# get cur dir
+RET_DIR="${PWD}"
+
+# update apt
+apt-get update
+
+# install git
+apt-get install -y git
+
+# clone formavid
+git clone https://github.com/bormanst/formavid /usr/local/formavid
+
+# cd froamvid
+cd /usr/local/formavid
+
+# install formavid
+./install
+
+printf "\n\n\n"
+printf "Post install manual configuration considerations:\n\n"
+printf "Bash (admin sudo) - Disable any unused services: systemctl disable servicename\n"
+printf "Bash (admin sudo) - Add any addtional sites:\n"
+printf "    /usr/local/formavid/bin/deploy/python/create-drupal-stack.py\n"
+printf "Update DNS entries at hosting service.\n"
+printf "Bash (admin sudo) - Activate Certbot (optional):\n"
+printf "    Set: /etc/formavid/default_envars/CERTBOT_INSTALL=\"True\"\n"
+printf "    Set: /etc/formavid/default_envars/CREATE_DRUPAL_STACK=\"False\"\n"
+printf "    Add domains and subdomains (optional):\n"
+printf "        Modify /usr/local/formavid/applications/certbot/certbot\n"
+printf "        Append domain(s) to command line \"certbot certonly ... -d domain\"\n"
+printf "    If hacking local /etc/hosts for subdomain access then\n"
+printf "        update DNS with temporary entries at hosting service.\n"
+printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
+printf "    If hacking local /etc/hosts for subdomain access then\n"
+printf "        remove temporary DNS entries at hosting service.\n"
+printf "    Set redirects (optional): Update drupal apache2 entries in\n"
+printf "        /etc/apache2/sites-available with http to https redirects.\n"
+printf "        In section <VirtualHost *:80> replace DocumentRoot line\n"
+printf "        with RedirectPermanent / \"https://sitedomain/\"\n"
+printf "Webmin - Disable any associated appliance firewall entries.\n"
+printf "Bash (admin sudo) - Activate BorgBackup (optional).\n"
+printf "    Set: /etc/formavid/default_envars/CONFIGURE_BORGBACKUP=\"True\"\n"
+printf "    Deploy: /usr/local/formavid/bin/deploy_appliance\n"
+printf "\n\n"
+
+cd "${RET_DIR}"
+
+exit 0

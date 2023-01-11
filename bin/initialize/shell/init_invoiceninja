@@ -1,0 +1,105 @@
+#!/bin/bash -e
+# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# You should have received LICENSE.txt, a copy of the
+# GNU General Public License, along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+PACKAGE=invoiceninja
+
+# set log
+LOG=/var/log/formavid/deploy_appliance.log
+
+# log configure
+MESSSAGE="Configuring ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# set envars
+ADMIN_FNAME="a"
+ADMIN_LNAME="admin"
+ADMIN_MAIL="admin@${APP_HOSTNAME}"
+APP_DIR=${WEBROOT}/${PACKAGE}
+ETC=/etc/${PACKAGE}
+SUBDOMAIN="billing."
+
+# initialize app env file
+MESSSAGE="Initializing env for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+php ${APP_DIR}/artisan config:cache
+php ${APP_DIR}/artisan key:generate --force
+php ${APP_DIR}/artisan migrate:fresh --seed --force
+php ${APP_DIR}/artisan config:clear
+wait
+
+# update app env file
+CURL="curl -c /tmp/cookie -b /tmp/cookie"
+TOKEN=$(${CURL} ${SUBDOMAIN}${APP_HOSTNAME}/setup 2>/dev/null | grep csrf-token | sed 's|^.*content="\([a-zA-Z0-9]*\)".*$|\1|')
+wait
+URL="http://${SUBDOMAIN}${APP_HOSTNAME}/setup"
+POST_DATA="_token=${TOKEN}&url=https%3A%2F%2F${SUBDOMAIN}${APP_HOSTNAME}&https=on&db_driver=MySQL&db_host=localhost&db_port=3306&db_database=${PACKAGE}&db_username=${PACKAGE}&db_password=${INVOICENINJA_PASS}&mail_driver=log&mail_name=&mail_address=&mail_username=&mail_host=&mail_port=&encryption=tls&mail_password=&first_name=${ADMIN_FNAME}&last_name=${ADMIN_LNAME}&email=${ADMIN_MAIL}&password=${INVOICENINJA_PASS}&terms_of_service=on&privacy_policy=on"
+${CURL} ${URL} -X POST --data-raw ${POST_DATA}
+wait
+
+# set permissions
+MESSSAGE="Setting perms for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+chown -R www-data:www-data ${APP_DIR}
+find ${APP_DIR} -type d -exec chmod 755 {} \;
+
+# add cron job
+CONF=/etc/cron.d/${PACKAGE}
+cat > ${CONF} <<EOF
+  * * * * * www-data php ${APP_DIR}/artisan schedule:run >> /dev/null 2>&1
+EOF
+
+# updatesecret
+URL="http://${SUBDOMAIN}${APP_HOSTNAME}/update?secret=updatesecret"
+${CURL} ${URL}
+
+# apache2: create conf
+MESSSAGE="Configuring apache for ${PACKAGE} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+CONF=/etc/${PACKAGE}/apache.conf
+cat > ${CONF} <<EOF
+<VirtualHost *:443>
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    SSLEngine on
+    ErrorLog \${APACHE_LOG_DIR}/invoice-ninja.error.log
+    CustomLog \${APACHE_LOG_DIR}/invoice-ninja.access.log combined
+    DocumentRoot ${APP_DIR}/public
+    <Directory ${APP_DIR}/public>
+        DirectoryIndex index.php
+        Options +FollowSymlinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    <Location /setup>
+        Require all denied
+        Options +FollowSymlinks
+        AuthName "To complete setup, please enter app password entered during install or initialization - invoiceninja:password."
+        AuthType Basic
+        Require valid-user
+        AuthBasicProvider dbm
+        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
+    </Location>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
+    ServerAdmin webmaster@localhost
+    UseCanonicalName Off
+    ErrorLog \${APACHE_LOG_DIR}/invoice-ninja.error.log
+    CustomLog \${APACHE_LOG_DIR}/invoice-ninja.access.log combined
+    RedirectPermanent / "https://${SUBDOMAIN}${APP_HOSTNAME}/"
+</VirtualHost>
+EOF
+
+# apache2 restart
+systemctl restart apache2
+
+# log completed
+MESSSAGE="Package ${PACKAGE} has been initialized."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+exit 0
