@@ -17,7 +17,7 @@
   <ul>
     <li><b>admin:</b></li>
     <ul>
-      <li>Initial password entered for Drupal8/Solr admin during appliance install.</li>
+      <li>Initial password entered for Drupal admin during appliance install.</li>
       <li>User maintenance.</li>
       <li>System maintenance.</li>
       <li>Apache.</li>
@@ -28,7 +28,6 @@
       <li>Fail2ban.</li>
       <li>Postfix.</li>
       <li>Shell-In-A-Box.</li>
-      <li>Solr.</li>
       <li>ssh.</li>
       <li>Webmin.</li>
     </ul>
@@ -46,7 +45,7 @@
   <ul>
     <li><b>admin:</b></li>
     <ul>
-      <li>Initial password entered for Drupal8/Solr admin during appliance install.</li>
+      <li>Initial password entered for Drupal admin during appliance install.</li>
       <li>User maintenance.</li>
       <li>System maintenance.</li>
       <li>Apache.</li>
@@ -57,16 +56,15 @@
       <li>Fail2ban.</li>
       <li>Postfix.</li>
       <li>Shell-In-A-Box.</li>
-      <li>Solr.</li>
       <li>ssh.</li>
       <li>Webmin.</li>
     </ul>
     <li><b>cssadmin:</b></li>
     <ul>
-      <li>Initial password same as entered for Drupal7/Solr admin during appliance install.</li>
+      <li>Initial password same as entered for Drupal admin during appliance install.</li>
       <li>Theme design privileges.</li>
-      <li>Access and permissions to /var/www/drupal8/prod/web/themes directory.</li>
-      <li>ProFTPD account mapped to /var/www/drupal8/prod/web/themes directory.</li>
+      <li>Access and permissions to /var/www/drupal9/prod/web/themes directory.</li>
+      <li>ProFTPD account mapped to /var/www/drupal9/prod/web/themes directory.</li>
       <li>Access drupal site themes via ftp://admin.HOSTNAME using cssadmin:password account.</li>
       <li>Gulp.</li>
       <li>Shell-In-A-Box.</li>
@@ -86,9 +84,9 @@
       <li>Roundup.</li>
       <li>Invoice Ninja.</li>
     </ul>
-    <li><b>drupal8:</b></li>
+    <li><b>drupal9:</b></li>
     <ul>
-      <li>Initial password same as entered for Drupal8/Solr admin during appliance install.</li>
+      <li>Initial password same as entered for Drupal admin during appliance install.</li>
       <li>Drupal.</li>
       <li>Drush.</li>
     </ul>
@@ -98,10 +96,10 @@
     <li><b>cssadmin:</b></li>
     <ul>
       <li>Access drupal site themes via ftp://admin.HOSTNAME using cssadmin:password account.</li>
-      <li>Initial password same as entered for Drupal8/Solr admin during appliance install.</li>
+      <li>Initial password same as entered for Drupal admin during appliance install.</li>
       <li>Theme design privileges.</li>
-      <li>Access and permissions to /var/www/drupal8/prod/web/themes directory.</li>
-      <li>ProFTPD account mapped to /var/www/drupal8/prod/web/themes directory.</li>
+      <li>Access and permissions to /var/www/drupal9/prod/web/themes directory.</li>
+      <li>ProFTPD account mapped to /var/www/drupal9/prod/web/themes directory.</li>
     </ul>
   </ul>
   <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/roundup.png"/><br><br>Roundup</h3></div><br>
@@ -125,17 +123,6 @@
     <li>Special note: application requires <b>user@BASESITENAME.TLD:password</b> for access (email address not just user name.)</li>
     <li>Sign up for a <a href="https://app.invoiceninja.com/invoice_now?rc=p1sk0fldfqful0otedp3haw66i0rlunt" title="Free Cloud Account">Free Cloud Account</a></li>
   </ul>
-  <div><h3><a href="/solr.php" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3></div><br>
-  <ul>
-    <li><b>admin:</b></li>
-    <ul>
-      <li>Initial password entered for Drupal8/Solr admin during appliance install.</li>
-      <li>Core maintenance.</li>
-      <li>Detailed information.</li>
-      <li>Reports.</li>
-      <li>Verify drupal dependencies before changes.</li>
-    </ul>
-  </ul>
   <div><h3><a href="/tools.php" title="Tools"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/formavid.png"/><br><br>Tools</a></h3></div><br>
   <ul>
     <li>Initial password entered for Tools admin during appliance install.</li>
@@ -145,7 +132,7 @@
   <ul>
     <li><b>admin:</b></li>
     <ul>
-      <li>Initial password entered for Drupal8/Solr admin during appliance install.</li>
+      <li>Initial password entered for Drupal admin during appliance install.</li>
       <li>User maintenance.</li>
       <li>System maintenance.</li>
       <li>Apache.</li>

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -125,14 +125,19 @@ else
     exit 0
 fi
 
-# install latest
-MESSSAGE="Installing latest distro zip for ${PACKAGE} ..."
+# install version
+VERSION="v5.5.50"
+MESSSAGE="Installing ${VERSION} distro zip for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-URL="https://download.invoiceninja.com"
+URL="https://github.com/invoiceninja/invoiceninja/releases/download/${VERSION}/invoiceninja.zip"
 wget -qO- -O ${PACKAGE}.zip ${URL}
-unzip -qq ${PACKAGE}.zip -d ${WEBROOT}
+mkdir ${APP_DIR}
+unzip -qq ${PACKAGE}.zip -d ${APP_DIR}
 rm ${PACKAGE}.zip
-mv ${WEBROOT}/ninja ${APP_DIR}
+CONF=${APP_DIR}/.env
+if [ -f "${CONF}" ]; then
+    rm ${CONF}
+fi
 
 # apply overlay
 OVERLAY_DIR=$1/overlay
@@ -144,57 +149,44 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
+# set log
+touch ${APP_DIR}/worker.log
+
+# update CONF
+cp ${APP_DIR}/.env.example ${CONF}
+sed -i "s/^APP_URL=.*/APP_URL=http:\/\/${SUBDOMAIN}${APP_HOSTNAME}/g" ${CONF}
+sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/g" ${CONF}
+sed -i "s/^DB_HOST=.*/DB_HOST=localhost/g" ${CONF}
+sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${INVOICENINJA_PASS}/g" ${CONF}
+sed -i "s/^DB_PORT=.*/DB_PORT=3306/g" ${CONF}
+sed -i "s/^DB_USERNAME=.*/DB_USERNAME=${DB_USER}/g" ${CONF}
+sed -i "s/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=database/g" ${CONF}
+sed -i "/^QUEUE_CONNECTION/ a INTERNAL_QUEUE_ENABLED=false" ${CONF}
+sed -i "s/^UPDATE_SECRET=.*/UPDATE_SECRET=updatesecret/g" ${CONF}
+
 # clean up mod_php5 references in htaccess
-MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR} ..."
+MESSSAGE="Replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
-MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}."
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR}."
 echo ${MESSSAGE} | tee -a ${LOG}
 
-# initialize app env file
-MESSSAGE="Initializing env for ${PACKAGE} ..."
+# clean up mod_php7 references in htaccess
+MESSSAGE="Replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-APP_SECRET=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
-PHANTOM_SECRET=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
-ENV=${APP_DIR}/.env
-cat > ${ENV} <<EOF
-APP_ENV=production
-APP_DEBUG=false
-APP_LOCALE=en
-APP_URL=https://${SUBDOMAIN}${APP_HOSTNAME}
-APP_KEY=${APP_SECRET}
-APP_CIPHER=AES-256-CBC
-REQUIRE_HTTPS=true
-DB_TYPE=mysql
-DB_HOST=localhost
-DB_DATABASE=${DB_NAME}
-DB_USERNAME=${DB_USER}
-DB_PASSWORD=${INVOICENINJA_PASS}
-MAIL_DRIVER=mail
-MAIL_PORT=587
-MAIL_ENCRYPTION=tls
-MAIL_HOST=${APP_HOSTNAME}
-MAIL_USERNAME=admin
-MAIL_FROM_NAME=Admin
-MAIL_FROM_ADDRESS=admin@${APP_HOSTNAME}
-MAIL_PASSWORD=${INVOICENINJA_PASS}
-PHANTOMJS_CLOUD_KEY=a-demo-key-with-low-quota-per-ip-address
-PHANTOMJS_SECRET=${PHANTOM_SECRET}
-MAILGUN_DOMAIN=
-MAILGUN_SECRET=
-EOF
-
-# tweak configuration
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php7/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
 
 # set permissions
 MESSSAGE="Setting perms for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-chown -R admin:admin ${APP_DIR}
-chmod -R 755 ${APP_DIR}/storage
-chown www-data:www-data ${APP_DIR}/.env
-chown -R www-data:www-data ${APP_DIR}/storage
-chown -R www-data:www-data ${APP_DIR}/bootstrap
-chown -R www-data:www-data ${APP_DIR}/public/logo
+chown -R www-data:www-data ${APP_DIR}
+find ${APP_DIR} -type d -exec chmod 755 {} \;
+
+# install snappdf library and make it default for PDF generation
+runuser -l www-data -s /bin/bash -c "${APP_DIR}/vendor/bin/snappdf download"
+sed -i "\|^PDF_GENERATOR|s|=.*|=snappdf|" ${CONF}
 
 # create etc dir
 ETC=/etc/${PACKAGE}
@@ -205,11 +197,10 @@ MESSSAGE="Configuring apache for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 CONF=${ETC}/apache.conf
 cat > ${CONF} <<EOF
-<VirtualHost *:443>
+<VirtualHost *:80>
     ServerName ${SUBDOMAIN}${APP_HOSTNAME}
     ServerAdmin webmaster@localhost
     UseCanonicalName Off
-    SSLEngine on
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
     DocumentRoot ${APP_DIR}/public
@@ -218,24 +209,6 @@ cat > ${CONF} <<EOF
         AllowOverride All
         Require all granted
     </Directory>
-    <Location /setup>
-        Require all denied
-        Options +FollowSymlinks
-        AuthName "To complete setup, please enter app password entered during install or initialization - invoiceninja:password."
-        AuthType Basic
-        Require valid-user
-        AuthBasicProvider dbm
-        AuthDBMUserFile /usr/local/apache2/passwd/${PACKAGE}/passwords.dbm
-    </Location>
-</VirtualHost>
-
-<VirtualHost *:80>
-    ServerName ${SUBDOMAIN}${APP_HOSTNAME}
-    ServerAdmin webmaster@localhost
-    UseCanonicalName Off
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
-    RedirectPermanent / "https://${SUBDOMAIN}${APP_HOSTNAME}/"
 </VirtualHost>
 EOF
 
@@ -244,11 +217,11 @@ chmod 0644 ${CONF}
 
 # apache2: link conf file
 AVAILABLE=/etc/apache2/sites-available
-ln -s ${CONF} ${AVAILABLE}/${PACKAGE}.conf
+ln -s ${CONF} ${AVAILABLE}/zzz-${PACKAGE}.conf
 
 # apache2: enable conf
 a2enmod rewrite
-a2ensite ${PACKAGE}
+a2ensite zzz-${PACKAGE}
 
 # add hosts entry
 MESSSAGE="Adding host entry for ${PACKAGE} ..."

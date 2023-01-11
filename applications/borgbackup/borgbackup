@@ -271,12 +271,12 @@ borg create \\
     --exclude '/var/webmin/miniserv.lastcrons' \\
     --exclude '/var/webmin/modules/system-status/*' \\
     --exclude '/var/webmin/modules/package-updates/*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/*/css/*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/config_*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/css/*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/js/*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/php/*' \\
-    --exclude '/var/www/drupal8/prod/web/sites/*/files/styles/*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/*/css/*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/config_*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/css/*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/js/*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/php/*' \\
+    --exclude '/var/www/drupal9/prod/web/sites/*/files/styles/*' \\
     --exclude-caches \\
     --compression lzma \\
     ::'{hostname}-{now:%Y-%m-%d-%H:%M:%S}' \\

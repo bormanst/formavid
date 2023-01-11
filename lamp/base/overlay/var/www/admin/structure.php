@@ -18,11 +18,9 @@
     <li><b>Host name:</b> /etc/hostname</li>
     <li><b>Hosts:</b> /etc/hosts</li>
     <li><b>Logs:</b> /var/log</li>
-    <li>Compartmentalized Drupal/Solr-core layout allows deployment flexibility:
+    <li>Compartmentalized Drupal layout allows deployment flexibility:
       <ul>
-        <li>Can deploy Solr on different server and use drupal search as backup if lost communication.</li>
         <li>Can deploy drupal stack accross servers (dedicated forum server, etc.)</li>
-        <li>Can deploy combination of the above.</li>
       </ul>
     </li>
     <li>Main console screen displays vital information.</li>
@@ -39,7 +37,7 @@
     <li><b>Users:</b> htdbm -bc /usr/local/apache2/passwd/admintools/passwords.dbm username password</li>
     <li><b>php Pages:</b> /var/www/admin</li>
     <li><b>Images:</b> /var/www/admin/images</li>
-    <li><b>Header CSS (symlinked):</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
+    <li><b>Header CSS (symlinked):</b> /var/www/drupal9/prod/web/themes/sedlowername</li>
     <li><b>Apache configuration:</b> /etc/apache2/sites-available/zzz-admin.HOSTNAME.conf</li>
   </ul>
 </div>
@@ -70,18 +68,17 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal8</h3></div><br>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal9</h3></div><br>
   <ul>
-    <li><b>Dependencies:</b> Apache2, MariaDb, PHP, [Solr]</li>
-    <li><b>Location:</b> /var/www/drupal8</li>
+    <li><b>Dependencies:</b> Apache2, MariaDb, PHP</li>
+    <li><b>Location:</b> /var/www/drupal9</li>
     <li><b>System admin:</b> admin</li>
     <li><b>CSS admin:</b> cssadmin</li>
-    <li><b>CSS themes:</b> /var/www/drupal8/prod/web/themes</li>
+    <li><b>CSS themes:</b> /var/www/drupal9/prod/web/themes</li>
     <li>Site stacks created using <a href="/drupal.php" title="instructions and script">instructions and script</a>.</li>
     <li>Permanent apache url redirects used to isolate sub sites.</li>
     <li><b>Apache configuration:</b> /etc/apache2/sites-available/HOSTNAME.conf</li>
     <li><b>Base Site (article):</b> http://HOSTNAME</li>
-    <li><b>Solr cores (sans aggregator):</b> /var/lib/solr/data/SITENAME</li>
   </ul>
 </div>
 <div>
@@ -130,23 +127,7 @@
     <li><b>Location:</b> /var/www/support</li>
     <li><b>Tracker configuration:</b> symlink /etc/roundup/tracker-config.ini /var/www/support/config.ini</li>
     <li><b>Apache configuration:</b> symlink /etc/roundup/apache.conf /etc/apache2/sites-available/support.sedhostname.conf</li>
-    <li><b>Header CSS:</b> /var/www/drupal8/prod/web/themes/sedlowername</li>
-  </ul>
-</div>
-<div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</h3></div><br>
-  <ul>
-    <li><b>Dependencies:</b> JDK</li>
-    <li><b>Admin Address:</b> http://sedhostname:8983/solr/#/</li>
-    <li><b>Location:</b> /usr/local/solr</li>
-    <li><b>Data:</b> /var/lib/solr/data</li>
-    <li><b>Password:</b> /var/lib/solr/security.json</li>
-    <li><b>Jetty start (Solr):</b> /usr/local/solr/server/start.jar</li>
-    <li><b>Jetty configuration:</b> /usr/local/solr/server/etc</li>
-    <li><b>Solr configuration:</b> /var/lib/solr/data/solr.xml</li>
-    <li><b>Core properties:</b> /var/lib/solr/data/[sitename]/[sitetype]/core.properties</li>
-    <li><b>Drupal8 schema:</b> /var/lib/solr/data/[sitename]/[sitetype]/conf/schema.xml</li>
-    <li><b>Drupal8 configuration:</b> /var/lib/solr/data/[sitename]/[sitetype]/conf/solrconfig.xml</li>
+    <li><b>Header CSS:</b> /var/www/drupal9/prod/web/themes/sedlowername</li>
   </ul>
 </div>
 <div>

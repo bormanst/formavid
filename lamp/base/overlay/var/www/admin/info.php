@@ -25,7 +25,7 @@
     <li><a href="/structure.php" title="Appliance Structure Info">Appliance Structure Info</a></li>
     <li><a href="https://github.com/bormanst/formavid/blob/master/INSTALL.txt" title="Customizing Build Scripts">Customizing Build Scripts</a></li>
     <li><a href="http://formavid.org" title="FormaVid Home">FormaVid Home</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
     <li><a href="http://formavid.org/download" title="FormaVid Donate">FormaVid <b><i>Donate</i></b></a></li>
   </ul>
 </div>
@@ -67,12 +67,10 @@
   <ul>
     <li><a href="/drupal.php" title="Drupal Local Info">Drupal Local Info</a></li>
     <li><a href="https://drupal.org/documentation" title="Drupal Documentation">Drupal Documentation</a></li>
-    <li><a href="https://www.drupal.org/8/faq" title="Drupal FAQs">Drupal FAQs</a></li>
-    <li><a href="https://www.drupal.org/docs/8/configuration-management/managing-your-sites-configuration" title="Drupal Configuration">Drupal Configuration</a></li>
-    <li><a href="https://drupal.org/project/apachesolr" title="Drupal Solr Module">Drupal Solr Module</a></li>
+    <li><a href="https://www.drupal.org/docs/configuration-management" title="Drupal Configuration">Drupal Configuration</a></li>
     <li><a href="https://drupal.org/project/zen" title="Drupal Zen Theme">Drupal Zen Theme</a></li>
-    <li><a href="https://www.drupal.org/requirements/php" title="Drupal php Requirements">Drupal php Requirements</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="https://www.drupal.org/docs/system-requirements" title="Drupal System Requirements">Drupal System Requirements</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
@@ -117,7 +115,7 @@
     <li><a href="https://www.adminer.org/en/plugins/" title="Adminer News">Adminer Plugins</a></li>
     <li><a href="https://sourceforge.net/p/adminer/news" title="Adminer News">Adminer Latest News</a></li>
     <li><a href="https://sourceforge.net/p/adminer/discussion/" title="Adminer Forums">Adminer Forums</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
@@ -125,12 +123,12 @@
   <ul>
     <li><a href="/phpinfo.php" title="PHP Local Info">PHP Local Info</a></li>
     <li><a href="https://php.net/manual/en/" title="PHP Manual">PHP Manual</a></li>
-    <li><a href="https://www.drupal.org/requirements/php" title="PHP Drupal Requirements">PHP Drupal Requirements</a></li>
+    <li><a href="https://www.drupal.org/docs/system-requirements/php-requirements" title="PHP Drupal Requirements">PHP Drupal Requirements</a></li>
     <li><a href="https://getcomposer.org/" title="Composer Dependency Manager for PHP">Composer Dependency Manager for PHP</a></li>
     <li><a href="https://getcomposer.org/doc/00-intro.md" title="Composer Getting Started">Composer Getting Started</a></li>
     <li><a href="https://getcomposer.org/doc/" title="Composer Documentation">Composer Documentation</a></li>
     <li><a href="https://packagist.org/" title="Composer PHP Package Repository">Composer PHP Package Repository</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
@@ -159,7 +157,7 @@
     <li><a href="http://roundup.sourceforge.net/docs/user_guide.html" title="Roundup User Guide">Roundup User Guide</a></li>
     <li><a href="http://roundup.sourceforge.net/docs/customizing.html" title="Roundup Customisation">Roundup Customisation</a></li>
     <li><a href="http://roundup.sourceforge.net/docs/admin_guide.html" title="Roundup Administration Guide">Roundup Administration Guide</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
@@ -167,40 +165,13 @@
   <ul>
     <li><a href="https://sass-lang.com/documentation/file.SASS_REFERENCE.html" title="Sass Reference">Sass Reference</a></li>
     <li><a href="https://sass-lang.com/tutorial.html" title="Sass Tutorial">Sass Tutorial</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
+    <li><a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
   <h3><a href="https://code.google.com/p/shellinabox/" title="Shell In A Box"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/shell.png"/><br><br>Shell In A Box</a></h3><br>
   <ul>
     <li><a href="https://code.google.com/p/shellinabox/wiki/shellinaboxd_man" title="Shell In A Box">Shell In A Box Documentation</a></li>
-  </ul>
-</div>
-<div>
-  <h3><a href="https://lucene.apache.org/solr/" title="Solr"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</a></h3><br>
-  <ul>
-    <li><a href="/solr.php" title="Apache Solr Local Info">Apache Solr Local Info</a></li>
-    <li><a href="https://lucene.apache.org/solr/7_4_0/" title="Apache Solr Documentation">Apache Solr Documentation</a></li>
-    <li><a href="https://lucene.apache.org/solr/quickstart.html" title="Apache Solr Quick Start">Apache Solr Quick Start</a></li>
-    <li><a href="https://lucene.apache.org/core/7_4_0/index.html" title="Apache Solr Core">Apache Solr Core</a></li>
-    <li><a href="http://archive.apache.org/dist/lucene/solr/ref-guide/apache-solr-ref-guide-7.4.pdf" title="Apache Solr Admin UI">Apache Solr Ref Guide</a></li>
-    <li><a href="https://lucene.apache.org/solr/community.html" title="Apache Solr Community">Apache Solr Community</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
-    <li><a href="https://www.apache.org/foundation/contributing.html" title="Apache Solr Donate">Apache Solr <b><i>Donate</i></b></a></li>
-  </ul>
-</div>
-<div>
-  <h3><a href="/spywatch.php" title="Spy Watch"><img style="float: left; margin: 0px 15px 0px 0px;" src="images/spywatch.png"/><br><br>Spy Watch</a></h3><br>
-  <ul>
-    <li><a href="/spywatch.php" title="Spy Watch Info">Spy Watch Info</a></li>
-    <li><a href="https://www.drupal.org/docs/user_guide/en/understanding-modules.html" title="Drupal Module Documentation">Drupal Module Documentation</a></li>
-    <li><a href="https://www.drupal.org/docs/8/theming" title="Theming Drupal 8">Theming Drupal 8</a></li>
-    <li><a href="https://gulpjs.org/getting-started" title="Gulp Getting Started">Gulp Getting Started</a></li>
-    <li><a href="https://gulpjs.org/faq" title="Gulp FAQ">Gulp FAQ</a></li>
-    <li><a href="https://gulpjs.org/cli" title="Gulp CLI">Gulp CLI</a></li>
-    <li><a href="https://gulpjs.org/api" title="Gulp API">Gulp API</a></li>
-    <li><a href="https://gulpjs.org/recipes#recipes" title="Gulp Recipes">Gulp Recipes</a></li>
-    <li><a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a></li>
   </ul>
 </div>
 <div>
@@ -226,7 +197,7 @@
 <br>
 <div>
 <p>
-If you need a custom design or build, please take a look at <a href="http://modorbis.com/appliances" title="FormaVid Custom Support">FormaVid Custom Support</a> where you can also find other professional services to help get things started, to keep them rolling, or to integrate appliances into existing systems.
+If you need a custom design or build, please take a look at <a href="http://modorbis.com/appliance" title="FormaVid Custom Support">FormaVid Custom Support</a> where you can also find other professional services to help get things started, to keep them rolling, or to integrate appliances into existing systems.
 </p>
 </div>
 <br>

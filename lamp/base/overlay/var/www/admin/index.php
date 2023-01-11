@@ -19,8 +19,6 @@
   <a href="https://admin.sedhostname:12321" title="Webmin"><img src="images/webmin.png"/></a>
   <a href="https://admin.sedhostname:12322" title="Adminer"><img src="images/adminer.png"/></a>
   <a href="https://admin.sedhostname:12320" title="Shell In A Box"><img src="images/shell.png"/></a>
-<!--  <a href="http://sedhostname:8983/solr/#/" title="Solr Admin"><img src="images/solr.png"/></a> -->
-  <a href="/solrsetup.php" title="Solr Setup"><img src="images/solr.png"/></a>
   <a href="/phpinfo.php" title="PHP Info"><img src="images/php.png"/></a>
   <a href="/server-status" title="httpd Status"><img src="images/apache.png"/></a>
   <a href="/info.php" title="Appliance Info"><img src="images/formavid.png"/></a>

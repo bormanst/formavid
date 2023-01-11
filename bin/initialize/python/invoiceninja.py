@@ -58,9 +58,6 @@ def main():
             "Apache access password",
             "Please enter password for Apache access to Invoice Ninja setup.")
 
-    # Set hashpass.
-    hashpass = hashlib.md5(password).hexdigest()
-
     # Init db connection.
     con = ""
     try:
@@ -73,8 +70,9 @@ def main():
         cur.execute('SET PASSWORD FOR invoiceninja@localhost = PASSWORD("%s"); FLUSH PRIVILEGES;' % escape_chars(password))
         # Update invoiceninja .env with MariaDb and Postfix password.
         system("echo 'Updating Invoice Ninja .env file MariaDb and Postfix passwords ...'")
-        system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
-        system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
+        if os.path.exists(env_file):
+            system("sed -i 's/^DB_PASSWORD=\(.*\)/DB_PASSWORD=%s/' %s" % (password, env_file))
+            system("sed -i 's/^MAIL_PASSWORD=\(.*\)/MAIL_PASSWORD=%s/' %s" % (password, env_file))
         # Set apache2 htdbm password.
         system("echo 'Updating Apache2 invoiceninja password for setup access ...'")
         directory = "/usr/local/apache2/passwd/invoiceninja"
@@ -85,8 +83,8 @@ def main():
         system(command)
         # restart apache2
         if restart_apache: system('systemctl restart apache2')
-    except mdb.Error, e:
-        print "Error %d: %s" % (e.args[0],e.args[1])
+    except mdb.Error as e:
+        # print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
     finally:
         if con:

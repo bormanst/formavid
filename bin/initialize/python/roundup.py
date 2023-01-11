@@ -53,8 +53,7 @@ def main():
         # Update tracker admin password.
         system("echo 'Updating Roundup admin password ...'")
         system('roundup-admin -i /var/www/%s set user1 password="%s"' % (tracker, password))
-    except mdb.Error, e:
-        print "Error %d: %s" % (e.args[0],e.args[1])
+    except mdb.Error as e:
         sys.exit(1)
     finally:
         if con:

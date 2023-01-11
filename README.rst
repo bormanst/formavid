@@ -1,18 +1,17 @@
-The FormaVid Small Business Appliance has been updated for Debian 10 Buster:
+The FormaVid Small Business Appliance has been updated for Debian 11 Bullseye:
 ------------------------------------------------------------------------
 
-- Specifically designed to run on Google Compute Engine's Debian-10 image
+- Specifically designed to run on Google Compute Engine's Debian-11 image
   but will run on compatible distros with minor modifications.
 - Deployable on local hardware, VMs, or to the cloud.
 - Select any compatible base distro and let the scripts do the work.
-- Notable improvements include php-7.3.9 and solr-8 using openjdk-11.
 
 
 The FormaVid Small Business Appliance integrates the following features:
 ------------------------------------------------------------------------
 
 
-Drupal 8 - Content Management Framework
+Drupal - Content Management Framework
 =======================================
 
 `Drupal`_ is an open source content management platform licensed under
@@ -20,17 +19,17 @@ the GPL. Equipped with a powerful blend of features, Drupal can support
 a variety of websites ranging from personal blogs, corporate brochures
 and large community-driven websites.
 
-- Drupal 8 configurations:
+- Drupal configurations:
 
-   - Installed from upstream source code to /var/www/drupal8.
+   - Installed from upstream source code to /var/www/drupal9.
    - Includes drush for command line administration and configuration.
    - Includes composer for base component and module administration.
    - Configured to use Gulp/Sass for improved design efficiency.
    - Default theme based upon Zen Grids for mobile first design.
-   - Site stacks are created in /var/www/drupal8/sites.
+   - Site stacks are created in /var/www/drupal9/prod.
    - Each site stack has its own corresponding apache.conf stack file.
 
-- Additional Drupal 8 modules:
+- Additional Drupal modules:
 
    - Advagg: Advanced CSS/JS Aggregation.
    - Advanced help: Allows developers to store help outside the system.
@@ -48,8 +47,6 @@ and large community-driven websites.
    - Field Group: Enables grouping fields together.
    - FiveStar: Simple five-star voting widget for nodes.
    - Honeypot: Methods for deterring spam bots.
-   - ImageAPI Optimize: allows you to use your preferred toolkit and
-     optimize (losslessly) the image when it is saved.
    - Image Style Quality: Allows you to specify a custom quality on
      individual image styles.
    - ImageMagick: Allows to use ImageMagick or GraphicsMagick as image
@@ -66,8 +63,6 @@ and large community-driven websites.
    - RestUI: Provides a user interface to manage REST resources.
    - Rules: Allows site administrators to define conditionally
      executed actions based on occurring events.
-   - Search API Solr: Optional customizable search support.
-   - Tagadelic: Makes weighted tag clouds from your taxonomy terms.
    - Typed Data: Extends the core Typed Data API with new APIs and features.
    - Views Bulk Operations: augments Views by allowing bulk operations
      to be executed on the displayed rows.
@@ -133,7 +128,6 @@ Additional Features
 - SSL support out of the box.
 - `Adminer`_ administration frontend for MariaDB (listening on port
   12322 - uses SSL).
-- `Apache Solr`_ optional search server (listening on port 8983).
 - `BorgBackup`_ deduplicating archiver with compression and encryption.
 - `Dovecot`_ IMAP/POP3 server (listening on ports 993/143).
 - `Fail2ban`_ bans IPs that show malicious signs.
@@ -150,14 +144,13 @@ Credentials *(passwords required for initialization)*
 -------------------------------------------
 
 -  Webmin, Webshell, SSH, MariaDB, Adminer: username **root**
--  Drupal 8, Roundup: username **admin**
+-  Drupal, Roundup: username **admin**
 -  Invoice Ninja setup: username **invoiceninja**
 -  ProFTPD: username **cssadmin**
 -  BorgBackup: repository passphrase
 
 .. _Adminer: https://www.adminer.org/
 .. _Apache: https://httpd.apache.org/
-.. _Apache Solr: https://lucene.apache.org/solr/
 .. _BorgBackup: https://www.borgbackup.org/
 .. _Dovecot: https://www.dovecot.org/
 .. _Drupal: https://www.drupal.org/

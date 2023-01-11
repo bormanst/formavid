@@ -20,22 +20,14 @@ if [ -d "${APP_DIR}" ]; then
     exit 0
 fi
 
-# dependencies check: composer requires lotsa mem or just a swap
-SWAPFILE=/swapfile
-if [ "${CREATE_SWAPFILE}" == "True" ] && [ $(swapon -s | grep -ci "partition") -eq 0 ];  then
-    # add permanent swap:
-    echo "$( date ) Adding permanent swap." >> ${LOG}
-    fallocate -l 3G ${SWAPFILE}
-    chmod 600 ${SWAPFILE}
-    mkswap ${SWAPFILE}
-    swapon ${SWAPFILE}
-    swapon -s
-    echo "${SWAPFILE} none swap sw 0 0" >> /etc/fstab
-fi
-
 # required for all-apt-gets
 apt-get update
 apt-get install -y apt-show-versions apt-transport-https curl gnupg software-properties-common unzip wget
+
+# repo php8.1
+curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+apt-get update
 
 echo ""
 echo ""

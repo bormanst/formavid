@@ -1,3 +1,27 @@
+formavid (17.0.0) stable; urgency=high
+
+  * Debian 11 Bullseye upgrade.
+  
+  * Major component versions:
+
+    adminer         4.7.9
+    apache2         2.4.54
+    borgbackup      1.2.1
+    dovecot         2.3.13
+    drupal          9.4.5 (upstream archive)
+    drush           11.1.1 (upstream archive)
+    fail2ban        0.10.2
+    invoiceninja    4.5.50 (upstream archive)
+    mariadb         10.5.15
+    php             7.4.30
+    proftpd         1.36
+    postfix         3.5.13
+    roundup         2.2.0 (upstream archive)
+    webmin          1.999
+
+ -- Sean Borman <bormanst@gmail.com>  Sat, 13 Aug 2022 03:57:56 -0600
+ 
+
 formavid (16.4.2) stable; urgency=high
 
   * Drupal core updated to 8.9.11

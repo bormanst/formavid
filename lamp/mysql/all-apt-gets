@@ -27,7 +27,7 @@ if [ ! -z "${!PKG_CHECK}" ] || (systemctl -q is-active ${PACKAGE}); then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add base packages
-    export APTGETS="mariadb-server mysqltuner libdbd-mysql-perl python-mysqldb"
+    export APTGETS="mariadb-server mysqltuner default-libmysqlclient-dev libdbd-mysql-perl"
     export "${PACKAGE^^}"="True"
     # log export and update
     MESSSAGE="export ${PACKAGE^^}=True"

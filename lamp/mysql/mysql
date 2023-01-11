@@ -10,6 +10,9 @@ PACKAGE=mysql
 MESSSAGE="Checking dependencies for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# Install python packages.
+pip install mysql mysql-connector-python mysqlclient
+
 # check packages
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
@@ -70,6 +73,9 @@ echo ${MESSSAGE} | tee -a ${LOG}
 ROOT_CREDS="--user=root --password=${DB_PASS}"
 MYSQL_BATCH="/usr/bin/mysql ${ROOT_CREDS} --batch"
 ${MYSQL_BATCH} --execute "GRANT ALL PRIVILEGES ON *.* TO admin@localhost IDENTIFIED BY '${APP_PASS}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
+# https://www.drupal.org/docs/system-requirements/setting-the-mysql-transaction-isolation-level
+${MYSQL_BATCH} --execute "SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;"
 
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -8,7 +8,7 @@ PACKAGE=deploy_appliance
 
 echo ""
 echo ""
-echo "Copyright (C) 2018 Sean Borman <bormanst@gmail.com>"
+echo "Copyright (C) 2022 Sean Borman <bormanst@gmail.com>"
 echo "This program is free software: you can redistribute it and/or modify"
 echo "it under the terms of the GNU General Public License as published by"
 echo "the Free Software Foundation, either version 3 of the License, or"
@@ -235,12 +235,6 @@ if [ -n "${APP_EMAIL}" ]; then
     echo ${MESSSAGE} >> ${LOG}
     # wait for processes completed
     wait
-    # bug - other systemd services gerk after enabling solr
-    if [ "${SOLR_INSTALL}" == "True" ]; then
-        systemctl restart mysql
-        systemctl restart apache2
-        systemctl restart postfix
-    fi
     echo ""
     MESSSAGE="$( date ) Base lamp setup completed."
     echo "#############################################"
@@ -447,7 +441,13 @@ if [ -n "${APP_EMAIL}" ]; then
             # create base site
             ${FORMAVID}/bin/deploy/python/create-drupal-stack.py
         fi
-    else
+        # check invoiceninja artisan exits
+        FILE=/var/www/invoiceninja/artisan
+        if [ -f "${FILE}" ]; then
+            # init
+            ${FORMAVID}/bin/initialize/shell/init_invoiceninja
+        fi
+   else
         # skipping
         echo ""
         MESSSAGE="$( date ) Skipped run-once post install scripts."

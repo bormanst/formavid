@@ -33,8 +33,8 @@
   <p>Do not forget to disable caching and css aggregation at <strong>/admin/config/development/performance</strong> while doing theme development or the newly compiled Spy Watch changes may not appear as expected.</p>
   <p>Ocassionlly, a gulp watch will fail on some scss errors. These errors are usually displayed in the terminal and can cause the watch to terminate abnormally leaving the theme in a broken state. Spy Watch does not show the terminal output, so if a theme apears broken, it is recommended to set Spy Watch to another state and then back to the desired state. This will cause gulp to clean out the broken files and regenerate new ones.</p>
   <p>If the theme remains broken, it can be properly debugged using a terminal and executing a gulp watch manually:</p>
-  <p><strong>gulp -f /var/www/drupal8/prod/web/themes/{theme to watch}/gulpfile.js watch</strong></p>
-  <p><strong>gulp -f /var/www/drupal8/prod/web/themes/{theme to watch}/gulpfile.js watch-scss</strong></p>
+  <p><strong>gulp -f /var/www/drupal9/prod/web/themes/{theme to watch}/gulpfile.js watch</strong></p>
+  <p><strong>gulp -f /var/www/drupal9/prod/web/themes/{theme to watch}/gulpfile.js watch-scss</strong></p>
 </div>
 <br />
 </body>

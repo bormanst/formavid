@@ -10,6 +10,9 @@ PACKAGE=roundup
 MESSSAGE="Checking dependencies for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# Install python packages.
+pip install tz
+
 # check packages
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
@@ -102,8 +105,8 @@ fi
 HOME="/home/${DB_USER}/.local"
 if [ ! -d "${HOME}" ]; then
     # set version
-    VERSION="1.6.1"
-    # install roundup to user home
+    VERSION="2.2.0"
+    # installroundup to user home
     su - ${DB_USER} -c "pip install ${PACKAGE}==${VERSION} --user"
     # set home access perms
     chmod -R 0775 ${HOME}
@@ -117,7 +120,7 @@ if [ ! -d "${HOME}" ]; then
     ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
     TARGET=/share/roundup
     ln -sf ${HOME}${TARGET} ${LOCAL}${TARGET}
-    TARGET=/lib/python2.7
+    TARGET=/lib/python3.9
     ln -sf ${HOME}${TARGET}/site-packages/roundup ${LOCAL}${TARGET}/dist-packages/roundup
     ln -sf ${HOME}${TARGET}/site-packages/roundup-${VERSION}.dist-info ${LOCAL}${TARGET}/dist-packages/roundup-${VERSION}.dist-info
 fi
@@ -159,7 +162,7 @@ mv ${CONF} ${ETC}/tracker-config.ini
 ln -s ${ETC}/tracker-config.ini ${CONF}
 
 # set roundup passwords
-# ${FORMAVID}/bin/initialize/python/roundup.py
+${FORMAVID}/bin/initialize/python/roundup.py
 
 # hide issues until authenticated
 OPTION="for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':"
@@ -240,10 +243,10 @@ EOF
 chmod 0644 ${CONF}
 
 # apache2: link conf file
-ln -s ${CONF} /etc/apache2/sites-available/${TRACKER}.conf
+ln -s ${CONF} /etc/apache2/sites-available/zzz-${TRACKER}.conf
 
 # apache2: enable conf
-a2ensite ${TRACKER}
+a2ensite zzz-${TRACKER}
 
 # add hosts entry
 MESSSAGE="Adding host entry for ${PACKAGE} ..."

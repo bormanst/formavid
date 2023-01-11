@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -7,10 +7,10 @@
 PACKAGE=default_envars
 
 # order important: required password list
-export PASS_REQ_LIST="APP_PASS BORGBACKUP_PASS INVOICENINJA_PASS ROUNDUP_PASS SOLR_NEW TOOLS_PASS WEBMIN_PASS DB_PASS"
+export PASS_REQ_LIST="APP_PASS BORGBACKUP_PASS INVOICENINJA_PASS ROUNDUP_PASS TOOLS_PASS WEBMIN_PASS DB_PASS"
 
 # order important: required envars
-export ENVAR_REQ_LIST="DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCS_BUCKET_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP SOLR_INSTALL CREATE_DRUPAL_STACK DEFAULT_PASS CREATE_SWAPFILE"
+export ENVAR_REQ_LIST="DOMAIN SITETITLE APP_EMAIL GCS_PROJECT_ID GCS_BUCKET_REGION GCS_BUCKET_TYPE GCS_BUCKET CONFIGURE_BORGBACKUP CREATE_DRUPAL_STACK DEFAULT_PASS"
 
 # DOMAIN goes first
 export DOMAIN="www.examplesitename.com" # will map to examplesitename.com
@@ -18,20 +18,18 @@ export APP_HOSTNAME=`echo ${DOMAIN,,} | sed 's/www.//'`
 export SITENAME=`echo ${APP_HOSTNAME} | sed 's/\.//g'`
 export SITETITLE="Example Site Name" # will map to Example Site Name for drupal and base admin site
 export APP_EMAIL="admin@${APP_HOSTNAME}"
-export SOLR_INSTALL="False" # default: False
 
 # warning - do not modify as some python scripts have this statically wired
 export WEBROOT=/var/www
-export DRUPAL_NAME=drupal8
+export DRUPAL_NAME=drupal9
 export DRUPAL_DIR=${WEBROOT}/${DRUPAL_NAME}
 export PROJECT=prod
 export PROJECT_DIR=${DRUPAL_DIR}/${PROJECT}
-export DRUPAL_SCRIPT=${FORMAVID}/applications/drupal8/drupal8
+export DRUPAL_SCRIPT=${FORMAVID}/applications/drupal9/drupal9
 
 # optionals
 export CREATE_DRUPAL_STACK="True"
 export CONFIGURE_BORGBACKUP="False"
-export CREATE_SWAPFILE="True"
 
 # gcloud envars
 GCS_PROJECT_ID="None"
@@ -58,9 +56,7 @@ export SECURE_CIPHER_LIST="ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-
 
 # select drupal modules to install
 export DRUPAL_MODULE_LIST="\
-    drupal/advagg \
     drupal/advanced_help \
-    drupal/background_image \
     drupal/backup_migrate \
     drupal/captcha \
     drupal/components \
@@ -71,18 +67,15 @@ export DRUPAL_MODULE_LIST="\
     drupal/fivestar \
     drupal/honeypot \
     drupal/image_style_quality \
-    drupal/imageapi_optimize \
     drupal/imagemagick \
-    drupal/imce \
     drupal/inline_entity_form \
+    drupal/jquery_ui \
+    drupal/jquery_ui_accordion \
     drupal/module_filter \
     drupal/panels \
     drupal/pathauto \
     drupal/recaptcha \
     drupal/rules \
-    drupal/search_api_solr \
-    drupal/search_api_solr_defaults \
-    drupal/tagadelic \
     drupal/views_bulk_operations \
     drupal/zen
 "

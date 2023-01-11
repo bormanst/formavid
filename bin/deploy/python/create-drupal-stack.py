@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2023 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -16,7 +16,6 @@ Option:
     --domain=       unless provided, will ask interactively
     --email=        unless provided, will ask interactively
     --sitetitle=    unless provided, will ask interactively
-    --solr=         unless provided, will ask interactively
 
 """
 
@@ -33,46 +32,10 @@ from dialog_wrapper import Dialog
 from local_methods import *
 from subprocess import Popen, PIPE
 
-# Sets the site specific default solr configurations.
-def set_solr_configs(solrconfigpath, solrserverid, solrservername, solrcorename, password, formavid):
-
-    # Get solr server config file.
-    with open(solrconfigpath + '/search_api.server.default_solr_server.yml') as f:
-        doc = yaml.safe_load(f)
-
-    # Set configs.
-    doc['id'] = solrserverid + "_solr_server"
-    doc['name'] = solrservername + " Solr Server"
-    doc['description'] = "Configured by site creation script located in %s/bin" % formavid
-    doc['backend_config']['connector'] = "basic_auth"
-    doc['backend_config']['connector_config']['core'] = solrcorename
-    doc['backend_config']['connector_config']['password'] = password
-    doc['backend_config']['connector_config']['username'] = "drupal8"
-
-    # Write updated solr server config file.
-    with open(solrconfigpath + '/search_api.server.default_solr_server.yml', 'w') as f:
-        yaml.safe_dump(doc, f, default_flow_style=False)
-
-    # Get solr index config file.
-    with open(solrconfigpath + '/search_api.index.default_solr_index.yml') as f:
-        doc = yaml.safe_load(f)
-
-    # Set configs.
-    doc['id'] = solrserverid + "_solr_index"
-    doc['name'] = solrservername + " Solr content index"
-    doc['description'] = "Configured by site creation script located in %s/bin" % formavid
-    doc['server'] = solrserverid + "_solr_server"
-
-    # Write updated solr index config file.
-    with open(solrconfigpath + '/search_api.index.default_solr_index.yml', 'w') as f:
-        yaml.safe_dump(doc, f, default_flow_style=False)
-
 DEFAULT_DIALOG_HEADER = "Formavid - Drupal site build script"
 DEFAULT_DOMAIN = "www.examplesitename.com"
 DEFAULT_LOG = "/var/log/formavid/create-drupal-stack.log"
 DEFAULT_TITLE = "Example Site Name"
-
-SOLR_TEXT = """Solr search can be used as a replacement for core content search and boasts both extra features and better performance. Low memory systems may wish to use the default search to avoid the overhead associated with a Java virtual machine."""
 
 HTACCESS = """
 # Turn off all options we don't need.
@@ -95,8 +58,8 @@ Deny from all
 """
 def main():
     try:
-        opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ['help', 'apass=', 'dbpass=', 'domain=', 'email=', 'formavid=', 'sitetitle=', 'solr='])
-    except getopt.GetoptError, e:
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "h", ['help', 'apass=', 'dbpass=', 'domain=', 'email=', 'formavid=', 'sitetitle='])
+    except getopt.GetoptError as e:
         usage(e)
 
     # Log setup.
@@ -106,14 +69,14 @@ def main():
     drupalsubdir = "prod"
 
     # Sites - drupal loaction.
-    drupaldir = "/".join(["/var/www/drupal8",drupalsubdir])
+    drupaldir = "/".join(["/var/www/drupal9",drupalsubdir])
 
     # Verify default/settings.php exists.
     pathFile = "/".join([drupaldir,"web/sites/default/default.settings.php"])
     if not os.path.exists(pathFile):
         # Log start.
         logging.info('Missing requirement: %s - Missing sites/default/default.settings.php file.' % datetime.datetime.now())
-        logging.info('Please verify the drupal 8 installation in /var/www.')
+        logging.info('Please verify the Drupal 9 installation in /var/www.')
         quit()
 
     # Log start.
@@ -126,8 +89,6 @@ def main():
     formavid = os.environ.get("FORMAVID")
     password = os.environ.get("APP_PASS")
     sitetitle = os.environ.get("SITETITLE")
-    solr = os.environ.get("SOLR_INSTALL")
-    solrnew = os.environ.get("SOLR_NEW")
 
     # Check for dbpass.
     isdbpass = "DbpasswordEnvar"
@@ -138,24 +99,15 @@ def main():
     if not password or password == "None": ispassword = "No-PasswordEnvar"
 
     # Log envars.
-    logging.info('Incoming envars: [isdbpass]:[domain]:[email]:[formavid]:[ispassword]:[sitetitle]:[solr]')
-    logging.info('Incoming envars: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, ispassword, sitetitle, solr))
+    logging.info('Incoming envars: [isdbpass]:[domain]:[email]:[formavid]:[ispassword]:[sitetitle]')
+    logging.info('Incoming envars: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, ispassword, sitetitle))
 
     # Assign common dialog header.
     d = Dialog(DEFAULT_DIALOG_HEADER)
 
-    # List of solr related modules.
-    solrModules = ['search_api_solr', 'search_api_solr_defaults']
-    logging.info('Drupal solr related modules: %s' % solrModules)
-
-    # List of modules to enable: initially populated by applications/1000-drupal8/drupal8drupal8 script.
-    modulesToEnable = ['advagg','advanced_help','background_image','backup_migrate','captcha','components','ctools','devel','features','field_group','fivestar','honeypot','image_style_quality','imageapi_optimize','imagemagick','imce','inline_entity_form','module_filter','panels','pathauto','recaptcha','rules','search_api_solr','search_api_solr_defaults','tagadelic','views_bulk_operations']
+    # List of modules to enable: initially populated by bin/deploy/shell/default_envars script.
+    modulesToEnable = []
     logging.info('Drupal modules to enable: %s' % modulesToEnable)
-
-    # Remove solr related modules from enable list.
-    for module in solrModules:
-        if module in modulesToEnable:
-            modulesToEnable.remove(module)
 
     # Check inputs.
     for opt, val in opts:
@@ -173,10 +125,6 @@ def main():
             formavid = val
         elif opt == '--sitetitle':
             sitetitle = val
-        elif opt == '--solr':
-            solr = val
-        elif opt == '--solrpass':
-            solrnew = val
 
     # Get formavid location.
     if not formavid or formavid == "None": formavid = "/usr/local/formavid"
@@ -184,8 +132,8 @@ def main():
     # Get domain.
     if not domain or domain == "None":
         domain = d.get_input(
-            "Add Drupal8 Domain",
-            "Enter additional domain for Drupal8.",
+            "Add drupal9 Domain",
+            "Enter additional domain for drupal9.",
             DEFAULT_DOMAIN)
 
     # Format domain.
@@ -201,60 +149,23 @@ def main():
     pathFile = "/".join([drupaldir,"web/sites",hostname])
     if os.path.exists(pathFile):
         # Log error.
-        logging.info('Selected domain already has drupal8 site: %s - Check sites/%s directory.' % (datetime.datetime.now(),hostname))
+        logging.info('Selected domain already has Drupal 9 site: %s - Check sites/%s directory.' % (datetime.datetime.now(),hostname))
         logging.info('Site stack creation for %s has been cancelled.' % hostname)
         quit()
 
     # Get site title.
     if not sitetitle or sitetitle == "None":
         sitetitle = d.get_input(
-            "Enter Drupal8 Site Title",
-            "Enter title for new Drupal8 site.",
+            "Enter Drupal 9 Site Title",
+            "Enter title for new drupal9 site.",
             DEFAULT_TITLE)
 
     # Get admin email.
     if not email or email == "None":
         email = d.get_email(
-            "Enter Drupal8 admin Email",
-            "Please enter email address for the Drupal8 admin account.",
+            "Enter Drupal 9 admin Email",
+            "Please enter email address for the Drupal 9 admin account.",
             "admin@%s" % get_hostname(domain))
-
-    # Check solr install.
-    installSolr = False
-    if not solr or solr == "None":
-        installSolr = not d.yesno(
-            "Select drupal's search type:",
-            SOLR_TEXT,
-            "Default",
-            "Solr")
-    elif solr == "True": installSolr = True
-
-    # Check solr requirements.
-    if installSolr:
-        # Check solr service available.
-        system("systemctl enable solr")
-        system("systemctl start solr")
-        subproc = Popen(['systemctl', 'is-active', 'solr'], stdout=PIPE, stderr=PIPE)
-        out, err = subproc.communicate()
-        if out and out.strip().lower() != 'active':
-            system("echo ''")
-            system("echo ''")
-            system("echo 'You selected Solr search but the solr service is not available!!!'")
-            system("echo 'Please validate that your Solr service is available prior to running this script.'")
-            system("echo 'Solr info is available on the admin/tools page.'")
-            system("echo 'Try starting solr with `systemctl start solr` and `systemctl enable solr` to autostart on boot.'")
-            system("echo ''")
-            system("echo 'If desired, select the default search and manually enable solr later.'")
-            system("echo ''")
-            system("echo 'Exiting Drupal site build script with no action taken.'")
-            system("echo ''")
-            # Log info.
-            logging.info('You selected Solr search but the solr service is not available!!!')
-            quit()
-        if not solrnew or solrnew == "None":
-            solrnew = d.get_password(
-                "Solr server access.",
-                "Please enter Solr password for the drupal8 account.")
 
     if not dbpass or dbpass == "None":
         dbpass = d.get_password(
@@ -264,11 +175,11 @@ def main():
     if not password or password == "None":
         password = d.get_password(
             "Warning - verify resources exist for additional site.",
-            "Please enter password for the Drupal8 admin account.")
+            "Please enter password for the drupal9 admin account.")
 
     # Log vars.
-    logging.info('Vars used to create stack: [isdbpass]:[domain]:[email]:[formavid]:[hostname]:[ispassword]:[sitename]:[sitetitle]:[installSolr]')
-    logging.info('Vars used to create stack: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, hostname, ispassword, sitename, sitetitle, installSolr))
+    logging.info('Vars used to create stack: [isdbpass]:[domain]:[email]:[formavid]:[hostname]:[ispassword]:[sitename]:[sitetitle]')
+    logging.info('Vars used to create stack: [%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]:[%s]' % (isdbpass, domain, email, formavid, hostname, ispassword, sitename, sitetitle))
 
     # Log create start.
     logging.info('Starting stack creation: %s' % datetime.datetime.now())
@@ -338,17 +249,21 @@ def main():
         system("echo ''")
         system("echo 'Creating %s drupal site ...'" % baseUri)
         system("echo ''")
-        system("drupal --root=%s multisite:new  %s http://%s --copy-default --uri=\"http://%s\"" % (drupaldir,baseUri,baseUri,baseUri))
-        system("drupal --root=%s --uri=\"http://%s\" site:install:inline --profile=\"standard\" --langcode=\"en\" --db_type=\"mysql\" --db_host=\"127.0.0.1\" --db_name=\"%s_%s\" --db_user=\"admin\" --db_pass=\"%s\" --db_port=\"3306\" --site_name=\"%s\" --site_mail=\"admin@%s\" --account_name=\"admin\" --account_mail=\"admin@%s\" --account_pass=\"%s\"" % (drupaldir,baseUri,sitename,sitetype,password,sitetitle,hostname,hostname,password))
+        system("drush --root=\"%s\" --uri=\"http://%s\" si standard --yes --db-url=\"mysql://admin:%s@localhost:3306/%s_%s\" --account-name=\"admin\" --account-mail=\"admin@%s\" --site-mail=\"admin@%s\" --account-pass=\"%s\" --locale=\"en\" --site-name=\"%s\" --site-pass=\"%s\" --sites-subdir=\"%s\"" % (drupaldir,baseUri,password,sitename,sitetype,baseUri,baseUri,password,sitetitle,password,baseUri))
+        system("mkdir -p %s/web/sites/%s/files/background_image/css" % (drupaldir,baseUri))
+        system("chmod 0775 -R %s/web/sites/%s/files/background_image" % (drupaldir,baseUri))
+        system("chown admin:admin -R %s/web/sites/%s/files/background_image" % (drupaldir,baseUri))
         system("chmod 0777 %s/web/sites/%s/files" % (drupaldir,baseUri))
-        system("chmod 0444 %s/web/sites/%s/settings.php" % (drupaldir,baseUri))
         # Sites - set trusted_host_patterns.
         esc_baseUri = baseUri.replace(".","\\\\\.")
         new_lines="\$settings['trusted_host_patterns'] = array\(\\n\\t'^" + esc_baseUri + "\$',\\n\);\\n"
         system("sed -i \"/trusted_host_patterns/,/\*\//{n;s|^$|%s|}\" %s/web/sites/%s/settings.php" % (new_lines,drupaldir,hostname))
         # Sites - set private file path.
         system("sed -i \"s/\#\ \$settings\['file_private_path']\ =\ '';/\$settings\['file_private_path']\ =\ 'sites\/%s\/files\/private';/g\" %s/web/sites/%s/settings.php" % (hostname,drupaldir,hostname))
+        # Sites - set database init commands.
+        system("sed -i \"/'autoload' => 'core\/modules\/mysql\/src\/Driver\/Database\/mysql\/',/a\  'init_commands' => ['isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED',],\" %s/web/sites/%s/settings.php" % (drupaldir,hostname))
         # Sites - update settings.
+        system("chmod 0444 %s/web/sites/%s/settings.php" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'The drupal site %s has been created.'" % baseUri)
         system("echo ''")
@@ -363,7 +278,7 @@ def main():
         # Sites - set additional database properties.
         for sitetype in siteTypes:
             # Allow perms for drush.
-            cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal8@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;" % (sitename,sitetype))
+            cur.execute("GRANT ALL PRIVILEGES ON %s_%s.* TO drupal9@localhost WITH GRANT OPTION; FLUSH PRIVILEGES;" % (sitename,sitetype))
             # Log info.
             logging.info('Allow perms for drush db access on %s_%s.*.' % (sitename,sitetype))
         # Restart mysql.
@@ -373,8 +288,8 @@ def main():
         system("systemctl restart mysql")
         system("echo ''")
 
-    except mdb.Error, e:
-        print "Error %d: %s" % (e.args[0],e.args[1])
+    except mdb.Error as e:
+#        print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
 
     finally:
@@ -396,7 +311,7 @@ def main():
         baseUri = sitetypemod + hostname
         system("echo ''")
         system("echo 'Rebuilding %s drupal caches ...'" % baseUri)
-        system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
+        system("drush --root=\"%s\" --uri=\"http://%s\" cache:rebuild --yes" % (drupaldir,baseUri))
         system("echo 'Site %s can now be modified.'" % baseUri)
 
     # Start configuring drupal.
@@ -409,14 +324,17 @@ def main():
     siteTheme = "%s/web/themes/%s" % (drupaldir,sitename)
 
     # Enable zen theme.
-    system("drush -r %s -l http://%s theme:enable -y zen" % (drupaldir,hostname))
+    system("drush --root=\"%s\" --uri=\"http://%s\" theme:enable -y zen" % (drupaldir,hostname))
 
     # Create site sub-theme from zen theme.
     system("cp -fpr %s/web/themes/contrib/zen/STARTERKIT %s/web/themes" % (drupaldir,drupaldir))
     system("mv %s/web/themes/STARTERKIT %s" % (drupaldir,siteTheme))
-    system("find %s -iname \"*STARTERKIT*\" -exec rename.ul STARTERKIT %s {} \;" % (siteTheme,sitename))
+    system("find %s -name \"*STARTERKIT*\" -exec bash -c 'mv $0 ${0/STARTERKIT/%s}' {} \;" % (siteTheme,sitename))
     system("find %s -type f -exec sed -i 's/STARTERKIT/%s/g' {} \;" % (siteTheme,sitename))
     system("find %s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (siteTheme,sitetitle))
+    
+    system("find %s -type f -exec sed -i 's/Zen\ Sub-theme\ Starter\ Kit/%s/g' {} \;" % (siteTheme,sitetitle))
+    
     system("echo ''")
     system("echo 'Theme %s is ready for modification.'" % sitename)
     system("echo ''")
@@ -481,11 +399,11 @@ def main():
         scssFile = "%s/components/base/text/_text.scss" % siteTheme
         if os.path.exists(scssFile):
             system("sed -i 's/\&:after/\&::after/g' %s" % scssFile)
-        system("gulp -f %s fix-js" % gulpFile)
+#        system("gulp -f %s fix-js" % gulpFile)
         system("echo 'Prettying up theme files completed.'")
 
     # Drupal - init git site theme.
-    gitDir = "/".join(["/var/lib/git/drupal8",drupalsubdir,"web/themes",sitename])
+    gitDir = "/".join(["/var/lib/git/drupal9",drupalsubdir,"web/themes",sitename])
     system("mkdir -p %s" % gitDir)
     system("echo 'components/asset-builds' >> %s/.gitignore" % siteTheme)
     system("echo 'styleguide' >> %s/.gitignore" % siteTheme)
@@ -508,19 +426,11 @@ def main():
     system('git -C %s commit -m "Initial commit by site creation script."' % siteTheme)
     system("chown -R cssadmin:cssadmin %s" % gitDir)
 
-    # Set path to solr configs.
-    solrconfigpath = "/".join([drupaldir,"web/modules/contrib/search_api_solr/modules/search_api_solr_defaults/config/optional"])
-
     # Drupal - enable/disable properties.
     for sitetype in siteTypes:
         sitetypemod = ''
-        solrserverid = sitename
-        solrcorename = ".".join([sitename,sitetype])
-        solrservername = sitetitle
         if sitetype != 'article':
             sitetypemod = sitetype + '.'
-            solrserverid = "_".join([sitename,sitetype])
-            solrservername = " ".join([sitetitle,sitetype])
         baseUri = sitetypemod + hostname
         # Start configuring sites.
         system("echo ''")
@@ -528,71 +438,20 @@ def main():
         system("echo 'Enabling and disabling Drupal properties for %s ...'" % sitetitle)
         system("echo ''")
         # Enable modules.
-        system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri," ".join(modulesToEnable)))
-        if installSolr:
-            for module in solrModules:
-                # Check for search_api_solr_defaults module.
-                if module == "search_api_solr_defaults":
-                    # Store solr defaults yaml files.
-                    system("cp %s/search_api.server.default_solr_server.yml %s/search_api.server.default_solr_server.bak" % (solrconfigpath,solrconfigpath))
-                    system("cp %s/search_api.index.default_solr_index.yml %s/search_api.index.default_solr_index.bak" % (solrconfigpath,solrconfigpath))
-                    # Update solr defaults yaml settings.
-                    set_solr_configs(solrconfigpath,solrserverid,solrservername,solrcorename,solrnew,formavid)
-                    # Enable and then disable module.
-                    system("drupal --root=%s --uri=\"http://%s\" module:install %s --no-interaction" % (drupaldir,baseUri,module))
-                    system("drupal --root=%s --uri=\"http://%s\" module:uninstall %s --no-interaction" % (drupaldir,baseUri,module))
-                    # Restore solr defaults yaml files.
-                    system("mv -f %s/search_api.server.default_solr_server.bak %s/search_api.server.default_solr_server.yml" % (solrconfigpath,solrconfigpath))
-                    system("mv -f %s/search_api.index.default_solr_index.bak %s/search_api.index.default_solr_index.yml" % (solrconfigpath,solrconfigpath))
-                else:
-                    # Enable module.
-                    system("drupal --root=%s --uri=\"http://%s\" module:install  %s --no-interaction" % (drupaldir,baseUri,module))
-
+        system("drush --root=\"%s\" --uri=\"http://%s\" pm:enable %s --yes" % (drupaldir,baseUri," ".join(modulesToEnable)))
         # Install sub-theme prior to possible disabling default search - fails otherwise.
-        system("drupal --root=%s --uri=\"http://%s\" theme:install %s --set-default" % (drupaldir,baseUri,sitename))
-
-        # Check if solr needs configuration.
-        if installSolr:
-            # After all installs disable default search module if solr.
-            system("drupal --root=%s --uri=\"http://%s\" module:uninstall search --no-interaction" % (drupaldir,baseUri))
-            # Solr - set core properties.
-            system("echo ''")
-            system("echo 'Configuring solr search core data ...'")
-            system("echo ''")
-            # Solr - create template dir.
-            system("mkdir -p %s/%s" % (templates,sitename))
-            for sitetype in siteTypes:
-                system("mkdir -p %s/%s/%s" % (templates,sitename,sitetype))
-                system("cp -f /etc/formavid/templates/cores-template/core.properties.template %s/%s/%s/core.properties" % (templates,sitename,sitetype))
-                system("sed -i \"s/sedsitename/%s/g\" %s/%s/%s/core.properties" % (sitename,templates,sitename,sitetype))
-                system("sed -i \"s/sedsitetype/%s/g\" %s/%s/%s/core.properties" % (sitetype,templates,sitename,sitetype))
-            # Solr - load cores.
-            solrdata = "/var/lib/solr/data"
-            system("mv %s/%s %s" % (templates,sitename,solrdata))
-            # Solr - copy drupal solr conf.
-            for sitetype in siteTypes:
-                system("drush -r %s -l http://%s solr-gsc %s_solr_server %s/%s/%s/configs.zip" % (drupaldir,baseUri,solrserverid,solrdata,sitename,sitetype))
-                system("unzip -o %s/%s/%s/configs.zip -d %s/%s/%s/conf/" % (solrdata,sitename,sitetype,solrdata,sitename,sitetype))
-                system("sed -i \"s|solr.install.dir=.*|solr.install.dir=/usr/local/solr|g\" %s/%s/%s/conf/solrcore.properties" % (solrdata,sitename,sitetype))
-            # Solr - ensure owner.
-            system("chown -R solr:solr %s/%s" % (solrdata,sitename))
-            # Solr - enable changes.
-            system("systemctl restart solr")
-            system("echo ''")
-            system("echo 'Solr search core data configuration is complete.'")
-            system("echo ''")
-            # Log info.
-            logging.info('Solr search core data configuration is complete.')
+        system("drush --root=\"%s\" --uri=\"http://%s\" theme:enable %s --yes" % (drupaldir,baseUri,sitename))
+        system("drush --root=\"%s\" --uri=\"http://%s\" config:set system.theme default %s --yes" % (drupaldir,baseUri,sitename))
 
         # Set configs.
-        system("drush -r %s -l http://%s config:set -y block.block.%s_powered status 0" % (drupaldir,baseUri,sitename))
+        system("drush --root=\"%s\" --uri=\"http://%s\" config:set --yes block.block.%s_powered status 0" % (drupaldir,baseUri,sitename))
         # Clean up.
         system("echo ''")
         system("echo 'Rebuilding %s drupal caches ...'" % baseUri)
-        system("drupal --root=%s --uri=\"http://%s\" cache:rebuild" % (drupaldir,baseUri))
+        system("drush --root=\"%s\" --uri=\"http://%s\" cache:rebuild --yes" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'Rebuilding %s drupal content permissions ...'" % baseUri)
-        system("drupal --root=%s --uri=\"http://%s\" node:access:rebuild" % (drupaldir,baseUri))
+        system("drush --root=\"%s\" --uri=\"http://%s\" php-eval \"node_access_rebuild();\"" % (drupaldir,baseUri))
         system("echo ''")
         system("echo 'Finishing setup of drupal files directory for %s ...'" % baseUri)
         # Make private dir and set .htaccess file.
@@ -619,7 +478,6 @@ def main():
         system("echo 'Completed setup of drupal site %s files directory.'" % baseUri)
         system("echo ''")
         system("echo 'Running initial cron job for drupal site %s ...'" % baseUri)
-        system("drupal --root=%s --uri=\"http://%s\" cron:execute" % (drupaldir,baseUri))
         system("echo ''")
         # Finished drupal setup.
         system("echo 'Please validate %s by viewing the drupal admin status report.'" % baseUri)

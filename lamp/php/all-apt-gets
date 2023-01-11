@@ -27,7 +27,8 @@ if [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     echo ${MESSSAGE} | tee -a ${LOG}
 else
     # add base packages
-    export APTGETS="php php-cli libapache2-mod-php libperl4-corelibs-perl php-common php-mysql php-pear php-xdebug php-xml"
+    export APTGETS="apt-transport-https ca-certificates curl gnupg2 libapache2-mod-php8.1 libperl4-corelibs-perl lsb-release php8.1 php8.1-bcmath php8.1-cgi php8.1-cli php8.1-common php8.1-curl php8.1-dom php8.1-fileinfo php8.1-fpm php8.1-gd php8.1-gmp php8.1-intl php8.1-mbstring php8.1-mysql php8.1-opcache php8.1-pdo php8.1-readline php8.1-simplexml php8.1-ssh2 php8.1-xdebug php8.1-xml php8.1-xmlreader php8.1-xmlrpc php8.1-xmlwriter php8.1-zip software-properties-common wget"
+apt-get install -y 
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -43,9 +43,6 @@ if [ -d "${OVERLAY_DIR}" ]; then
     echo ""
 fi
 
-# Use Maildir format.
-postconf -e "home_mailbox = Maildir/"
-
 # create virtual map
 touch /etc/postfix/virtual
 
@@ -55,6 +52,12 @@ echo "root@localhost admin" >> /etc/postfix/virtual
 echo "root@${APP_HOSTNAME} admin" >> /etc/postfix/virtual
 echo "webmaster@localhost admin" >> /etc/postfix/virtual
 newaliases
+
+# set CONF
+CONF=/etc/postfix/master.cf
+
+# activate submission inet service
+sed -i "s/#submission inet/submission inet/" ${CONF}
 
 # post virtual map
 postmap /etc/postfix/virtual

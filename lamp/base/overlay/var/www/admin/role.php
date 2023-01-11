@@ -27,7 +27,6 @@
     <li>Fail2ban.</li>
     <li>Postfix.</li>
     <li>Shell-In-A-Box.</li>
-    <li>Solr.</li>
     <li>ssh.</li>
     <li>Webmin.</li>
   </ul>
@@ -35,14 +34,14 @@
   <li><b>cssadmin:</b> Design and related drupal maintenance.</li>
   <ul>
     <li>Theme design privileges.</li>
-    <li>Access and permissions to /var/www/drupal8/prod/web/themes directory.</li>
-    <li>ProFTPD account mapped to /var/www/drupal8/prod/web/themes directory.</li>
+    <li>Access and permissions to /var/www/drupal9/prod/web/themes directory.</li>
+    <li>ProFTPD account mapped to /var/www/drupal9/prod/web/themes directory.</li>
      <li>Access drupal site themes via ftp://admin.HOSTNAME using cssadmin:password account.</li>
     <li>Shell-In-A-Box.</li>
     <li>ssh.</li>
     <li>Gulp/Sass:</li>
     <ul>
-      <li>Execute watch command from /var/www/drupal8/prod/web/themes/SITEBASENAME directory.</li>
+      <li>Execute watch command from /var/www/drupal9/prod/web/themes/SITEBASENAME directory.</li>
       <li><b>Watch command line:</b> gulp watch</li>
       <li>Set a gulp watch in the site theme directory.</li>
       <li>Edit sass files located within the site's components sass directory.</li>
@@ -52,7 +51,7 @@
     </ul>
   </ul>
   <br>
-  <li><b>drupal8:</b> Drupal database maintenance and scripting.</li>
+  <li><b>drupal9:</b> Drupal database maintenance and scripting.</li>
   <ul>
     <li>Drupal.</li>
     <li>Drush.</li>

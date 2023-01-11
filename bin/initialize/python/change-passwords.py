@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -37,7 +37,6 @@ def main():
         os.environ["DB_PASS"] = single_pass
         os.environ["INVOICENINJA_PASS"] = single_pass
         os.environ["ROUNDUP_PASS"] = single_pass
-        os.environ["SOLR_NEW"] = single_pass
         os.environ["TOOLS_PASS"] = single_pass
         os.environ["WEBMIN_PASS"] = single_pass
 
@@ -51,19 +50,13 @@ def main():
     system("python %s/bin/initialize/python/mysqlconf.py" % formavid)
 
     # Drupal password.
-    system("python %s/bin/initialize/python/drupal8.py" % formavid)
+    system("python %s/bin/initialize/python/drupal9.py" % formavid)
 
     # Invoice Ninja password.
     system("python %s/bin/initialize/python/invoiceninja.py" % formavid)
 
     # Roundup password.
     system("python %s/bin/initialize/python/roundup.py" % formavid)
-
-    # Solr password.
-    solr_install = os.environ.get("SOLR_INSTALL")
-    solrold = os.environ.get("SOLR_OLD")
-    if solr_install and solr_install == "True" and solrold and not solrold == "None":
-        system("python %s/bin/initialize/python/solr.py" % formavid)
 
     # Tools password.
     system("python %s/bin/initialize/python/tools.py" % formavid)

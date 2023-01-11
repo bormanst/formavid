@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2018 Sean Borman <bormanst@gmail.com>.
+# Copyright (C) 2022 Sean Borman <bormanst@gmail.com>.
 # You should have received LICENSE.txt, a copy of the
 # GNU General Public License, along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
@@ -28,7 +28,7 @@ elif [ ! -z "${!PKG_CHECK}" ] || [ -d "${APP_DIR}" ]; then
     MESSSAGE="Skipping package install for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
 else
-    apt-get install -yq python-certbot-apache python-certbot-apache-doc
+    apt-get install -yq certbot python3-certbot-apache
     export "${PACKAGE^^}"="True"
     # log export
     MESSSAGE="export ${PACKAGE^^}=True"

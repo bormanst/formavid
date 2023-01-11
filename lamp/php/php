@@ -127,6 +127,9 @@ MESSSAGE="Configuring modules for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 phpdismod xdebug
 
+# configure apache
+a2enmod php8.1
+
 # log completed
 MESSSAGE="Package ${PACKAGE} install has completed."
 echo ${MESSSAGE} | tee -a ${LOG}

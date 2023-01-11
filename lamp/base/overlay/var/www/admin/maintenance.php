@@ -39,7 +39,7 @@
   </ul>
 </div>
 <div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal8</h3></div><br>
+  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/drupal.png"/><br><br>Drupal9</h3></div><br>
   <ul>
     <li>Check status report for the main site for each stack.</li>
     <li>Update according to report until report is clear. Use composer commands as needed: <a href="/drupal.php" title="Drupal Info"><span>Drupal Info</span></a>.</li>
@@ -90,15 +90,6 @@
   <ul>
     <li>Ensure backups are functional.</li>
     <li>Ensure space for backups.</li>
-  </ul>
-</div>
-<div>
-  <div style="width: 100%"><h3><img style="float: left; margin: 0px 15px 0px 0px;" src="images/solr.png"/><br><br>Solr</h3></div><br>
-  <ul>
-    <li>Check indexing/cleaning for usage adjustments.</li>
-    <li>Ensure cores are not inactive/orphaned after drupal updates.</li>
-    <li>Check cores occasionally for abnormalities.</li>
-    <li>Check logs occasionally for abnormalities.</li>
   </ul>
 </div>
 <div>

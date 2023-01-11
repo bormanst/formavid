@@ -10,6 +10,12 @@ PACKAGE=base
 MESSSAGE="Checking dependencies for ${PACKAGE} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
 
+# Link python.
+ln -s /usr/bin/python3 /usr/bin/python
+
+# Install python packages.
+pip install babel debtcollector funcsigs iso8601 keystoneauth1 monotonic msgpack netaddr netifaces openssl-python pbr pyparsing python-keystoneclient python-swiftclient pythondialog requests-futures rfc3986 stevedore wrapt
+
 # check packages
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
@@ -44,10 +50,17 @@ if [ -d "${OVERLAY_DIR}" ]; then
 fi
 
 # clean up mod_php5 references in htaccess
-MESSSAGE="Replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR} ..."
+MESSSAGE="Replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
 echo ${MESSSAGE} | tee -a ${LOG}
-find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php7/g' {} \;
-MESSSAGE="Finished replacing mod_php5 with mod_php7 all .htaccess within dir ${APP_DIR}."
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php5/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php5 with mod_php8 all .htaccess within dir ${APP_DIR}."
+echo ${MESSSAGE} | tee -a ${LOG}
+
+# clean up mod_php7 references in htaccess
+MESSSAGE="Replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR} ..."
+echo ${MESSSAGE} | tee -a ${LOG}
+find ${APP_DIR} -name ".htaccess" -exec sed -i -e 's/mod_php7/mod_php8/g' {} \;
+MESSSAGE="Finished replacing mod_php7 with mod_php8 all .htaccess within dir ${APP_DIR}."
 echo ${MESSSAGE} | tee -a ${LOG}
 
 # create admin

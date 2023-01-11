@@ -14,10 +14,9 @@ echo ${MESSSAGE} | tee -a ${LOG}
 PKG_CHECK=${PACKAGE^^}
 if [ -z "${!PKG_CHECK}" ]; then exit 0; fi
 
-# check dir
-APP_DIR=/usr/share/${PACKAGE}
-if [ -d "${APP_DIR}" ]; then
-    MESSSAGE="The ${APP_DIR} already exists. Skipping configuration for ${PACKAGE}."
+# check ALREADY_RUN
+if [ "${ALREADY_RUN}" != "False" ]; then
+    MESSSAGE="The script has already been run. Skipping configuration for ${PACKAGE}."
     echo ${MESSSAGE} | tee -a ${LOG}
     echo ""
     echo ""
@@ -64,18 +63,16 @@ CONF=/etc/dovecot/conf.d/10-mail.conf
 sed -i "s/^mail_location =\(.*\)/mail_location = maildir:~\/Maildir/" ${CONF}
 
 CONF=/etc/dovecot/conf.d/10-master.conf
+sed -i "s/#port = 110/port = 110/g" ${CONF}
+sed -i "s/#port = 995/port = 995/g" ${CONF}
 sed -i "s/#port = 143/port = 143/g" ${CONF}
 sed -i "s/#port = 993/port = 993/g" ${CONF}
-sed -i "/port = 993/assl = yes" ${CONF}
+sed -i "s/#ssl = yes/ssl = yes/g" ${CONF}
 sed -i "/# Postfix smtp-auth/a}" ${CONF}
 sed -i "/# Postfix smtp-auth/auser = postfix" ${CONF}
 sed -i "/# Postfix smtp-auth/amode = 0660" ${CONF}
 sed -i "/# Postfix smtp-auth/agroup = postfix" ${CONF}
 sed -i "/# Postfix smtp-auth/aunix_listener \/var\/spool\/postfix\/private\/auth {" ${CONF}
-
-CONF=/etc/dovecot/conf.d/10-ssl.conf
-sed -i "/# SSL\/TLS support/assl = required" ${CONF}
-sed -i "s/#ssl_protocols = \!SSLv3/ssl_protocols = \!SSLv3/g" ${CONF}
 
 CONF=/etc/dovecot/conf.d/90-plugin.conf
 sed -i "/plugin {/aautosubscribe2 = Sent" ${CONF}

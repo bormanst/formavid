@@ -7,10 +7,12 @@
 // - https://github.com/dlmanning/gulp-sass/blob/master/README.md
 // - http://www.browsersync.io/docs/gulp/
 
-'use strict';
+// 'use strict';
 
 var importOnce = require('node-sass-import-once'),
   path = require('path');
+
+var del = require('del');
 
 var options = {};
 
@@ -58,12 +60,12 @@ options.sass = {
 };
 
 // Define which browsers to add vendor prefixes for.
-options.autoprefixer = {
-  browsers: [
-    '> 1%',
-    'ie 9'
-  ]
-};
+// options.autoprefixer = {
+//   browsers: [
+//     '> 1%',
+//     'ie 9'
+//   ]
+// };
 
 // Define the style guide paths and options.
 options.styleGuide = {
@@ -142,12 +144,11 @@ options.eslint = {
 options.gulpWatchOptions = {};
 // options.gulpWatchOptions = {interval: 1000, mode: 'poll'};
 
-
 // Load Gulp and tools we will use.
 var gulp      = require('gulp'),
   $           = require('gulp-load-plugins')(),
   browserSync = require('browser-sync').create(),
-  del         = require('del'),
+  // del         = require('del'),
   // gulp-load-plugins will report "undefined" error unless you load gulp-sass manually.
   sass        = require('gulp-sass'),
   gulpIf      = require('gulp-if'),
@@ -163,7 +164,7 @@ var sassFiles = [
 ];
 
 // Clean style guide files.
-gulp.task('clean:styleguide', function () {
+gulp.task('clean:styleguide', function() {
   // You can use multiple globbing patterns as you would with `gulp.src`
   return del([
     options.styleGuide.destination + '*.html',
@@ -173,7 +174,7 @@ gulp.task('clean:styleguide', function () {
 });
 
 // Clean CSS files.
-gulp.task('clean:css', function () {
+gulp.task('clean:css', function() {
   return del([
     options.theme.css + '**/*.css',
     options.theme.css + '**/*.map'
@@ -181,7 +182,7 @@ gulp.task('clean:css', function () {
 });
 
 // Style guide production.
-gulp.task('styles:production', gulp.series('clean:css', function () {
+gulp.task('styles:production', gulp.series('clean:css', function() {
   return gulp.src(sassFiles)
     .pipe(sass(options.sass).on('error', sass.logError))
     .pipe($.autoprefixer(options.autoprefixer))
@@ -191,7 +192,7 @@ gulp.task('styles:production', gulp.series('clean:css', function () {
 }));
 
 // Style guide example.
-gulp.task('styleguide:kss-example-chroma', function () {
+gulp.task('styleguide:kss-example-chroma', function() {
   return gulp.src(options.theme.components + 'style-guide/kss-example-chroma.scss')
     .pipe(sass(options.sass).on('error', sass.logError))
     .pipe($.replace(/(\/\*|\*\/)\n/g, ''))
@@ -201,12 +202,12 @@ gulp.task('styleguide:kss-example-chroma', function () {
 });
 
 // Clean style guide and load example.
-gulp.task('styleguide', gulp.series('clean:styleguide', 'styleguide:kss-example-chroma', function () {
+gulp.task('styleguide', gulp.series('clean:styleguide', 'styleguide:kss-example-chroma', function() {
   return kss(options.styleGuide);
 }));
 
 // Debug the generation of the style guide with the --verbose flag.
-gulp.task('styleguide:debug', gulp.series('clean:styleguide', 'styleguide:kss-example-chroma', function () {
+gulp.task('styleguide:debug', gulp.series('clean:styleguide', 'styleguide:kss-example-chroma', function() {
   options.styleGuide.verbose = true;
   return kss(options.styleGuide);
 }));
@@ -215,14 +216,14 @@ gulp.task('styleguide:debug', gulp.series('clean:styleguide', 'styleguide:kss-ex
 gulp.task('clean', gulp.parallel('clean:css', 'clean:styleguide'));
 
 // Lint JavaScript.
-gulp.task('lint:js', function () {
+gulp.task('lint:js', function() {
   return gulp.src(options.eslint.files)
     .pipe($.eslint())
     .pipe($.eslint.format());
 });
 
 // Lint JavaScript and throw an error for a CI to catch.
-gulp.task('lint:js-with-fail', function () {
+gulp.task('lint:js-with-fail', function() {
   return gulp.src(options.eslint.files)
     .pipe($.eslint())
     .pipe($.eslint.format())
@@ -230,14 +231,14 @@ gulp.task('lint:js-with-fail', function () {
 });
 
 // Lint Sass.
-gulp.task('lint:sass', function () {
+gulp.task('lint:sass', function() {
   return gulp.src(options.theme.components + '**/*.scss')
     .pipe($.sassLint())
     .pipe($.sassLint.format());
 });
 
 // Lint Sass and throw an error for a CI to catch.
-gulp.task('lint:sass-with-fail', function () {
+gulp.task('lint:sass-with-fail', function() {
   return gulp.src(options.theme.components + '**/*.scss')
     .pipe($.sassLint())
     .pipe($.sassLint.format())
@@ -248,7 +249,7 @@ gulp.task('lint:sass-with-fail', function () {
 gulp.task('lint', gulp.parallel('lint:sass', 'lint:js'));
 
 // Clean Sass.
-gulp.task('styles', gulp.series('clean:css', function () {
+gulp.task('styles', gulp.series('clean:css', function() {
   return gulp.src(sassFiles)
     .pipe($.sourcemaps.init())
     .pipe(sass(options.sass).on('error', sass.logError))
@@ -261,15 +262,15 @@ gulp.task('styles', gulp.series('clean:css', function () {
 }));
 
 // Watch for Sass changes and rebuild.
-gulp.task('watch:css', gulp.series('lint:sass', 'styles', 'styleguide', function () {
+gulp.task('watch:css', gulp.series('lint:sass', 'styles', 'styleguide', function() {
   return gulp.watch(
-  	options.theme.components + '**/*.scss', 
-  	options.gulpWatchOptions, 
-  	gulp.series('lint:sass', 'styles', 'styleguide'));
+    options.theme.components + '**/*.scss',
+    options.gulpWatchOptions,
+    gulp.series('lint:sass', 'styles', 'styleguide'));
 }));
 
 // Watch Sass with browser-sync.
-gulp.task('browser-sync', gulp.series('watch:css', function () {
+gulp.task('browser-sync', gulp.series('watch:css', function() {
   if (!options.drupalURL) {
     return Promise.resolve();
   }
@@ -280,7 +281,7 @@ gulp.task('browser-sync', gulp.series('watch:css', function () {
 }));
 
 // Watch lint Sass with browser-sync.
-gulp.task('watch:lint-and-styleguide', gulp.series('lint:sass', 'styleguide', function () {
+gulp.task('watch:lint-and-styleguide', gulp.series('lint:sass', 'styleguide', function() {
   return gulp.watch([
     options.theme.components + '**/*.scss',
     options.theme.components + '**/*.twig'
@@ -288,7 +289,7 @@ gulp.task('watch:lint-and-styleguide', gulp.series('lint:sass', 'styleguide', fu
 }));
 
 // Watch for JavaScript changes and lint.
-gulp.task('watch:js', gulp.series('lint:js', function () {
+gulp.task('watch:js', gulp.series('lint:js', function() {
   return gulp.watch(options.eslint.files, options.gulpWatchOptions, gulp.series('lint:js'));
 }));
 

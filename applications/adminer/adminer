@@ -90,14 +90,14 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
     Substitute 's|<div id="menu">|<div id="menu" style="margin-top:113px;">|i'
     Substitute 's|<link rel="shortcut icon" type="image/x-icon" href="../adminer/static/favicon.ico">|<link rel="shortcut icon" type="image/x-icon" href="theme/favicon.ico" /><link rel="stylesheet" type="text/css" href="theme/components/asset-builds/css/header.css" />|i'
     Substitute 's|<body class=(.*)|<body  class="ltr nojs" onkeydown="bodyKeydown(event);" onclick="bodyClick(event);"><header class="header" role="banner"><div id="block-modorbiscom-branding" class="block block-system block-system-branding-block"><a href="/" title="Home" rel="home" class="site-logo"><img src="theme/logo.svg" alt="Home" /></a><div class="site-name"><a href="/" title="Home" rel="home">${SITETITLE} Adminer</a><br style="line-height:10px;" /></div></div></header>|i'
-    Alias /theme /var/www/drupal8/prod/web/themes/system
+    Alias /theme /var/www/drupal9/prod/web/themes/system
     Alias /adminer/static /usr/share/adminer/adminer/static
     Alias /externals /usr/share/adminer/externals
     Alias /editor /usr/share/adminer/editor
     DocumentRoot /usr/share/adminer/adminer
     <Directory /usr/share/adminer/adminer>
         Options +FollowSymLinks
-        <IfModule mod_php7.c>
+        <IfModule mod_php8.c>
             AddType application/x-httpd-php .php
             php_flag magic_quotes_gpc Off
             php_flag track_vars On
@@ -107,7 +107,7 @@ cat >> /etc/apache2/sites-available/zzz-admin.${SITENAME}.conf <<EOF
     </Directory>
     <Directory /usr/share/adminer/editor>
         Options +FollowSymLinks
-        <IfModule mod_php7.c>
+        <IfModule mod_php8.c>
             AddType application/x-httpd-php .php
             php_flag magic_quotes_gpc Off
             php_flag track_vars On

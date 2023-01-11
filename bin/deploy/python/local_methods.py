@@ -13,12 +13,8 @@ ExecError exception on error
 """
 import os
 import sys
-import commands
 import string
-
-from subprocess import Popen, PIPE
-
-mkarg = commands.mkarg
+import subprocess
 
 class ExecError(Exception):
     """Accessible attributes:
@@ -61,7 +57,7 @@ def getoutput(command, *args):
     If command returns non-zero exitcode raises ExecError"""
 
     command = fmt_command(command, *args)
-    error, output = commands.getstatusoutput(command)
+    error, output = subprocess.call(command)
     if error:
         exitcode = os.WEXITSTATUS(error)
         raise ExecError(command, exitcode, output)
