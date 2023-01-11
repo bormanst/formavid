@@ -31,7 +31,6 @@ and large community-driven websites.
 
 - Additional Drupal modules:
 
-   - Advagg: Advanced CSS/JS Aggregation.
    - Advanced help: Allows developers to store help outside the system.
    - Background Image: Allows utilizing background images.
    - Backup and migrate: Backup and restore your Drupal site
@@ -51,8 +50,7 @@ and large community-driven websites.
      individual image styles.
    - ImageMagick: Allows to use ImageMagick or GraphicsMagick as image
      toolkit for Image API.
-   - Imce: Powerful image file uploader and browser, with support for
-     on the fly resizing.
+      on the fly resizing.
    - Inline Entity Form: Provides a widget for inline management
      (creation, modification, removal) of referenced entities.
    - Module Filter: The ability to quickly find  modules.
