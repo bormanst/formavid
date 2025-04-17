@@ -1,3 +1,5 @@
+# DEPRECATED
+
 The FormaVid Small Business Appliance has been updated for Debian 11 Bullseye:
 ------------------------------------------------------------------------
 
